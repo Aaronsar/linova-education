@@ -183,8 +183,8 @@ export default function BlogArticle({
       {/* Sticky CTA card - bottom right */}
       <div className="fixed bottom-6 right-6 z-50 hidden md:block">
         <div className="bg-navy rounded-2xl p-6 shadow-2xl w-[280px]">
-          <p className="text-white font-bold text-lg mb-1">Ce metier vous interesse ?</p>
-          <p className="text-gray-400 text-xs mb-5">Formation BTS en 2 ans - Initial ou alternance</p>
+          <p className="text-white font-bold text-lg mb-1">Rejoignez Linova</p>
+          <p className="text-gray-400 text-xs mb-5">BTS Biologie Medicale - Initial ou alternance</p>
           <CandidaterButton className="px-0 py-3 text-sm w-full">
             Candidater maintenant
           </CandidaterButton>
