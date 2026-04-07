@@ -28,5 +28,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/blog/technicien-recherche-biomedicale`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/blog/technicien-toxicologie`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/blog/technicien-efs`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    // Blog articles - formation & general
+    { url: `${baseUrl}/blog/certification-qualiopi`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/blog/qualites-technicien-laboratoire`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/blog/stage-bts-biologie-medicale`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/blog/bts-biologie-medicale-ou-licence`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/blog/inscription-bts-biologie-medicale`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/blog/programme-bts-biologie-medicale`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/blog/salaire-bts-biologie-medicale`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
   ];
 }

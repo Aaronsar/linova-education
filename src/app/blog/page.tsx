@@ -95,60 +95,60 @@ const careerArticles = [
 
 const legacyArticles = [
   {
-    title: 'Linova Formation obtient la certification Qualiopi',
+    title: 'Linova obtient la certification Qualiopi : ce que ca change pour vous',
+    slug: 'certification-qualiopi',
     date: '10 decembre 2025',
     categories: ['Actualite'],
-    excerpt: "La certification Qualiopi atteste de la qualite de nos processus de formation et de notre engagement envers l'excellence pedagogique.",
+    excerpt: "La certification Qualiopi atteste de la qualite de nos formations. Decouvrez les 7 criteres evalues et ce que cela signifie pour votre parcours.",
     image: '/images/photos/prof-cours.jpg',
-    href: '/ecole/qualiopi',
   },
   {
-    title: 'Les qualites indispensables pour devenir technicien(ne) de laboratoire',
+    title: 'Les qualites indispensables pour devenir technicien de laboratoire',
+    slug: 'qualites-technicien-laboratoire',
     date: '3 octobre 2025',
     categories: ['Debouches'],
     excerpt: "Rigueur, precision, sens de l'observation... Decouvrez les qualites essentielles pour reussir dans ce metier en tension.",
     image: '/images/photos/tp-concentration.png',
-    href: '/blog/technicien-laboratoire-medical',
   },
   {
-    title: 'Stage en BTS Biologie Medicale : comment le reussir ?',
+    title: 'Stage en BTS Biologie Medicale : guide complet pour le reussir',
+    slug: 'stage-bts-biologie-medicale',
     date: '3 octobre 2025',
     categories: ['BTS Biologie Medicale'],
-    excerpt: "Conseils pratiques pour tirer le maximum de votre stage en laboratoire et construire votre reseau professionnel.",
+    excerpt: "12 semaines de stage obligatoire : comment trouver, reussir et tirer le meilleur de votre immersion en laboratoire.",
     image: '/images/photos/etudiants-labo.png',
-    href: '/formations/bts-biologie-medicale',
   },
   {
     title: 'BTS Biologie Medicale ou Licence Sciences de la Vie : que choisir ?',
+    slug: 'bts-biologie-medicale-ou-licence',
     date: '2 octobre 2025',
     categories: ['Debouches'],
-    excerpt: "Comparaison detaillee entre ces deux formations pour vous aider a faire le bon choix selon votre projet professionnel.",
+    excerpt: "Comparaison detaillee entre ces deux formations : insertion, contenu, poursuites d'etudes. Pour quel profil ?",
     image: '/images/photos/cours-amphi.png',
-    href: '/formations/bts-biologie-medicale',
   },
   {
-    title: "Comment s'inscrire a un BTS Biologie Medicale ?",
+    title: "Comment s'inscrire en BTS Biologie Medicale : le guide etape par etape",
+    slug: 'inscription-bts-biologie-medicale',
     date: '2 octobre 2025',
     categories: ['BTS Biologie Medicale'],
-    excerpt: "Guide complet des etapes d'inscription, des prerequis aux delais, pour integrer cette formation porteuse.",
+    excerpt: "Parcoursup ou candidature directe, dossier, entretien de motivation : tout savoir pour candidater sereinement.",
     image: '/images/photos/future-etudiante.png',
-    href: '/infos-pratiques/admission',
   },
   {
-    title: 'BTS Biologie Medicale : matieres, cours et programme detaille',
+    title: 'BTS Biologie Medicale : programme complet, matieres et cours detailles',
+    slug: 'programme-bts-biologie-medicale',
     date: '2 octobre 2025',
     categories: ['BTS Biologie Medicale'],
-    excerpt: "Tout savoir sur le programme de formation : matieres generales, enseignements professionnels et stages.",
+    excerpt: "510h d'enseignement general, 1335h de professionnel, TP en laboratoire, stages : le programme complet decortique.",
     image: '/images/photos/techniques-analyse.png',
-    href: '/formations/bts-biologie-medicale',
   },
   {
-    title: 'Quel salaire apres un BTS Biologie Medicale ?',
+    title: 'Quel salaire apres un BTS Biologie Medicale ? Grille complete 2026',
+    slug: 'salaire-bts-biologie-medicale',
     date: '16 septembre 2025',
     categories: ['Debouches'],
-    excerpt: "Grille de salaires, evolutions de carriere et facteurs qui influencent la remuneration dans ce secteur.",
+    excerpt: "De 1 800 a 2 800 euros : grille de salaires par secteur, evolution de carriere et facteurs d'augmentation.",
     image: '/images/photos/etudiants-contents.png',
-    href: '/blog/technicien-laboratoire-medical',
   },
 ];
 
@@ -213,7 +213,7 @@ export default function Blog() {
             {legacyArticles.map((article, i) => (
               <Link
                 key={i}
-                href={article.href}
+                href={`/blog/${article.slug}`}
                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group border border-gray-100 block"
               >
                 <div className="relative aspect-[16/9]">
