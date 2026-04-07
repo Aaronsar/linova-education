@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 
@@ -46,6 +46,7 @@ interface FileData {
   fichier_cni: File | null;
   fichier_photos: File | null;
   fichier_releve: File | null;
+  fichier_cv: File | null;
 }
 
 export default function DossierInscription() {
@@ -88,13 +89,20 @@ export default function DossierInscription() {
     fichier_cni: null,
     fichier_photos: null,
     fichier_releve: null,
+    fichier_cv: null,
   });
 
-  const [fileNames, setFileNames] = useState<{ fichier_cni: string; fichier_photos: string; fichier_releve: string }>({
+  const [fileNames, setFileNames] = useState<{ fichier_cni: string; fichier_photos: string; fichier_releve: string; fichier_cv: string }>({
     fichier_cni: '',
     fichier_photos: '',
     fichier_releve: '',
+    fichier_cv: '',
   });
+
+  const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const addressDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
   const handleChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -104,6 +112,59 @@ export default function DossierInscription() {
     setFiles((prev) => ({ ...prev, [field]: file }));
     setFileNames((prev) => ({ ...prev, [field]: file ? file.name : '' }));
   };
+
+  const fetchAddressSuggestions = (query: string) => {
+    if (addressDebounceRef.current) {
+      clearTimeout(addressDebounceRef.current);
+    }
+    if (query.length < 3) {
+      setAddressSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+    addressDebounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
+        const data = await res.json();
+        if (data.features && data.features.length > 0) {
+          setAddressSuggestions(data.features);
+          setShowSuggestions(true);
+        } else {
+          setAddressSuggestions([]);
+          setShowSuggestions(false);
+        }
+      } catch {
+        setAddressSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300);
+  };
+
+  const selectAddressSuggestion = (feature: any) => {
+    const props = feature.properties;
+    const context = props.context || '';
+    const contextParts = context.split(', ');
+    const departement = contextParts.length >= 2 ? contextParts[1] : '';
+    setFormData((prev) => ({
+      ...prev,
+      adresse: props.name || '',
+      code_postal: props.postcode || '',
+      ville: props.city || '',
+      departement: departement,
+    }));
+    setShowSuggestions(false);
+    setAddressSuggestions([]);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const next = () => setStep((s) => Math.min(s + 1, 5));
   const prev = () => setStep((s) => Math.max(s - 1, 1));
@@ -138,6 +199,11 @@ export default function DossierInscription() {
         fichier_releve_url = await uploadFile(files.fichier_releve, 'releves');
       }
 
+      let fichier_cv_url = '';
+      if (files.fichier_cv) {
+        fichier_cv_url = await uploadFile(files.fichier_cv, 'cv');
+      }
+
       const { error } = await supabase.from('candidatures').insert({
         prenom: formData.prenom,
         nom: formData.nom,
@@ -161,6 +227,7 @@ export default function DossierInscription() {
         fichier_cni_url,
         fichier_photos_url,
         fichier_releve_url,
+        fichier_cv_url,
         entreprise_trouvee: formData.entreprise_trouvee,
         nom_entreprise: formData.nom_entreprise,
         aide_recherche: formData.aide_recherche === 'Oui',
@@ -271,8 +338,9 @@ export default function DossierInscription() {
               <ul className="space-y-2">
                 {[
                   'Carte d\'identit\u00e9 (recto-verso) ou titre de s\u00e9jour',
-                  '2 photos d\'identit\u00e9 r\u00e9centes',
+                  'Photo de vous',
                   'Dernier relev\u00e9 de notes ou dipl\u00f4me obtenu',
+                  'CV (format PDF)',
                   'Num\u00e9ro de S\u00e9curit\u00e9 Sociale',
                 ].map((doc, i) => (
                   <li key={i} className="flex items-center gap-3 text-gray-700 text-sm">
@@ -348,14 +416,23 @@ export default function DossierInscription() {
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">Nationalit&eacute; *</label>
-                <input
-                  type="text"
+                <select
                   required
-                  placeholder="Fran&ccedil;aise"
                   value={formData.nationalite}
                   onChange={(e) => handleChange('nationalite', e.target.value)}
-                  className={inputClass}
-                />
+                  className={selectClass}
+                >
+                  <option value="">S&eacute;lectionnez...</option>
+                  {[
+                    'Francaise', 'Algerienne', 'Allemande', 'Americaine', 'Belge', 'Bresilienne',
+                    'Britannique', 'Camerounaise', 'Canadienne', 'Chinoise', 'Congolaise', 'Espagnole',
+                    'Guineenne', 'Haitienne', 'Indienne', 'Italienne', 'Ivoirienne', 'Japonaise',
+                    'Libanaise', 'Marocaine', 'Mauritanienne', 'Nigeriane', 'Polonaise', 'Portugaise',
+                    'Roumaine', 'Russe', 'Senegalaise', 'Suisse', 'Tunisienne', 'Turque', 'Autre',
+                  ].map((nat) => (
+                    <option key={nat} value={nat}>{nat}</option>
+                  ))}
+                </select>
               </div>
 
               <hr className="my-6 border-gray-100" />
@@ -363,14 +440,35 @@ export default function DossierInscription() {
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">Adresse compl&egrave;te *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Num&eacute;ro et rue"
-                  value={formData.adresse}
-                  onChange={(e) => handleChange('adresse', e.target.value)}
-                  className={`${inputClass} mb-3`}
-                />
+                <div className="relative mb-3" ref={suggestionsRef}>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Num&eacute;ro et rue"
+                    value={formData.adresse}
+                    onChange={(e) => {
+                      handleChange('adresse', e.target.value);
+                      fetchAddressSuggestions(e.target.value);
+                    }}
+                    onFocus={() => {
+                      if (addressSuggestions.length > 0) setShowSuggestions(true);
+                    }}
+                    className={inputClass}
+                  />
+                  {showSuggestions && addressSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto">
+                      {addressSuggestions.map((feature: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="px-4 py-3 text-sm hover:bg-light cursor-pointer border-b border-gray-50 last:border-0"
+                          onClick={() => selectAddressSuggestion(feature)}
+                        >
+                          {feature.properties.label}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <input
                     type="text"
@@ -524,17 +622,30 @@ export default function DossierInscription() {
 
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-dark mb-1.5">N&deg; de S&eacute;curit&eacute; Sociale *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="1 XX XX XX XXX XXX XX"
-                    value={formData.numero_secu}
-                    onChange={(e) => handleChange('numero_secu', e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
+                {formData.nationalite === 'Francaise' || formData.nationalite === '' ? (
+                  <div>
+                    <label className="block text-sm font-medium text-dark mb-1.5">N&deg; de S&eacute;curit&eacute; Sociale *</label>
+                    <input
+                      type="text"
+                      required={formData.nationalite === 'Francaise'}
+                      placeholder="195127510234567"
+                      maxLength={15}
+                      minLength={15}
+                      pattern="[0-9]{15}"
+                      value={formData.numero_secu}
+                      onChange={(e) => handleChange('numero_secu', e.target.value.replace(/\D/g, ''))}
+                      className={inputClass}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">15 chiffres, sans espaces</p>
+                  </div>
+                ) : (
+                  <div className="bg-light rounded-xl p-4 flex items-center gap-3">
+                    <svg className="w-5 h-5 text-teal flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-xs text-gray-600">Le num&eacute;ro de S&eacute;curit&eacute; Sociale sera demand&eacute; ult&eacute;rieurement pour les &eacute;tudiants &eacute;trangers.</p>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">N&deg; Carte d&apos;identit&eacute; / Titre de s&eacute;jour *</label>
                   <input
@@ -568,8 +679,9 @@ export default function DossierInscription() {
 
               {([
                 { key: 'fichier_cni' as keyof FileData, label: 'Carte d\'identit\u00e9 (recto-verso) *', accept: '.pdf,.jpg,.jpeg,.png' },
-                { key: 'fichier_photos' as keyof FileData, label: '2 photos d\'identit\u00e9 r\u00e9centes *', accept: '.jpg,.jpeg,.png' },
+                { key: 'fichier_photos' as keyof FileData, label: 'Photo de vous *', accept: '.jpg,.jpeg,.png' },
                 { key: 'fichier_releve' as keyof FileData, label: 'Relev\u00e9 de notes ou dipl\u00f4me *', accept: '.pdf,.jpg,.jpeg,.png' },
+                { key: 'fichier_cv' as keyof FileData, label: 'CV (format PDF) *', accept: '.pdf' },
               ]).map((doc) => (
                 <div key={doc.key}>
                   <label className="block text-sm font-medium text-dark mb-1.5">{doc.label}</label>
