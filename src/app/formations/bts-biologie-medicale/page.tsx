@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import ContactForm from '@/components/ContactForm';
+import { CandidaterButton } from '@/components/CandidaterModal';
 import FAQ from '@/components/FAQ';
 import CTASection from '@/components/CTASection';
 
@@ -146,6 +147,9 @@ export default function BTSBiologieMedicale() {
                   </li>
                 ))}
               </ul>
+              <div className="mt-6">
+                <CandidaterButton>Candidater maintenant</CandidaterButton>
+              </div>
             </div>
           </div>
         </div>
@@ -182,12 +186,9 @@ export default function BTSBiologieMedicale() {
               </ul>
               <div className="text-3xl font-bold text-dark mb-1">4 500 &euro;/an</div>
               <p className="text-sm text-gray-500 mb-6">dont 500 &euro; de frais d&apos;inscription</p>
-              <Link href="/infos-pratiques/admission" className="inline-flex items-center gap-2 text-teal font-semibold hover:underline">
+              <CandidaterButton variant="teal" className="px-6 py-2.5 text-sm">
                 Candidater en initial
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
+              </CandidaterButton>
             </div>
 
             {/* Alternance */}
@@ -212,12 +213,9 @@ export default function BTSBiologieMedicale() {
               </ul>
               <div className="text-3xl font-bold text-yellow mb-1">0 &euro;</div>
               <p className="text-sm text-gray-300 mb-6">Frais intégralement pris en charge par l&apos;OPCO</p>
-              <Link href="/infos-pratiques/admission" className="inline-flex items-center gap-2 text-yellow font-semibold hover:underline">
+              <CandidaterButton variant="yellow" className="px-6 py-2.5 text-sm">
                 Candidater en alternance
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
+              </CandidaterButton>
             </div>
           </div>
         </div>
@@ -568,11 +566,27 @@ export default function BTSBiologieMedicale() {
               </div>
             </div>
           </div>
+
+          {/* CTA Candidater */}
+          <div className="mt-16 text-center">
+            <CandidaterButton>Candidater au BTS Biologie Médicale</CandidaterButton>
+          </div>
         </div>
       </section>
 
       <FAQ items={faqItems} />
-      <CTASection />
+
+      {/* CTA final */}
+      <section className="py-20 bg-navy">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Prêt à rejoindre Linova ?</h2>
+          <p className="text-gray-300 text-lg mb-10">Faites le premier pas vers votre carrière dans les métiers de la santé.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <CandidaterButton className="px-8 py-3.5 text-lg">Candidater maintenant</CandidaterButton>
+            <CandidaterButton variant="white" className="px-8 py-3.5 text-lg">Demander des informations</CandidaterButton>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

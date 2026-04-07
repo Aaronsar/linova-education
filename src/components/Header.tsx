@@ -107,12 +107,12 @@ export default function Header() {
             >
               Notre brochure
             </Link>
-            <Link
-              href="/infos-pratiques/admission"
-              className="px-5 py-2.5 text-sm font-semibold bg-yellow text-dark rounded-full hover:brightness-95 transition-all"
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-candidater-modal'))}
+              className="px-5 py-2.5 text-sm font-semibold bg-yellow text-dark rounded-full hover:brightness-95 transition-all cursor-pointer"
             >
               Candidater
-            </Link>
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -182,9 +182,12 @@ export default function Header() {
               <Link href="#brochure" className="block text-center px-5 py-2.5 text-sm font-semibold border-2 border-dark text-dark rounded-full">
                 Notre brochure
               </Link>
-              <Link href="/infos-pratiques/admission" className="block text-center px-5 py-2.5 text-sm font-semibold bg-yellow text-dark rounded-full">
+              <button
+                onClick={() => { setMobileOpen(false); window.dispatchEvent(new CustomEvent('open-candidater-modal')); }}
+                className="block w-full text-center px-5 py-2.5 text-sm font-semibold bg-yellow text-dark rounded-full cursor-pointer"
+              >
                 Candidater
-              </Link>
+              </button>
             </div>
           </div>
         </div>

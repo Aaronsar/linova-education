@@ -2,16 +2,20 @@
 
 import { useState } from 'react';
 
-export default function ContactForm() {
+export default function ContactForm({ embedded = true }: { embedded?: boolean }) {
   const [submitted, setSubmitted] = useState(false);
 
+  const containerClass = embedded
+    ? 'bg-white rounded-2xl shadow-xl p-6 max-w-sm ml-auto'
+    : '';
+
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm ml-auto">
+    <div className={containerClass}>
       <h3 className="font-[var(--font-outfit)] text-xl font-bold text-dark mb-1">
-        Demande d&apos;informations
+        Candidater au BTS Biologie Médicale
       </h3>
       <p className="text-sm text-gray-500 mb-6">
-        Recevez notre brochure et toutes les infos sur le BTS.
+        Remplissez le formulaire, notre équipe vous recontacte sous 48h.
       </p>
 
       {submitted ? (
@@ -21,8 +25,8 @@ export default function ContactForm() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <p className="font-semibold text-dark mb-1">Merci !</p>
-          <p className="text-sm text-gray-500">Nous vous recontactons rapidement.</p>
+          <p className="font-semibold text-dark mb-1">Candidature envoyée !</p>
+          <p className="text-sm text-gray-500">Nous vous recontactons sous 48h.</p>
         </div>
       ) : (
         <form
@@ -103,11 +107,24 @@ export default function ContactForm() {
             </select>
           </div>
 
+          <div>
+            <label htmlFor="message" className="block text-sm font-medium text-dark mb-1">
+              Message <span className="text-gray-400 font-normal">(optionnel)</span>
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows={3}
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal transition-colors resize-none"
+              placeholder="Votre projet, vos questions..."
+            />
+          </div>
+
           <button
             type="submit"
             className="w-full py-3 bg-yellow text-dark font-semibold rounded-lg hover:brightness-95 transition-all text-sm"
           >
-            Recevoir la brochure
+            Envoyer ma candidature
           </button>
 
           <p className="text-xs text-gray-400 text-center">

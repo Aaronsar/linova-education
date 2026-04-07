@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CandidaterModal from "@/components/CandidaterModal";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://linova-education.fr"),
@@ -94,6 +95,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <CandidaterModal />
       </body>
     </html>
   );
