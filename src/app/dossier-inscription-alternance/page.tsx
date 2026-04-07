@@ -163,11 +163,11 @@ export default function DossierInscription() {
         fichier_releve_url,
         entreprise_trouvee: formData.entreprise_trouvee,
         nom_entreprise: formData.nom_entreprise,
-        aide_recherche: formData.aide_recherche,
-        disponible_echange: formData.disponible_echange,
+        aide_recherche: formData.aide_recherche === 'Oui',
+        disponible_echange: formData.disponible_echange === 'Oui',
         creneaux_preferes: formData.creneaux_preferes,
         source_decouverte: formData.source_decouverte,
-        newsletter: formData.newsletter,
+        newsletter: formData.newsletter === 'Oui',
         remarques: formData.remarques,
       });
 
