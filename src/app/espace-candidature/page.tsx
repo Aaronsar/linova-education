@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
-interface Candidature {
+interface Inscription {
   id: string;
   prenom: string;
   nom: string;
@@ -14,23 +14,23 @@ interface Candidature {
 }
 
 const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
-  nouveau: { label: 'Nouveau', bg: 'bg-gray-100', text: 'text-gray-700' },
-  en_cours: { label: 'En cours', bg: 'bg-yellow/20', text: 'text-yellow-700' },
-  entretien: { label: 'Entretien', bg: 'bg-teal/15', text: 'text-teal-700' },
-  accepte: { label: 'Accepte', bg: 'bg-green-100', text: 'text-green-700' },
+  nouveau: { label: 'Recu', bg: 'bg-gray-100', text: 'text-gray-700' },
+  en_cours: { label: 'En traitement', bg: 'bg-yellow/20', text: 'text-yellow-700' },
+  entretien: { label: 'Dossier complet', bg: 'bg-teal/15', text: 'text-teal-700' },
+  accepte: { label: 'Inscrit', bg: 'bg-green-100', text: 'text-green-700' },
   refuse: { label: 'Refuse', bg: 'bg-red-100', text: 'text-red-700' },
 };
 
 export default function AdminDashboard() {
-  const [candidatures, setCandidatures] = useState<Candidature[]>([]);
+  const [inscriptions, setInscriptions] = useState<Inscription[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    fetchCandidatures();
+    fetchInscriptions();
   }, []);
 
-  const fetchCandidatures = async () => {
+  const fetchInscriptions = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('candidatures')
@@ -38,12 +38,12 @@ export default function AdminDashboard() {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setCandidatures(data);
+      setInscriptions(data);
     }
     setLoading(false);
   };
 
-  const filtered = candidatures.filter((c) => {
+  const filtered = inscriptions.filter((c) => {
     const q = search.toLowerCase();
     return (
       c.prenom?.toLowerCase().includes(q) ||
@@ -53,10 +53,10 @@ export default function AdminDashboard() {
   });
 
   const stats = {
-    total: candidatures.length,
-    nouveau: candidatures.filter((c) => !c.statut || c.statut === 'nouveau').length,
-    en_cours: candidatures.filter((c) => c.statut === 'en_cours' || c.statut === 'entretien').length,
-    accepte: candidatures.filter((c) => c.statut === 'accepte').length,
+    total: inscriptions.length,
+    nouveau: inscriptions.filter((c) => !c.statut || c.statut === 'nouveau').length,
+    en_cours: inscriptions.filter((c) => c.statut === 'en_cours' || c.statut === 'entretien').length,
+    accepte: inscriptions.filter((c) => c.statut === 'accepte').length,
   };
 
   const formatDate = (dateStr: string) => {
@@ -78,26 +78,26 @@ export default function AdminDashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page heading */}
       <div className="mb-8">
-        <h1 className="font-[var(--font-outfit)] text-2xl font-bold text-dark">Candidatures</h1>
+        <h1 className="font-[var(--font-outfit)] text-2xl font-bold text-dark">Inscriptions</h1>
         <p className="text-gray-500 text-sm mt-1">Gestion des dossiers d&apos;inscription BTS Biologie Medicale</p>
       </div>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 mb-1">Total candidatures</p>
+          <p className="text-sm text-gray-500 mb-1">Total inscriptions</p>
           <p className="text-3xl font-bold text-dark">{stats.total}</p>
         </div>
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 mb-1">Nouvelles</p>
+          <p className="text-sm text-gray-500 mb-1">Recues</p>
           <p className="text-3xl font-bold text-gray-600">{stats.nouveau}</p>
         </div>
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 mb-1">En cours / Entretien</p>
+          <p className="text-sm text-gray-500 mb-1">En traitement</p>
           <p className="text-3xl font-bold text-teal">{stats.en_cours}</p>
         </div>
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 mb-1">Acceptees</p>
+          <p className="text-sm text-gray-500 mb-1">Inscrits</p>
           <p className="text-3xl font-bold text-green-600">{stats.accepte}</p>
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
-          <p className="text-gray-500 text-sm">Chargement des candidatures...</p>
+          <p className="text-gray-500 text-sm">Chargement des inscriptions...</p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
           </svg>
           <p className="text-gray-500 text-sm">
-            {search ? 'Aucune candidature ne correspond a votre recherche.' : 'Aucune candidature pour le moment.'}
+            {search ? 'Aucune inscription ne correspond a votre recherche.' : 'Aucune inscription pour le moment.'}
           </p>
         </div>
       ) : (
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100">
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Candidat</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Etudiant</th>
                   <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
                   <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Telephone</th>
                   <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>

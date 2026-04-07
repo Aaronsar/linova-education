@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { supabase } from '@/lib/supabase';
 
-interface Candidature {
+interface Inscription {
   id: string;
   prenom: string;
   nom: string;
@@ -41,10 +41,10 @@ interface Candidature {
 }
 
 const statusOptions = [
-  { value: 'nouveau', label: 'Nouveau', bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-400' },
-  { value: 'en_cours', label: 'En cours', bg: 'bg-yellow/20', text: 'text-yellow-700', dot: 'bg-yellow-500' },
-  { value: 'entretien', label: 'Entretien', bg: 'bg-teal/15', text: 'text-teal-700', dot: 'bg-teal' },
-  { value: 'accepte', label: 'Accepte', bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
+  { value: 'nouveau', label: 'Recu', bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-400' },
+  { value: 'en_cours', label: 'En traitement', bg: 'bg-yellow/20', text: 'text-yellow-700', dot: 'bg-yellow-500' },
+  { value: 'entretien', label: 'Dossier complet', bg: 'bg-teal/15', text: 'text-teal-700', dot: 'bg-teal' },
+  { value: 'accepte', label: 'Inscrit', bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
   { value: 'refuse', label: 'Refuse', bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' },
 ];
 
@@ -82,9 +82,9 @@ function formatDate(dateStr: string): string {
   });
 }
 
-export default function CandidatureDetail({ params }: { params: Promise<{ id: string }> }) {
+export default function InscriptionDetail({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const [candidature, setCandidature] = useState<Candidature | null>(null);
+  const [inscription, setInscription] = useState<Inscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [notesAdmin, setNotesAdmin] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
@@ -92,11 +92,11 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
   const [saveMessage, setSaveMessage] = useState('');
 
   useEffect(() => {
-    fetchCandidature();
+    fetchInscription();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedParams.id]);
 
-  const fetchCandidature = async () => {
+  const fetchInscription = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('candidatures')
@@ -105,34 +105,34 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
       .single();
 
     if (!error && data) {
-      setCandidature(data);
+      setInscription(data);
       setNotesAdmin(data.notes_admin || '');
     }
     setLoading(false);
   };
 
   const updateStatus = async (newStatus: string) => {
-    if (!candidature) return;
+    if (!inscription) return;
     setSavingStatus(true);
     const { error } = await supabase
       .from('candidatures')
       .update({ statut: newStatus })
-      .eq('id', candidature.id);
+      .eq('id', inscription.id);
 
     if (!error) {
-      setCandidature((prev) => prev ? { ...prev, statut: newStatus } : prev);
+      setInscription((prev) => prev ? { ...prev, statut: newStatus } : prev);
       showSaveMessage('Statut mis a jour');
     }
     setSavingStatus(false);
   };
 
   const saveNotes = async () => {
-    if (!candidature) return;
+    if (!inscription) return;
     setSavingNotes(true);
     const { error } = await supabase
       .from('candidatures')
       .update({ notes_admin: notesAdmin })
-      .eq('id', candidature.id);
+      .eq('id', inscription.id);
 
     if (!error) {
       showSaveMessage('Notes enregistrees');
@@ -163,14 +163,14 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
     );
   }
 
-  if (!candidature) {
+  if (!inscription) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
         <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <h2 className="text-xl font-bold text-dark mb-2">Candidature introuvable</h2>
-        <p className="text-gray-500 mb-6">Cette candidature n&apos;existe pas ou a ete supprimee.</p>
+        <h2 className="text-xl font-bold text-dark mb-2">Inscription introuvable</h2>
+        <p className="text-gray-500 mb-6">Cette inscription n&apos;existe pas ou a ete supprimee.</p>
         <a href="/espace-candidature" className="inline-flex items-center gap-2 text-teal font-medium hover:underline">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -181,8 +181,8 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
     );
   }
 
-  const age = calculateAge(candidature.date_naissance);
-  const currentStatus = statusOptions.find((s) => s.value === (candidature.statut || 'nouveau')) || statusOptions[0];
+  const age = calculateAge(inscription.date_naissance);
+  const currentStatus = statusOptions.find((s) => s.value === (inscription.statut || 'nouveau')) || statusOptions[0];
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -209,19 +209,19 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
         <div className="flex flex-col sm:flex-row items-start gap-6">
           {/* Photo placeholder */}
           <div className="flex-shrink-0">
-            {candidature.fichier_photos_url ? (
+            {inscription.fichier_photos_url ? (
               <div className="w-24 h-24 rounded-2xl bg-gray-100 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={getFileDownloadUrl(candidature.fichier_photos_url) || ''}
-                  alt={`${candidature.prenom} ${candidature.nom}`}
+                  src={getFileDownloadUrl(inscription.fichier_photos_url) || ''}
+                  alt={`${inscription.prenom} ${inscription.nom}`}
                   className="w-full h-full object-cover"
                 />
               </div>
             ) : (
               <div className="w-24 h-24 rounded-2xl bg-navy/10 flex items-center justify-center">
                 <span className="text-3xl font-bold text-navy">
-                  {(candidature.prenom?.[0] || '').toUpperCase()}{(candidature.nom?.[0] || '').toUpperCase()}
+                  {(inscription.prenom?.[0] || '').toUpperCase()}{(inscription.nom?.[0] || '').toUpperCase()}
                 </span>
               </div>
             )}
@@ -231,7 +231,7 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
           <div className="flex-1 min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
               <h1 className="font-[var(--font-outfit)] text-2xl font-bold text-dark">
-                {candidature.prenom} {candidature.nom}
+                {inscription.prenom} {inscription.nom}
               </h1>
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${currentStatus.bg} ${currentStatus.text}`}>
                 <span className={`w-2 h-2 rounded-full ${currentStatus.dot}`} />
@@ -242,24 +242,24 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
               {age !== null && (
                 <span>{age} ans</span>
               )}
-              {candidature.date_naissance && (
-                <span>Ne(e) le {formatDate(candidature.date_naissance)}</span>
+              {inscription.date_naissance && (
+                <span>Ne(e) le {formatDate(inscription.date_naissance)}</span>
               )}
-              {candidature.lieu_naissance && (
-                <span>{candidature.lieu_naissance}</span>
+              {inscription.lieu_naissance && (
+                <span>{inscription.lieu_naissance}</span>
               )}
-              {candidature.nationalite && (
-                <span>{candidature.nationalite}</span>
+              {inscription.nationalite && (
+                <span>{inscription.nationalite}</span>
               )}
             </div>
-            <p className="text-xs text-gray-400 mt-2">Dossier recu le {formatDateTime(candidature.created_at)}</p>
+            <p className="text-xs text-gray-400 mt-2">Dossier recu le {formatDateTime(inscription.created_at)}</p>
           </div>
 
           {/* Status dropdown */}
           <div className="flex-shrink-0 w-full sm:w-auto">
             <label className="block text-xs font-medium text-gray-500 mb-1">Changer le statut</label>
             <select
-              value={candidature.statut || 'nouveau'}
+              value={inscription.statut || 'nouveau'}
               onChange={(e) => updateStatus(e.target.value)}
               disabled={savingStatus}
               className="w-full sm:w-44 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal bg-white disabled:opacity-50"
@@ -278,44 +278,44 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
           {/* Contact */}
           <Section title="Coordonnees">
             <InfoGrid>
-              <InfoItem label="Email" value={candidature.email} href={`mailto:${candidature.email}`} />
-              <InfoItem label="Telephone" value={candidature.telephone} href={`tel:${candidature.telephone}`} />
-              <InfoItem label="Adresse" value={[candidature.adresse, `${candidature.code_postal} ${candidature.ville}`, candidature.departement].filter(Boolean).join(', ')} />
+              <InfoItem label="Email" value={inscription.email} href={`mailto:${inscription.email}`} />
+              <InfoItem label="Telephone" value={inscription.telephone} href={`tel:${inscription.telephone}`} />
+              <InfoItem label="Adresse" value={[inscription.adresse, `${inscription.code_postal} ${inscription.ville}`, inscription.departement].filter(Boolean).join(', ')} />
             </InfoGrid>
           </Section>
 
           {/* Parcours scolaire */}
           <Section title="Parcours scolaire">
             <InfoGrid>
-              <InfoItem label="Niveau d'etudes" value={candidature.niveau_etudes} />
-              <InfoItem label="Filiere bac" value={candidature.filiere_bac} />
-              <InfoItem label="Annee d'obtention" value={candidature.annee_obtention} />
-              <InfoItem label="Etablissement" value={candidature.etablissement} />
-              <InfoItem label="Dernier diplome" value={candidature.dernier_diplome} span={2} />
-              <InfoItem label="Niveau anglais" value={candidature.niveau_anglais} />
+              <InfoItem label="Niveau d'etudes" value={inscription.niveau_etudes} />
+              <InfoItem label="Filiere bac" value={inscription.filiere_bac} />
+              <InfoItem label="Annee d'obtention" value={inscription.annee_obtention} />
+              <InfoItem label="Etablissement" value={inscription.etablissement} />
+              <InfoItem label="Dernier diplome" value={inscription.dernier_diplome} span={2} />
+              <InfoItem label="Niveau anglais" value={inscription.niveau_anglais} />
             </InfoGrid>
           </Section>
 
           {/* Alternance */}
           <Section title="Alternance">
             <InfoGrid>
-              <InfoItem label="Entreprise trouvee" value={candidature.entreprise_trouvee} />
-              {candidature.nom_entreprise && (
-                <InfoItem label="Nom de l'entreprise" value={candidature.nom_entreprise} />
+              <InfoItem label="Entreprise trouvee" value={inscription.entreprise_trouvee} />
+              {inscription.nom_entreprise && (
+                <InfoItem label="Nom de l'entreprise" value={inscription.nom_entreprise} />
               )}
-              <InfoItem label="Souhaite aide recherche" value={candidature.aide_recherche} />
+              <InfoItem label="Souhaite aide recherche" value={inscription.aide_recherche} />
             </InfoGrid>
           </Section>
 
           {/* Informations complementaires */}
           <Section title="Informations complementaires">
             <InfoGrid>
-              <InfoItem label="Disponible pour echange" value={candidature.disponible_echange} />
-              <InfoItem label="Creneaux preferes" value={candidature.creneaux_preferes} />
-              <InfoItem label="Source decouverte" value={candidature.source_decouverte} />
-              <InfoItem label="Newsletter" value={candidature.newsletter} />
-              {candidature.remarques && (
-                <InfoItem label="Remarques" value={candidature.remarques} span={2} />
+              <InfoItem label="Disponible pour echange" value={inscription.disponible_echange} />
+              <InfoItem label="Creneaux preferes" value={inscription.creneaux_preferes} />
+              <InfoItem label="Source decouverte" value={inscription.source_decouverte} />
+              <InfoItem label="Newsletter" value={inscription.newsletter} />
+              {inscription.remarques && (
+                <InfoItem label="Remarques" value={inscription.remarques} span={2} />
               )}
             </InfoGrid>
           </Section>
@@ -326,17 +326,17 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
           {/* Identite administrative */}
           <Section title="Identite administrative">
             <div className="space-y-3">
-              <InfoItem label="N. Securite Sociale" value={candidature.numero_secu} />
-              <InfoItem label="N. CNI / Titre de sejour" value={candidature.numero_cni} />
+              <InfoItem label="N. Securite Sociale" value={inscription.numero_secu} />
+              <InfoItem label="N. CNI / Titre de sejour" value={inscription.numero_cni} />
             </div>
           </Section>
 
           {/* Documents */}
           <Section title="Documents">
             <div className="space-y-3">
-              <FileLink label="Carte d'identite" path={candidature.fichier_cni_url} getUrl={getFileDownloadUrl} />
-              <FileLink label="Photos d'identite" path={candidature.fichier_photos_url} getUrl={getFileDownloadUrl} />
-              <FileLink label="Releve de notes / Diplome" path={candidature.fichier_releve_url} getUrl={getFileDownloadUrl} />
+              <FileLink label="Carte d'identite" path={inscription.fichier_cni_url} getUrl={getFileDownloadUrl} />
+              <FileLink label="Photos d'identite" path={inscription.fichier_photos_url} getUrl={getFileDownloadUrl} />
+              <FileLink label="Releve de notes / Diplome" path={inscription.fichier_releve_url} getUrl={getFileDownloadUrl} />
             </div>
           </Section>
 
@@ -352,7 +352,7 @@ export default function CandidatureDetail({ params }: { params: Promise<{ id: st
               rows={5}
               value={notesAdmin}
               onChange={(e) => setNotesAdmin(e.target.value)}
-              placeholder="Ajouter des notes sur ce candidat..."
+              placeholder="Ajouter des notes sur cet etudiant..."
               className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal resize-none mb-3"
             />
             <button

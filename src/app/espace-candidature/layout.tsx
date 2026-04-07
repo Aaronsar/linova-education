@@ -20,7 +20,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 Linova Admin
               </a>
               <span className="hidden sm:inline-block text-xs bg-teal/20 text-teal px-2.5 py-0.5 rounded-full font-medium">
-                Gestion des candidatures
+                Gestion des inscriptions
               </span>
             </div>
             <div className="flex items-center gap-4">

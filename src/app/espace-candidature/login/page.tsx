@@ -31,7 +31,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <Image src="/images/logos/logo-sans-baseline-blanc.svg" alt="Linova" width={140} height={40} className="mx-auto mb-6" />
-          <h1 className="text-2xl font-bold text-white mb-2">Espace candidatures</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">Espace inscriptions</h1>
           <p className="text-gray-400 text-sm">Connectez-vous pour acceder au tableau de bord</p>
         </div>
 

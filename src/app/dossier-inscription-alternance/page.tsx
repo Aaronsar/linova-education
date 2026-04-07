@@ -200,7 +200,7 @@ export default function DossierInscription() {
             </svg>
           </div>
           <h1 className="font-[var(--font-outfit)] text-3xl font-bold text-dark mb-4">Dossier envoy&eacute; !</h1>
-          <p className="text-gray-600 mb-2">Merci pour votre candidature au BTS Biologie M&eacute;dicale en alternance.</p>
+          <p className="text-gray-600 mb-2">Merci pour votre inscription au BTS Biologie M&eacute;dicale en alternance.</p>
           <p className="text-gray-600 mb-8">Notre &eacute;quipe vous recontacte sous <strong>48 heures</strong> pour planifier votre entretien de motivation.</p>
           <a href="/" className="inline-flex items-center gap-2 px-8 py-3 bg-navy text-white font-semibold rounded-full hover:brightness-95 transition-all">
             Retour &agrave; l&apos;accueil
@@ -261,10 +261,10 @@ export default function DossierInscription() {
         {step === 0 && (
           <div className="bg-white rounded-2xl shadow-sm p-8 md:p-12">
             <h2 className="font-[var(--font-outfit)] text-2xl font-bold text-dark mb-6">
-              Bienvenue dans votre dossier de candidature
+              Bienvenue dans votre dossier d&apos;inscription
             </h2>
             <p className="text-gray-600 mb-6">
-              Vous &ecirc;tes sur le point de candidater au <strong>BTS Biologie M&eacute;dicale en alternance</strong> chez Linova &Eacute;ducation, Paris 12e. Ce formulaire prend environ <strong>10 minutes</strong>.
+              Vous &ecirc;tes sur le point de vous inscrire au <strong>BTS Biologie M&eacute;dicale en alternance</strong> chez Linova &Eacute;ducation, Paris 12e. Ce formulaire prend environ <strong>10 minutes</strong>.
             </p>
             <div className="bg-light rounded-xl p-6 mb-8">
               <h3 className="font-bold text-dark mb-3">Pr&eacute;parez ces documents avant de commencer :</h3>
@@ -285,7 +285,7 @@ export default function DossierInscription() {
               </ul>
             </div>
             <button onClick={next} className="w-full py-4 bg-yellow text-dark font-semibold rounded-xl hover:brightness-95 transition-all text-lg cursor-pointer">
-              Commencer ma candidature
+              Commencer mon inscription
             </button>
           </div>
         )}
