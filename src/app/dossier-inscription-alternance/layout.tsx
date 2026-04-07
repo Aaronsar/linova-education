@@ -10,5 +10,13 @@ export default function DossierLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <>{children}</>;
+  return (
+    <>
+      <style>{`
+        header.sticky, footer { display: none !important; }
+        main { margin: 0 !important; padding: 0 !important; }
+      `}</style>
+      {children}
+    </>
+  );
 }
