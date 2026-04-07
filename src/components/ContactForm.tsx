@@ -117,14 +117,6 @@ export default function ContactForm({ embedded = true }: { embedded?: boolean })
           <p className="text-xs text-gray-400 text-center">
             En soumettant ce formulaire, vous acceptez d&apos;être recontacté par Linova Éducation.
           </p>
-          <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-            <a
-              href="/dossier-inscription-alternance"
-              className="text-xs text-teal hover:underline"
-            >
-              Remplir le dossier d&apos;inscription complet
-            </a>
-          </div>
         </form>
       )}
     </div>
