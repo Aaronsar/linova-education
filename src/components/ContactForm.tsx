@@ -107,19 +107,6 @@ export default function ContactForm({ embedded = true }: { embedded?: boolean })
             </select>
           </div>
 
-          <div>
-            <label htmlFor="message" className="block text-sm font-medium text-dark mb-1">
-              Message <span className="text-gray-400 font-normal">(optionnel)</span>
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              rows={3}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal transition-colors resize-none"
-              placeholder="Votre projet, vos questions..."
-            />
-          </div>
-
           <button
             type="submit"
             className="w-full py-3 bg-yellow text-dark font-semibold rounded-lg hover:brightness-95 transition-all text-sm"
