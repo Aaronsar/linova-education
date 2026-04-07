@@ -99,42 +99,56 @@ const legacyArticles = [
     date: '10 decembre 2025',
     categories: ['Actualite'],
     excerpt: "La certification Qualiopi atteste de la qualite de nos processus de formation et de notre engagement envers l'excellence pedagogique.",
+    image: '/images/photos/prof-cours.jpg',
+    href: '/ecole/qualiopi',
   },
   {
     title: 'Les qualites indispensables pour devenir technicien(ne) de laboratoire',
     date: '3 octobre 2025',
     categories: ['Debouches'],
     excerpt: "Rigueur, precision, sens de l'observation... Decouvrez les qualites essentielles pour reussir dans ce metier en tension.",
+    image: '/images/photos/tp-concentration.png',
+    href: '/blog/technicien-laboratoire-medical',
   },
   {
     title: 'Stage en BTS Biologie Medicale : comment le reussir ?',
     date: '3 octobre 2025',
     categories: ['BTS Biologie Medicale'],
     excerpt: "Conseils pratiques pour tirer le maximum de votre stage en laboratoire et construire votre reseau professionnel.",
+    image: '/images/photos/etudiants-labo.png',
+    href: '/formations/bts-biologie-medicale',
   },
   {
     title: 'BTS Biologie Medicale ou Licence Sciences de la Vie : que choisir ?',
     date: '2 octobre 2025',
     categories: ['Debouches'],
     excerpt: "Comparaison detaillee entre ces deux formations pour vous aider a faire le bon choix selon votre projet professionnel.",
+    image: '/images/photos/cours-amphi.png',
+    href: '/formations/bts-biologie-medicale',
   },
   {
     title: "Comment s'inscrire a un BTS Biologie Medicale ?",
     date: '2 octobre 2025',
     categories: ['BTS Biologie Medicale'],
     excerpt: "Guide complet des etapes d'inscription, des prerequis aux delais, pour integrer cette formation porteuse.",
+    image: '/images/photos/future-etudiante.png',
+    href: '/infos-pratiques/admission',
   },
   {
     title: 'BTS Biologie Medicale : matieres, cours et programme detaille',
     date: '2 octobre 2025',
     categories: ['BTS Biologie Medicale'],
     excerpt: "Tout savoir sur le programme de formation : matieres generales, enseignements professionnels et stages.",
+    image: '/images/photos/techniques-analyse.png',
+    href: '/formations/bts-biologie-medicale',
   },
   {
     title: 'Quel salaire apres un BTS Biologie Medicale ?',
     date: '16 septembre 2025',
     categories: ['Debouches'],
     excerpt: "Grille de salaires, evolutions de carriere et facteurs qui influencent la remuneration dans ce secteur.",
+    image: '/images/photos/etudiants-contents.png',
+    href: '/blog/technicien-laboratoire-medical',
   },
 ];
 
@@ -197,14 +211,13 @@ export default function Blog() {
           <h2 className="text-3xl md:text-4xl font-bold text-dark mb-12">Tous nos articles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {legacyArticles.map((article, i) => (
-              <article
+              <Link
                 key={i}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group border border-gray-100"
+                href={article.href}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group border border-gray-100 block"
               >
-                <div className="aspect-[16/9] bg-gray flex items-center justify-center">
-                  <svg className="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                <div className="relative aspect-[16/9]">
+                  <Image src={article.image} alt={article.title} fill className="object-cover" />
                 </div>
                 <div className="p-6">
                   <div className="flex flex-wrap gap-2 mb-3">
@@ -218,9 +231,12 @@ export default function Blog() {
                     {article.title}
                   </h3>
                   <p className="text-sm text-gray-600 mb-4 line-clamp-2">{article.excerpt}</p>
-                  <span className="text-xs text-gray-400">{article.date}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">{article.date}</span>
+                    <span className="text-teal text-sm font-semibold group-hover:underline">Lire →</span>
+                  </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </div>
