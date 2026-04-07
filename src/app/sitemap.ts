@@ -17,5 +17,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/infos-pratiques/handicap-accessibilite`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
     { url: `${baseUrl}/entreprises`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
+    // Blog articles - metiers
+    { url: `${baseUrl}/blog/technicien-laboratoire-medical`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/blog/preleveur-laboratoire`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/blog/technicien-microbiologie`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/blog/technicien-hematologie`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/blog/technicien-anatomopathologie`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/blog/technicien-biologie-reproduction`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/blog/technicien-qualite-laboratoire`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/blog/technicien-recherche-biomedicale`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/blog/technicien-toxicologie`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/blog/technicien-efs`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
   ];
 }
