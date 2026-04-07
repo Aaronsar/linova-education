@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import FAQ from '@/components/FAQ';
 import CTASection from '@/components/CTASection';
 
@@ -16,18 +17,24 @@ const blogPosts = [
     date: '10 décembre 2025',
     category: 'Actualité',
     slug: '#',
+    image: '/images/photos/boite-petri.png',
+    alt: 'Boite de Petri en laboratoire',
   },
   {
     title: 'Les qualités indispensables pour devenir technicien(ne) de laboratoire',
     date: '3 octobre 2025',
     category: 'Débouchés',
     slug: '#',
+    image: '/images/photos/tp-concentration.png',
+    alt: 'Etudiante concentree en travaux pratiques',
   },
   {
     title: 'Stage en BTS Biologie Médicale : comment le réussir ?',
     date: '3 octobre 2025',
     category: 'BTS Biologie Médicale',
     slug: '#',
+    image: '/images/photos/prof-cours.jpg',
+    alt: 'Professeur donnant un cours en classe',
   },
 ];
 
@@ -70,13 +77,14 @@ export default function Home() {
               <div className="relative w-80 h-80 md:w-[450px] md:h-[450px]">
                 <div className="absolute inset-0 bg-yellow rounded-full" />
                 <div className="absolute -top-8 -left-8 w-24 h-24 bg-teal/30 rounded-full" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-navy/50">
-                    <svg className="w-20 h-20 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-sm font-medium">Photo hero</p>
-                  </div>
+                <div className="absolute inset-0 rounded-full overflow-hidden">
+                  <Image
+                    src="/images/photos/future-etudiante.png"
+                    alt="Future etudiante Linova souriante"
+                    fill
+                    className="object-cover"
+                    priority
+                  />
                 </div>
               </div>
             </div>
@@ -217,13 +225,13 @@ export default function Home() {
               </Link>
             </div>
             <div className="relative">
-              <div className="bg-gray rounded-3xl aspect-[4/3] flex items-center justify-center">
-                <div className="text-center text-gray-400">
-                  <svg className="w-20 h-20 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <p className="text-sm font-medium">Photo laboratoire</p>
-                </div>
+              <div className="relative rounded-3xl aspect-[4/3] overflow-hidden">
+                <Image
+                  src="/images/photos/etudiants-labo.png"
+                  alt="Etudiants en travaux pratiques au laboratoire"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-teal text-white p-6 rounded-2xl shadow-lg">
                 <div className="text-3xl font-bold">80%</div>
@@ -249,10 +257,13 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogPosts.map((post, i) => (
               <article key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group">
-                <div className="aspect-[16/9] bg-light flex items-center justify-center">
-                  <svg className="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                <div className="relative aspect-[16/9]">
+                  <Image
+                    src={post.image}
+                    alt={post.alt}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div className="p-6">
                   <span className="inline-block px-3 py-1 bg-teal/10 text-teal text-xs font-semibold rounded-full mb-3">

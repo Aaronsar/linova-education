@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import ContactForm from '@/components/ContactForm';
 import { CandidaterButton } from '@/components/CandidaterModal';
 import FAQ from '@/components/FAQ';
@@ -151,6 +152,14 @@ export default function BTSBiologieMedicale() {
                 <CandidaterButton>Candidater maintenant</CandidaterButton>
               </div>
             </div>
+          </div>
+          <div className="mt-12 relative rounded-2xl overflow-hidden aspect-[21/9]">
+            <Image
+              src="/images/photos/techniques-analyse.png"
+              alt="Techniques d'analyse en laboratoire de biologie medicale"
+              fill
+              className="object-cover"
+            />
           </div>
         </div>
       </section>

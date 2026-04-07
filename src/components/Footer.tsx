@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -7,9 +8,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Logo & Contact */}
           <div>
-            <span className="font-[var(--font-outfit)] text-3xl font-bold tracking-wider">
-              LIN<span className="text-teal">O</span>VA
-            </span>
+            <Image
+              src="/images/logos/logo-sans-baseline-blanc.svg"
+              alt="Linova Education"
+              width={140}
+              height={40}
+            />
+            <p className="mt-2 text-xs text-gray-400 italic">De la formation à la vocation</p>
             <p className="mt-4 text-sm text-gray-300 leading-relaxed">
               L&apos;école dédiée aux métiers de la santé
             </p>

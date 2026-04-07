@@ -9,6 +9,11 @@
   --color-light: #F9F9F9;
   --color-gray: #EFEFEF;
   --color-white: #FFFFFF;
+  --color-beige: #EEE4D8;
+  --color-teal-light: #BAD8D7;
+  --color-teal-medium: #96B6B7;
+  --color-teal-dark: #3A646F;
+  --color-navy-dark: #284755;
   --font-outfit: 'Outfit', sans-serif;
   --font-quicksand: 'Quicksand', sans-serif;
 }

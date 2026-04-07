@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 
 const navigation = [
@@ -44,9 +45,13 @@ export default function Header() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <span className="font-[var(--font-outfit)] text-3xl font-bold tracking-wider text-dark">
-              LIN<span className="text-teal">O</span>VA
-            </span>
+            <Image
+              src="/images/logos/logo-sans-baseline-noir-bleu.svg"
+              alt="Linova Education - Accueil"
+              width={140}
+              height={40}
+              priority
+            />
           </Link>
 
           {/* Desktop nav */}
