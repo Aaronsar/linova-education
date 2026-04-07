@@ -6,7 +6,7 @@ export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8">
+    <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm ml-auto">
       <h3 className="font-[var(--font-outfit)] text-xl font-bold text-dark mb-1">
         Demande d&apos;informations
       </h3>
