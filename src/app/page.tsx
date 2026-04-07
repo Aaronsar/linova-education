@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import FAQ from '@/components/FAQ';
 import CTASection from '@/components/CTASection';
+import { CandidaterButton } from '@/components/CandidaterModal';
 
 const stats = [
   { value: '2M', label: 'professionnels de santé en France' },
@@ -108,12 +109,9 @@ export default function Home() {
                 >
                   Découvrir nos formations
                 </Link>
-                <Link
-                  href="/infos-pratiques/admission"
-                  className="px-8 py-3.5 border-2 border-dark text-dark font-semibold rounded-full hover:bg-dark hover:text-white transition-all text-lg"
-                >
+                <CandidaterButton variant="outline" className="px-8 py-3.5 text-lg">
                   Candidater
-                </Link>
+                </CandidaterButton>
               </div>
             </div>
           </div>
