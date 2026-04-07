@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageHero from '@/components/PageHero';
+import ContactForm from '@/components/ContactForm';
 import FAQ from '@/components/FAQ';
 import CTASection from '@/components/CTASection';
 
@@ -20,27 +20,39 @@ const faqItems = [
 export default function BTSBiologieMedicale() {
   return (
     <>
-      <PageHero
-        title="BTS Biologie Médicale"
-        highlight="Le diplôme qui ouvre les portes du laboratoire"
-        description="Un diplôme national en 2 ans pour devenir technicien de laboratoire médical. Formation certifiée RNCP 40027."
-      />
-
-      {/* Key info */}
-      <section className="py-12 bg-white border-b">
+      {/* Hero with form */}
+      <section className="bg-navy py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { label: 'Durée', value: '2 ans' },
-              { label: 'Heures', value: '1 350h' },
-              { label: 'RNCP', value: '40027' },
-              { label: 'Insertion', value: '80%' },
-            ].map((item, i) => (
-              <div key={i} className="text-center">
-                <div className="text-3xl font-bold text-teal">{item.value}</div>
-                <div className="text-sm text-gray-500 mt-1">{item.label}</div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Title */}
+            <div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                BTS Biologie Médicale
+              </h1>
+              <p className="mt-3 text-2xl md:text-3xl font-bold text-teal leading-snug">
+                Le diplôme qui ouvre les portes du laboratoire
+              </p>
+              <p className="mt-6 text-gray-300 text-lg leading-relaxed max-w-lg">
+                Un diplôme national en 2 ans pour devenir technicien de laboratoire médical. Formation certifiée RNCP 40027.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-6">
+                {[
+                  { value: '2 ans', label: 'Durée' },
+                  { value: '1 350h', label: 'Formation' },
+                  { value: '80%', label: 'Insertion' },
+                ].map((stat, i) => (
+                  <div key={i}>
+                    <div className="text-2xl font-bold text-yellow">{stat.value}</div>
+                    <div className="text-xs text-gray-400">{stat.label}</div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Right: Form */}
+            <div>
+              <ContactForm />
+            </div>
           </div>
         </div>
       </section>
