@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { supabase } from '@/lib/supabase';
 
 const steps = [
   { id: 1, title: 'Identite', icon: '1' },
@@ -11,13 +12,183 @@ const steps = [
   { id: 5, title: 'Finalisation', icon: '5' },
 ];
 
+interface FormData {
+  prenom: string;
+  nom: string;
+  date_naissance: string;
+  lieu_naissance: string;
+  nationalite: string;
+  adresse: string;
+  code_postal: string;
+  ville: string;
+  departement: string;
+  email: string;
+  telephone: string;
+  niveau_etudes: string;
+  filiere_bac: string;
+  annee_obtention: string;
+  etablissement: string;
+  dernier_diplome: string;
+  numero_secu: string;
+  numero_cni: string;
+  niveau_anglais: string;
+  entreprise_trouvee: string;
+  nom_entreprise: string;
+  aide_recherche: string;
+  disponible_echange: string;
+  creneaux_preferes: string;
+  source_decouverte: string;
+  newsletter: string;
+  remarques: string;
+}
+
+interface FileData {
+  fichier_cni: File | null;
+  fichier_photos: File | null;
+  fichier_releve: File | null;
+}
+
 export default function DossierInscription() {
-  const [step, setStep] = useState(0); // 0 = intro
+  const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const [entrepriseTrouvee, setEntrepriseTrouvee] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  const [formData, setFormData] = useState<FormData>({
+    prenom: '',
+    nom: '',
+    date_naissance: '',
+    lieu_naissance: '',
+    nationalite: '',
+    adresse: '',
+    code_postal: '',
+    ville: '',
+    departement: '',
+    email: '',
+    telephone: '',
+    niveau_etudes: '',
+    filiere_bac: '',
+    annee_obtention: '',
+    etablissement: '',
+    dernier_diplome: '',
+    numero_secu: '',
+    numero_cni: '',
+    niveau_anglais: '',
+    entreprise_trouvee: '',
+    nom_entreprise: '',
+    aide_recherche: '',
+    disponible_echange: '',
+    creneaux_preferes: '',
+    source_decouverte: '',
+    newsletter: '',
+    remarques: '',
+  });
+
+  const [files, setFiles] = useState<FileData>({
+    fichier_cni: null,
+    fichier_photos: null,
+    fichier_releve: null,
+  });
+
+  const [fileNames, setFileNames] = useState<{ fichier_cni: string; fichier_photos: string; fichier_releve: string }>({
+    fichier_cni: '',
+    fichier_photos: '',
+    fichier_releve: '',
+  });
+
+  const handleChange = (field: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileChange = (field: keyof FileData, file: File | null) => {
+    setFiles((prev) => ({ ...prev, [field]: file }));
+    setFileNames((prev) => ({ ...prev, [field]: file ? file.name : '' }));
+  };
 
   const next = () => setStep((s) => Math.min(s + 1, 5));
   const prev = () => setStep((s) => Math.max(s - 1, 1));
+
+  const uploadFile = async (file: File, folder: string): Promise<string> => {
+    const timestamp = Date.now();
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const filePath = `${folder}/${timestamp}_${safeName}`;
+    const { error } = await supabase.storage
+      .from('candidatures')
+      .upload(filePath, file);
+    if (error) throw new Error(`Erreur upload ${file.name}: ${error.message}`);
+    return filePath;
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      let fichier_cni_url = '';
+      let fichier_photos_url = '';
+      let fichier_releve_url = '';
+
+      if (files.fichier_cni) {
+        fichier_cni_url = await uploadFile(files.fichier_cni, 'cni');
+      }
+      if (files.fichier_photos) {
+        fichier_photos_url = await uploadFile(files.fichier_photos, 'photos');
+      }
+      if (files.fichier_releve) {
+        fichier_releve_url = await uploadFile(files.fichier_releve, 'releves');
+      }
+
+      const { error } = await supabase.from('candidatures').insert({
+        prenom: formData.prenom,
+        nom: formData.nom,
+        date_naissance: formData.date_naissance || null,
+        lieu_naissance: formData.lieu_naissance,
+        nationalite: formData.nationalite,
+        adresse: formData.adresse,
+        code_postal: formData.code_postal,
+        ville: formData.ville,
+        departement: formData.departement,
+        email: formData.email,
+        telephone: formData.telephone,
+        niveau_etudes: formData.niveau_etudes,
+        filiere_bac: formData.filiere_bac,
+        annee_obtention: formData.annee_obtention,
+        etablissement: formData.etablissement,
+        dernier_diplome: formData.dernier_diplome,
+        numero_secu: formData.numero_secu,
+        numero_cni: formData.numero_cni,
+        niveau_anglais: formData.niveau_anglais,
+        fichier_cni_url,
+        fichier_photos_url,
+        fichier_releve_url,
+        entreprise_trouvee: formData.entreprise_trouvee,
+        nom_entreprise: formData.nom_entreprise,
+        aide_recherche: formData.aide_recherche,
+        disponible_echange: formData.disponible_echange,
+        creneaux_preferes: formData.creneaux_preferes,
+        source_decouverte: formData.source_decouverte,
+        newsletter: formData.newsletter,
+        remarques: formData.remarques,
+      });
+
+      if (error) throw new Error(error.message);
+
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : 'Une erreur est survenue. Veuillez reessayer.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const inputClass =
+    'w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal';
+  const selectClass =
+    'w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal bg-white';
 
   if (submitted) {
     return (
@@ -129,28 +300,62 @@ export default function DossierInscription() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">Pr&eacute;nom *</label>
-                  <input type="text" required placeholder="Votre pr&eacute;nom" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Votre pr&eacute;nom"
+                    value={formData.prenom}
+                    onChange={(e) => handleChange('prenom', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">Nom *</label>
-                  <input type="text" required placeholder="Votre nom" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Votre nom"
+                    value={formData.nom}
+                    onChange={(e) => handleChange('nom', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">Date de naissance *</label>
-                  <input type="date" required className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="date"
+                    required
+                    value={formData.date_naissance}
+                    onChange={(e) => handleChange('date_naissance', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">Lieu de naissance (+ d&eacute;partement) *</label>
-                  <input type="text" required placeholder="Paris (75)" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Paris (75)"
+                    value={formData.lieu_naissance}
+                    onChange={(e) => handleChange('lieu_naissance', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">Nationalit&eacute; *</label>
-                <input type="text" required placeholder="Fran&ccedil;aise" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                <input
+                  type="text"
+                  required
+                  placeholder="Fran&ccedil;aise"
+                  value={formData.nationalite}
+                  onChange={(e) => handleChange('nationalite', e.target.value)}
+                  className={inputClass}
+                />
               </div>
 
               <hr className="my-6 border-gray-100" />
@@ -158,22 +363,63 @@ export default function DossierInscription() {
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">Adresse compl&egrave;te *</label>
-                <input type="text" required placeholder="Num&eacute;ro et rue" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal mb-3" />
+                <input
+                  type="text"
+                  required
+                  placeholder="Num&eacute;ro et rue"
+                  value={formData.adresse}
+                  onChange={(e) => handleChange('adresse', e.target.value)}
+                  className={`${inputClass} mb-3`}
+                />
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <input type="text" required placeholder="Code postal" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
-                  <input type="text" required placeholder="Ville" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
-                  <input type="text" placeholder="D&eacute;partement" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Code postal"
+                    value={formData.code_postal}
+                    onChange={(e) => handleChange('code_postal', e.target.value)}
+                    className={inputClass}
+                  />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ville"
+                    value={formData.ville}
+                    onChange={(e) => handleChange('ville', e.target.value)}
+                    className={inputClass}
+                  />
+                  <input
+                    type="text"
+                    placeholder="D&eacute;partement"
+                    value={formData.departement}
+                    onChange={(e) => handleChange('departement', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">Email *</label>
-                  <input type="email" required placeholder="votre@email.com" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="votre@email.com"
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">T&eacute;l&eacute;phone *</label>
-                  <input type="tel" required placeholder="06 12 34 56 78" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="tel"
+                    required
+                    placeholder="06 12 34 56 78"
+                    value={formData.telephone}
+                    onChange={(e) => handleChange('telephone', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
               </div>
             </div>
@@ -195,7 +441,12 @@ export default function DossierInscription() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">Niveau d&apos;&eacute;tudes actuel *</label>
-                <select required className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal bg-white">
+                <select
+                  required
+                  value={formData.niveau_etudes}
+                  onChange={(e) => handleChange('niveau_etudes', e.target.value)}
+                  className={selectClass}
+                >
                   <option value="">S&eacute;lectionnez...</option>
                   <option value="terminale">Terminale</option>
                   <option value="bachelier">Bachelier</option>
@@ -207,22 +458,50 @@ export default function DossierInscription() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">Fili&egrave;re de baccalaur&eacute;at *</label>
-                  <input type="text" required placeholder="Ex: STL, ST2S, G&eacute;n&eacute;ral..." className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: STL, ST2S, G&eacute;n&eacute;ral..."
+                    value={formData.filiere_bac}
+                    onChange={(e) => handleChange('filiere_bac', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">Ann&eacute;e d&apos;obtention *</label>
-                  <input type="text" required placeholder="2025" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="2025"
+                    value={formData.annee_obtention}
+                    onChange={(e) => handleChange('annee_obtention', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">&Eacute;tablissement (ann&eacute;e du bac) *</label>
-                <input type="text" required placeholder="Nom du lyc&eacute;e" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                <input
+                  type="text"
+                  required
+                  placeholder="Nom du lyc&eacute;e"
+                  value={formData.etablissement}
+                  onChange={(e) => handleChange('etablissement', e.target.value)}
+                  className={inputClass}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">Intitul&eacute; complet du dernier dipl&ocirc;me obtenu *</label>
-                <textarea required rows={3} placeholder="Ex: Baccalaur&eacute;at technologique STL sp&eacute;cialit&eacute; biotechnologies" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal resize-none" />
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Ex: Baccalaur&eacute;at technologique STL sp&eacute;cialit&eacute; biotechnologies"
+                  value={formData.dernier_diplome}
+                  onChange={(e) => handleChange('dernier_diplome', e.target.value)}
+                  className={`${inputClass} resize-none`}
+                />
               </div>
             </div>
 
@@ -247,17 +526,35 @@ export default function DossierInscription() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">N&deg; de S&eacute;curit&eacute; Sociale *</label>
-                  <input type="text" required placeholder="1 XX XX XX XXX XXX XX" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="1 XX XX XX XXX XXX XX"
+                    value={formData.numero_secu}
+                    onChange={(e) => handleChange('numero_secu', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">N&deg; Carte d&apos;identit&eacute; / Titre de s&eacute;jour *</label>
-                  <input type="text" required className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="text"
+                    required
+                    value={formData.numero_cni}
+                    onChange={(e) => handleChange('numero_cni', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">Niveau estim&eacute; en anglais *</label>
-                <select required className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal bg-white">
+                <select
+                  required
+                  value={formData.niveau_anglais}
+                  onChange={(e) => handleChange('niveau_anglais', e.target.value)}
+                  className={selectClass}
+                >
                   <option value="">S&eacute;lectionnez...</option>
                   <option value="debutant">D&eacute;butant</option>
                   <option value="intermediaire">Interm&eacute;diaire</option>
@@ -269,21 +566,44 @@ export default function DossierInscription() {
               <hr className="my-6 border-gray-100" />
               <h3 className="font-bold text-dark">Pi&egrave;ces &agrave; d&eacute;poser</h3>
 
-              {[
-                { label: 'Carte d\'identit\u00e9 (recto-verso) *', accept: '.pdf,.jpg,.jpeg,.png' },
-                { label: '2 photos d\'identit\u00e9 r\u00e9centes *', accept: '.jpg,.jpeg,.png' },
-                { label: 'Relev\u00e9 de notes ou dipl\u00f4me *', accept: '.pdf,.jpg,.jpeg,.png' },
-              ].map((doc, i) => (
-                <div key={i}>
+              {([
+                { key: 'fichier_cni' as keyof FileData, label: 'Carte d\'identit\u00e9 (recto-verso) *', accept: '.pdf,.jpg,.jpeg,.png' },
+                { key: 'fichier_photos' as keyof FileData, label: '2 photos d\'identit\u00e9 r\u00e9centes *', accept: '.jpg,.jpeg,.png' },
+                { key: 'fichier_releve' as keyof FileData, label: 'Relev\u00e9 de notes ou dipl\u00f4me *', accept: '.pdf,.jpg,.jpeg,.png' },
+              ]).map((doc) => (
+                <div key={doc.key}>
                   <label className="block text-sm font-medium text-dark mb-1.5">{doc.label}</label>
-                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-teal transition-colors cursor-pointer">
-                    <input type="file" accept={doc.accept} className="hidden" id={`file-${i}`} />
-                    <label htmlFor={`file-${i}`} className="cursor-pointer">
-                      <svg className="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                      <p className="text-sm text-gray-500">Cliquez pour t&eacute;l&eacute;verser</p>
-                      <p className="text-xs text-gray-400 mt-1">PDF, JPG ou PNG (max 5 Mo)</p>
+                  <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer ${
+                    fileNames[doc.key] ? 'border-teal bg-teal/5' : 'border-gray-200 hover:border-teal'
+                  }`}>
+                    <input
+                      type="file"
+                      accept={doc.accept}
+                      className="hidden"
+                      id={`file-${doc.key}`}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        handleFileChange(doc.key, file);
+                      }}
+                    />
+                    <label htmlFor={`file-${doc.key}`} className="cursor-pointer">
+                      {fileNames[doc.key] ? (
+                        <>
+                          <svg className="w-8 h-8 text-teal mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <p className="text-sm text-teal font-medium">{fileNames[doc.key]}</p>
+                          <p className="text-xs text-gray-400 mt-1">Cliquez pour changer de fichier</p>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="text-sm text-gray-500">Cliquez pour t&eacute;l&eacute;verser</p>
+                          <p className="text-xs text-gray-400 mt-1">PDF, JPG ou PNG (max 5 Mo)</p>
+                        </>
+                      )}
                     </label>
                   </div>
                 </div>
@@ -313,14 +633,14 @@ export default function DossierInscription() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {['Oui', 'Non', 'En cours de recherche'].map((opt) => (
                     <label key={opt} className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all text-sm font-medium ${
-                      entrepriseTrouvee === opt ? 'border-teal bg-teal/5 text-teal' : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      formData.entreprise_trouvee === opt ? 'border-teal bg-teal/5 text-teal' : 'border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}>
                       <input
                         type="radio"
                         name="entreprise"
                         value={opt}
-                        checked={entrepriseTrouvee === opt}
-                        onChange={(e) => setEntrepriseTrouvee(e.target.value)}
+                        checked={formData.entreprise_trouvee === opt}
+                        onChange={(e) => handleChange('entreprise_trouvee', e.target.value)}
                         className="sr-only"
                       />
                       {opt}
@@ -329,21 +649,36 @@ export default function DossierInscription() {
                 </div>
               </div>
 
-              {entrepriseTrouvee === 'Oui' && (
+              {formData.entreprise_trouvee === 'Oui' && (
                 <div className="bg-teal/5 rounded-xl p-5">
                   <label className="block text-sm font-medium text-dark mb-1.5">Nom de l&apos;entreprise</label>
-                  <input type="text" placeholder="Nom de l'entreprise d'accueil" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                  <input
+                    type="text"
+                    placeholder="Nom de l'entreprise d'accueil"
+                    value={formData.nom_entreprise}
+                    onChange={(e) => handleChange('nom_entreprise', e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
               )}
 
-              {(entrepriseTrouvee === 'Non' || entrepriseTrouvee === 'En cours de recherche') && (
+              {(formData.entreprise_trouvee === 'Non' || formData.entreprise_trouvee === 'En cours de recherche') && (
                 <div className="bg-yellow/10 rounded-xl p-5">
                   <p className="text-sm text-dark font-medium mb-3">Souhaites-tu que Linova t&apos;aide dans ta recherche de contrat d&apos;alternance ?</p>
                   <div className="flex gap-3">
-                    {['Oui, je veux de l\'aide', 'Non merci'].map((opt) => (
-                      <label key={opt} className="flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-teal transition-all text-sm">
-                        <input type="radio" name="aide" className="accent-teal" />
-                        {opt}
+                    {[{ label: 'Oui, je veux de l\'aide', value: 'Oui' }, { label: 'Non merci', value: 'Non' }].map((opt) => (
+                      <label key={opt.value} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all text-sm ${
+                        formData.aide_recherche === opt.value ? 'border-teal bg-teal/5 text-teal' : 'border-gray-200 hover:border-teal'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="aide"
+                          value={opt.value}
+                          checked={formData.aide_recherche === opt.value}
+                          onChange={(e) => handleChange('aide_recherche', e.target.value)}
+                          className="accent-teal"
+                        />
+                        {opt.label}
                       </label>
                     ))}
                   </div>
@@ -373,8 +708,17 @@ export default function DossierInscription() {
                 <label className="block text-sm font-medium text-dark mb-3">Es-tu disponible pour un &eacute;change avec notre &eacute;quipe ?</label>
                 <div className="flex gap-3">
                   {['Oui', 'Non'].map((opt) => (
-                    <label key={opt} className="flex items-center gap-2 px-5 py-2.5 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-teal transition-all text-sm">
-                      <input type="radio" name="disponible" className="accent-teal" />
+                    <label key={opt} className={`flex items-center gap-2 px-5 py-2.5 rounded-lg border-2 cursor-pointer transition-all text-sm ${
+                      formData.disponible_echange === opt ? 'border-teal bg-teal/5 text-teal' : 'border-gray-200 hover:border-teal'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="disponible"
+                        value={opt}
+                        checked={formData.disponible_echange === opt}
+                        onChange={(e) => handleChange('disponible_echange', e.target.value)}
+                        className="accent-teal"
+                      />
                       {opt}
                     </label>
                   ))}
@@ -383,15 +727,30 @@ export default function DossierInscription() {
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">Cr&eacute;neaux pr&eacute;f&eacute;r&eacute;s</label>
-                <input type="text" placeholder="Ex: mardi et jeudi apr&egrave;s-midi" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" />
+                <input
+                  type="text"
+                  placeholder="Ex: mardi et jeudi apr&egrave;s-midi"
+                  value={formData.creneaux_preferes}
+                  onChange={(e) => handleChange('creneaux_preferes', e.target.value)}
+                  className={inputClass}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-3">Comment as-tu connu Linova ?</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {['R\u00e9seaux sociaux', 'Google', 'Conseiller d\'orientation', 'Bouche-\u00e0-oreille', 'Salon', 'Autre'].map((opt) => (
-                    <label key={opt} className="flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-teal transition-all text-sm">
-                      <input type="radio" name="source" className="accent-teal" />
+                    <label key={opt} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all text-sm ${
+                      formData.source_decouverte === opt ? 'border-teal bg-teal/5 text-teal' : 'border-gray-200 hover:border-teal'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="source"
+                        value={opt}
+                        checked={formData.source_decouverte === opt}
+                        onChange={(e) => handleChange('source_decouverte', e.target.value)}
+                        className="accent-teal"
+                      />
                       {opt}
                     </label>
                   ))}
@@ -402,8 +761,17 @@ export default function DossierInscription() {
                 <label className="block text-sm font-medium text-dark mb-3">Souhaites-tu recevoir nos infos utiles (stages, alternance, conseils) ?</label>
                 <div className="flex gap-3">
                   {['Oui', 'Non'].map((opt) => (
-                    <label key={opt} className="flex items-center gap-2 px-5 py-2.5 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-teal transition-all text-sm">
-                      <input type="radio" name="newsletter" className="accent-teal" />
+                    <label key={opt} className={`flex items-center gap-2 px-5 py-2.5 rounded-lg border-2 cursor-pointer transition-all text-sm ${
+                      formData.newsletter === opt ? 'border-teal bg-teal/5 text-teal' : 'border-gray-200 hover:border-teal'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="newsletter"
+                        value={opt}
+                        checked={formData.newsletter === opt}
+                        onChange={(e) => handleChange('newsletter', e.target.value)}
+                        className="accent-teal"
+                      />
                       {opt}
                     </label>
                   ))}
@@ -412,19 +780,42 @@ export default function DossierInscription() {
 
               <div>
                 <label className="block text-sm font-medium text-dark mb-1.5">Une remarque ou question ?</label>
-                <textarea rows={3} placeholder="N'h&eacute;sitez pas &agrave; nous laisser un message..." className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal resize-none" />
+                <textarea
+                  rows={3}
+                  placeholder="N'h&eacute;sitez pas &agrave; nous laisser un message..."
+                  value={formData.remarques}
+                  onChange={(e) => handleChange('remarques', e.target.value)}
+                  className={`${inputClass} resize-none`}
+                />
               </div>
             </div>
 
+            {submitError && (
+              <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-red-600 text-sm font-medium">{submitError}</p>
+              </div>
+            )}
+
             <div className="flex gap-4 mt-10">
-              <button onClick={prev} className="px-6 py-3.5 border-2 border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
+              <button onClick={prev} disabled={isSubmitting} className="px-6 py-3.5 border-2 border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-all cursor-pointer disabled:opacity-50">
                 Retour
               </button>
               <button
-                onClick={() => setSubmitted(true)}
-                className="flex-1 py-4 bg-yellow text-dark font-bold rounded-xl hover:brightness-95 transition-all text-lg cursor-pointer"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="flex-1 py-4 bg-yellow text-dark font-bold rounded-xl hover:brightness-95 transition-all text-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
               >
-                Envoyer mon dossier
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Envoi en cours...
+                  </>
+                ) : (
+                  'Envoyer mon dossier'
+                )}
               </button>
             </div>
 
