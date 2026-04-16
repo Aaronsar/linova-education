@@ -3,8 +3,8 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { useArticleEditor, estimateReadTime } from '@/lib/admin/useArticleEditor';
-import { analyzeSEO } from '@/lib/admin/analyzeSEO';
+import { useArticleEditor, estimateReadTime, ArticleCategory } from '@/lib/admin/useArticleEditor';
+import { analyzeSEO, ArticleSection } from '@/lib/admin/analyzeSEO';
 import ArticleEditor from '@/components/admin/ArticleEditor';
 import SEOPanel from '@/components/admin/SEOPanel';
 
@@ -45,9 +45,7 @@ export default function EditArticlePage({ params }: { params: Promise<{ id: stri
         readTime: data.read_time || '5 min',
         status: data.status || 'draft',
         source: data.source || 'manual',
-        scheduledAt: data.scheduled_at
-          ? new Date(data.scheduled_at).toISOString().slice(0, 16)
-          : '',
+        scheduledAt: data.scheduled_at ? new Date(data.scheduled_at).toISOString().slice(0, 16) : '',
       });
       setLoading(false);
     };
@@ -55,19 +53,93 @@ export default function EditArticlePage({ params }: { params: Promise<{ id: stri
     fetchArticle();
   }, [id]);
 
+  // ─── Appel API amélioration ──────────────────────────────────────────────────
+  const callImproveAPI = async (
+    action: string,
+    articleTitle: string,
+    articleKeyword: string,
+    articleCategory: string,
+    content: { metaTitle: string; metaDescription: string; sections: ArticleSection[] }
+  ) => {
+    const analysis = analyzeSEO({
+      title: articleTitle,
+      metaTitle: content.metaTitle,
+      metaDescription: content.metaDescription,
+      slug: articleTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      focusKeyword: articleKeyword,
+      sections: content.sections,
+    });
+    const failedChecks = analysis.checks
+      .filter(c => !c.passed)
+      .map(c => `- ${c.label}: ${c.message}`)
+      .join('\n');
+
+    const res = await fetch('/api/admin/generate-article', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: articleTitle, focusKeyword: articleKeyword, category: articleCategory,
+        action, currentContent: content,
+        failedChecks: action !== 'humanize' ? failedChecks : '',
+        feedback: '',
+      }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || `Erreur lors de l'étape ${action}.`);
+    }
+    return res.json();
+  };
+
+  // ─── Pipeline complet : SEO → GEO → Humaniser ───────────────────────────────
+  const handleAutoOptimize = async () => {
+    setError('');
+    let current = { metaTitle: state.metaTitle, metaDescription: state.metaDescription, sections: state.sections };
+
+    try {
+      setImproving('auto-seo');
+      const seoResult = await callImproveAPI('seo', state.title, state.focusKeyword, state.category, current);
+      current = {
+        metaTitle: seoResult.metaTitle || current.metaTitle,
+        metaDescription: seoResult.metaDescription || current.metaDescription,
+        sections: seoResult.sections?.length ? seoResult.sections : current.sections,
+      };
+
+      setImproving('auto-geo');
+      const geoResult = await callImproveAPI('geo', state.title, state.focusKeyword, state.category, current);
+      current = {
+        metaTitle: geoResult.metaTitle || current.metaTitle,
+        metaDescription: geoResult.metaDescription || current.metaDescription,
+        sections: geoResult.sections?.length ? geoResult.sections : current.sections,
+      };
+
+      setImproving('auto-humanize');
+      const humanizeResult = await callImproveAPI('humanize', state.title, state.focusKeyword, state.category, current);
+      current = {
+        metaTitle: humanizeResult.metaTitle || current.metaTitle,
+        metaDescription: humanizeResult.metaDescription || current.metaDescription,
+        sections: humanizeResult.sections?.length ? humanizeResult.sections : current.sections,
+      };
+
+      loadArticle({ ...state, metaTitle: current.metaTitle, metaDescription: current.metaDescription, sections: current.sections });
+      setSuccess('Article optimisé : SEO 80+, GEO 80+, humanisé !');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'optimisation.');
+    } finally {
+      setImproving(null);
+    }
+  };
+
+  // ─── Amélioration manuelle étape par étape ───────────────────────────────────
   const handleImprove = async (action: 'seo' | 'geo' | 'humanize' | 'maillage', feedback?: string) => {
     setImproving(action);
     setError('');
 
     const analysis = analyzeSEO({
-      title: state.title,
-      metaTitle: state.metaTitle,
-      metaDescription: state.metaDescription,
-      slug: state.slug,
-      focusKeyword: state.focusKeyword,
-      sections: state.sections,
+      title: state.title, metaTitle: state.metaTitle, metaDescription: state.metaDescription,
+      slug: state.slug, focusKeyword: state.focusKeyword, sections: state.sections,
     });
-
     const failedChecks = analysis.checks.filter(c => !c.passed).map(c => `- ${c.label}: ${c.message}`).join('\n');
 
     try {
@@ -75,17 +147,9 @@ export default function EditArticlePage({ params }: { params: Promise<{ id: stri
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: state.title,
-          focusKeyword: state.focusKeyword,
-          category: state.category,
-          action,
-          currentContent: {
-            metaTitle: state.metaTitle,
-            metaDescription: state.metaDescription,
-            sections: state.sections,
-          },
-          failedChecks,
-          feedback: feedback || '',
+          title: state.title, focusKeyword: state.focusKeyword, category: state.category,
+          action, currentContent: { metaTitle: state.metaTitle, metaDescription: state.metaDescription, sections: state.sections },
+          failedChecks, feedback: feedback || '',
         }),
       });
 
@@ -96,13 +160,8 @@ export default function EditArticlePage({ params }: { params: Promise<{ id: stri
         return;
       }
 
-      if (data.sections && data.sections.length > 0) {
-        loadArticle({
-          ...state,
-          sections: data.sections,
-          metaTitle: data.metaTitle || state.metaTitle,
-          metaDescription: data.metaDescription || state.metaDescription,
-        });
+      if (data.sections?.length > 0) {
+        loadArticle({ ...state, sections: data.sections, metaTitle: data.metaTitle || state.metaTitle, metaDescription: data.metaDescription || state.metaDescription });
       }
 
       const labels: Record<string, string> = { seo: 'SEO', geo: 'GEO', humanize: 'Humanisation', maillage: 'Maillage interne' };
@@ -114,54 +173,36 @@ export default function EditArticlePage({ params }: { params: Promise<{ id: stri
     }
   };
 
+  // ─── Sauvegarde ──────────────────────────────────────────────────────────────
   const handleSave = async (publish = false) => {
     if (!state.title.trim() || !state.slug.trim()) {
       setError('Le titre et le slug sont obligatoires.');
       return;
     }
-
     setSaving(true);
     setError('');
 
     const analysis = analyzeSEO({
-      title: state.title,
-      metaTitle: state.metaTitle,
-      metaDescription: state.metaDescription,
-      slug: state.slug,
-      focusKeyword: state.focusKeyword,
-      sections: state.sections,
+      title: state.title, metaTitle: state.metaTitle, metaDescription: state.metaDescription,
+      slug: state.slug, focusKeyword: state.focusKeyword, sections: state.sections,
     });
-
     const readTime = estimateReadTime(state.sections);
-
     const finalStatus = publish ? 'published' : state.status;
+
     const { error: supabaseError } = await supabase
       .from('linova_articles')
       .update({
-        slug: state.slug,
-        title: state.title,
-        meta_title: state.metaTitle,
-        meta_description: state.metaDescription,
-        excerpt: state.excerpt,
-        category: state.category,
-        focus_keyword: state.focusKeyword,
-        sections: state.sections,
-        read_time: readTime,
-        seo_score: analysis.seoScore,
-        geo_score: analysis.geoScore,
-        status: finalStatus,
-        scheduled_at: finalStatus === 'scheduled' && state.scheduledAt
-          ? new Date(state.scheduledAt).toISOString()
-          : null,
+        slug: state.slug, title: state.title, meta_title: state.metaTitle,
+        meta_description: state.metaDescription, excerpt: state.excerpt, category: state.category,
+        focus_keyword: state.focusKeyword, sections: state.sections, read_time: readTime,
+        seo_score: analysis.seoScore, geo_score: analysis.geoScore, status: finalStatus,
+        scheduled_at: finalStatus === 'scheduled' && state.scheduledAt ? new Date(state.scheduledAt).toISOString() : null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', id);
 
     if (supabaseError) {
-      setError(supabaseError.message.includes('duplicate')
-        ? `Le slug "${state.slug}" existe déjà.`
-        : supabaseError.message
-      );
+      setError(supabaseError.message.includes('duplicate') ? `Le slug "${state.slug}" existe déjà.` : supabaseError.message);
       setSaving(false);
       return;
     }
@@ -184,7 +225,6 @@ export default function EditArticlePage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="max-w-7xl">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
@@ -196,62 +236,38 @@ export default function EditArticlePage({ params }: { params: Promise<{ id: stri
         </div>
         <div className="flex items-center gap-3">
           {state.slug && (
-            <a
-              href={`/blog/${state.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-gray-500 hover:text-teal transition-colors flex items-center gap-1"
-            >
+            <a href={`/blog/${state.slug}`} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-gray-500 hover:text-teal transition-colors flex items-center gap-1">
               Voir
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </a>
           )}
-          <button
-            onClick={() => handleSave(false)}
-            disabled={saving}
-            className="px-4 py-2.5 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:border-gray-300 transition-colors text-sm cursor-pointer disabled:opacity-50"
-          >
+          <button onClick={() => handleSave(false)} disabled={saving}
+            className="px-4 py-2.5 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:border-gray-300 transition-colors text-sm cursor-pointer disabled:opacity-50">
             {saving ? 'Sauvegarde...' : 'Sauvegarder'}
           </button>
-          <button
-            onClick={() => handleSave(true)}
-            disabled={saving}
-            className="px-5 py-2.5 bg-teal text-white font-semibold rounded-xl hover:brightness-95 transition-all text-sm cursor-pointer disabled:opacity-50"
-          >
+          <button onClick={() => handleSave(true)} disabled={saving}
+            className="px-5 py-2.5 bg-teal text-white font-semibold rounded-xl hover:brightness-95 transition-all text-sm cursor-pointer disabled:opacity-50">
             🚀 Publier
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">{error}</div>
-      )}
-      {success && (
-        <div className="mb-5 p-4 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">{success}</div>
-      )}
+      {error && <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">{error}</div>}
+      {success && <div className="mb-5 p-4 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">{success}</div>}
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2">
-          <ArticleEditor
-            state={state}
-            setField={setField}
-            addBlock={addBlock}
-            updateBlock={updateBlock}
-            deleteBlock={deleteBlock}
-            moveBlock={moveBlock}
-          />
+          <ArticleEditor state={state} setField={setField} addBlock={addBlock} updateBlock={updateBlock} deleteBlock={deleteBlock} moveBlock={moveBlock} />
         </div>
         <div className="xl:col-span-1">
           <SEOPanel
-            title={state.title}
-            metaTitle={state.metaTitle}
-            metaDescription={state.metaDescription}
-            slug={state.slug}
-            focusKeyword={state.focusKeyword}
-            sections={state.sections}
+            title={state.title} metaTitle={state.metaTitle} metaDescription={state.metaDescription}
+            slug={state.slug} focusKeyword={state.focusKeyword} sections={state.sections}
             onImprove={handleImprove}
+            onAutoOptimize={handleAutoOptimize}
             improving={improving}
           />
         </div>
