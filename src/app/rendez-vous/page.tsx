@@ -81,7 +81,7 @@ export default function RendezVousPage() {
               {
                 icon: '⏱️',
                 title: 'Durée',
-                text: '45 minutes\nLundi au vendredi\n9h00 – 17h00',
+                text: '45 minutes\n7j/7\n9h00 – 17h00',
               },
               {
                 icon: '📋',

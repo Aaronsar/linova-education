@@ -78,11 +78,6 @@ function getDaysInMonth(year: number, month: number): (number | null)[] {
   return cells;
 }
 
-function isWeekend(year: number, month: number, day: number): boolean {
-  const d = new Date(year, month, day).getDay();
-  return d === 0 || d === 6;
-}
-
 function isPast(year: number, month: number, day: number): boolean {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -225,7 +220,7 @@ function StepDate({
         Choisissez une date
       </h2>
       <p className="text-gray-500 text-center mb-8">
-        Disponible du lundi au vendredi
+        Sélectionnez le jour qui vous convient
       </p>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -267,9 +262,8 @@ function StepDate({
           {cells.map((day, idx) => {
             if (!day) return <div key={`empty-${idx}`} />;
             const dateStr = toDateString(viewYear, viewMonth, day);
-            const weekend = isWeekend(viewYear, viewMonth, day);
             const past = isPast(viewYear, viewMonth, day);
-            const disabled = weekend || past;
+            const disabled = past;
             const selected = selectedDate === dateStr;
 
             return (

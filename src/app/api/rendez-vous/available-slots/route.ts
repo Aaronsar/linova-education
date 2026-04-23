@@ -6,7 +6,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// All possible time slots (Mon-Fri, 9h-12h and 14h-17h, every 30 min)
+// All possible time slots (every day, 9h-12h and 14h-17h, every 30 min)
 // Last slot starts at 16:30 to allow 30-min appointments ending at 17:00
 export const ALL_SLOTS = [
   '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -29,12 +29,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
   }
 
-  // Check if it's a weekend
   const d = new Date(date + 'T12:00:00');
-  const dayOfWeek = d.getDay();
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
-    return NextResponse.json({ slots: [] });
-  }
 
   // Check if it's a closed date
   if (CLOSED_DATES.includes(date)) {
