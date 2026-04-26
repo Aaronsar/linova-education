@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/appointment-reminders",
       "schedule": "0,30 * * * *"
+    },
+    {
+      "path": "/api/cron/generate-daily-article",
+      "schedule": "0 5 * * *"
     }
   ]
 }
