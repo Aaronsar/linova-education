@@ -1,13 +1,27 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import AuthGuard from '@/components/AuthGuard';
 
 function AdminShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.href = '/espace-candidature/login';
+  };
+
+  const tabs = [
+    { href: '/espace-candidature', label: 'Inscriptions' },
+    { href: '/espace-candidature/rendez-vous', label: 'Rendez-vous' },
+  ];
+
+  const isActiveTab = (href: string) => {
+    if (href === '/espace-candidature') {
+      return pathname === '/espace-candidature';
+    }
+    return pathname?.startsWith(href);
   };
 
   return (
@@ -16,15 +30,15 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <a href="/espace-candidature" className="font-[var(--font-outfit)] text-lg font-bold tracking-tight hover:text-teal transition-colors">
+              <Link href="/espace-candidature" className="font-[var(--font-outfit)] text-lg font-bold tracking-tight hover:text-teal transition-colors">
                 Linova Admin
-              </a>
+              </Link>
               <span className="hidden sm:inline-block text-xs bg-teal/20 text-teal px-2.5 py-0.5 rounded-full font-medium">
-                Gestion des inscriptions
+                Espace gestion
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <a
+              <Link
                 href="/"
                 className="text-sm text-gray-300 hover:text-white transition-colors hidden sm:flex items-center gap-1.5"
               >
@@ -32,7 +46,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
                 Voir le site
-              </a>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="text-sm text-gray-300 hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"
@@ -44,6 +58,25 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           </div>
+          {/* Tabs */}
+          <nav className="flex gap-1 -mb-px">
+            {tabs.map((tab) => {
+              const active = isActiveTab(tab.href);
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    active
+                      ? 'border-teal text-white'
+                      : 'border-transparent text-gray-400 hover:text-white hover:border-gray-500'
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
       </header>
       {children}
