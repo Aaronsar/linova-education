@@ -333,7 +333,7 @@ function StepTime({
   const { slots, loading, error } = state;
 
   const morningSlots = (slots || []).filter((s) => parseInt(s) < 12);
-  const afternoonSlots = (slots || []).filter((s) => parseInt(s) >= 14);
+  const afternoonSlots = (slots || []).filter((s) => parseInt(s) >= 12);
 
   return (
     <div className="animate-fade-in-up max-w-sm mx-auto">

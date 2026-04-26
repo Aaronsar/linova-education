@@ -6,11 +6,13 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// All possible time slots (every day, 9h-12h and 14h-17h, every 30 min)
-// Last slot starts at 16:30 to allow 30-min appointments ending at 17:00
+// All possible time slots (every day, 8h30-20h, every 30 min)
+// Last slot starts at 19:30 to allow 30-min appointments ending at 20:00
 export const ALL_SLOTS = [
-  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '12:00', '12:30', '13:00', '13:30',
   '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+  '17:00', '17:30', '18:00', '18:30', '19:00', '19:30',
 ];
 
 // Holidays where the school is closed (YYYY-MM-DD)
