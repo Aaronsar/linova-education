@@ -17,7 +17,7 @@ const blogPosts = [
     title: 'Linova Formation obtient la certification Qualiopi',
     date: '10 décembre 2025',
     category: 'Actualité',
-    slug: '#',
+    slug: 'certification-qualiopi',
     image: '/images/photos/boite-petri.png',
     alt: 'Boite de Petri en laboratoire',
   },
@@ -25,7 +25,7 @@ const blogPosts = [
     title: 'Les qualités indispensables pour devenir technicien(ne) de laboratoire',
     date: '3 octobre 2025',
     category: 'Débouchés',
-    slug: '#',
+    slug: 'qualites-technicien-laboratoire',
     image: '/images/photos/tp-concentration.png',
     alt: 'Etudiante concentree en travaux pratiques',
   },
@@ -33,7 +33,7 @@ const blogPosts = [
     title: 'Stage en BTS Biologie Médicale : comment le réussir ?',
     date: '3 octobre 2025',
     category: 'BTS Biologie Médicale',
-    slug: '#',
+    slug: 'stage-bts-biologie-medicale',
     image: '/images/photos/prof-cours.jpg',
     alt: 'Professeur donnant un cours en classe',
   },
@@ -254,25 +254,31 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogPosts.map((post, i) => (
-              <article key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group">
-                <div className="relative aspect-[16/9]">
-                  <Image
-                    src={post.image}
-                    alt={post.alt}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <span className="inline-block px-3 py-1 bg-teal/10 text-teal text-xs font-semibold rounded-full mb-3">
-                    {post.category}
-                  </span>
-                  <h3 className="font-bold text-dark group-hover:text-teal transition-colors mb-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-sm text-gray-400">{post.date}</p>
-                </div>
-              </article>
+              <Link
+                key={i}
+                href={`/blog/${post.slug}`}
+                className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group"
+              >
+                <article>
+                  <div className="relative aspect-[16/9]">
+                    <Image
+                      src={post.image}
+                      alt={post.alt}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <span className="inline-block px-3 py-1 bg-teal/10 text-teal text-xs font-semibold rounded-full mb-3">
+                      {post.category}
+                    </span>
+                    <h3 className="font-bold text-dark group-hover:text-teal transition-colors mb-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-sm text-gray-400">{post.date}</p>
+                  </div>
+                </article>
+              </Link>
             ))}
           </div>
           <div className="mt-8 text-center md:hidden">
