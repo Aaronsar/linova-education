@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { createClient } from '@supabase/supabase-js';
 import PageHero from '@/components/PageHero';
+import { generateArticleCover } from '@/lib/article-cover';
 
 export const metadata: Metadata = {
   title: 'Blog - Metiers, formation et debouches en biologie medicale',
@@ -139,13 +139,15 @@ export default async function Blog() {
     (a, b) => b.publishedAt.localeCompare(a.publishedAt)
   );
 
-  // Réassignation déterministe des images par position dans la liste triée :
-  // round-robin sur le pool. Les N premiers articles affichés (les plus
-  // récents) sont garantis uniques tant que N ≤ taille du pool. Aucune
-  // image ne se répète sur 2 articles voisins.
-  const allArticles: BlogCard[] = sorted.map((article, idx) => ({
+  // Cover brandée Linova générée par slug → unique pour chaque article,
+  // jamais de doublon possible.
+  const allArticles: BlogCard[] = sorted.map((article) => ({
     ...article,
-    image: DYNAMIC_IMAGE_POOL[idx % DYNAMIC_IMAGE_POOL.length],
+    image: generateArticleCover({
+      slug: article.slug,
+      title: article.title,
+      category: article.categories[0],
+    }),
   }));
 
   return (
@@ -174,8 +176,13 @@ export default async function Blog() {
                 href={`/blog/${article.slug}`}
                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group border border-gray-100 block"
               >
-                <div className="relative aspect-[16/9]">
-                  <Image src={article.image} alt={article.title} fill className="object-cover" />
+                <div className="relative aspect-[16/9] overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={article.image}
+                    alt={article.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                 </div>
                 <div className="p-6">
                   <div className="flex flex-wrap gap-2 mb-3">
