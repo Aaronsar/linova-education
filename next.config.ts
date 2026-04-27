@@ -44,9 +44,6 @@ const LEGACY_REDIRECTS: Redirect[] = [
   { source: "/remerciement-brochure", destination: "/", permanent: true },
   { source: "/remerciement-candidature", destination: "/", permanent: true },
 
-  // ── CGU / mentions légales (pas de page dédiée actuelle) ────────────
-  { source: "/conditions-generales-de-services", destination: "/", permanent: true },
-
   // ── Pages auteur (legacy WordPress) ─────────────────────────────────
   { source: "/author/:slug*", destination: "/blog", permanent: true },
 ];
