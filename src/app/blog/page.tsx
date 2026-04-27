@@ -98,15 +98,6 @@ const DYNAMIC_IMAGE_POOL = [
   '/images/photos/campus-vie.png',
 ];
 
-function pickImageForSlug(slug: string): string {
-  let hash = 0;
-  for (let i = 0; i < slug.length; i++) {
-    hash = (hash * 31 + slug.charCodeAt(i)) | 0;
-  }
-  const idx = Math.abs(hash) % DYNAMIC_IMAGE_POOL.length;
-  return DYNAMIC_IMAGE_POOL[idx];
-}
-
 async function getDynamicArticles(): Promise<BlogCard[]> {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jhopwqpbaiyjfoggvcaf.supabase.co',
@@ -134,7 +125,8 @@ async function getDynamicArticles(): Promise<BlogCard[]> {
         dateLabel: formatFrDate(publishedAt),
         categories: [a.category || 'Article'],
         excerpt: a.excerpt || '',
-        image: pickImageForSlug(a.slug),
+        // Image réassignée plus tard par position dans la liste triée
+        image: DYNAMIC_IMAGE_POOL[0],
       };
     });
 }
@@ -143,9 +135,18 @@ export default async function Blog() {
   const dynamicArticles = await getDynamicArticles();
 
   // Fusion + tri DESC (plus récent en premier)
-  const allArticles: BlogCard[] = [...dynamicArticles, ...STATIC_ARTICLES].sort(
+  const sorted: BlogCard[] = [...dynamicArticles, ...STATIC_ARTICLES].sort(
     (a, b) => b.publishedAt.localeCompare(a.publishedAt)
   );
+
+  // Réassignation déterministe des images par position dans la liste triée :
+  // round-robin sur le pool. Les N premiers articles affichés (les plus
+  // récents) sont garantis uniques tant que N ≤ taille du pool. Aucune
+  // image ne se répète sur 2 articles voisins.
+  const allArticles: BlogCard[] = sorted.map((article, idx) => ({
+    ...article,
+    image: DYNAMIC_IMAGE_POOL[idx % DYNAMIC_IMAGE_POOL.length],
+  }));
 
   return (
     <>
