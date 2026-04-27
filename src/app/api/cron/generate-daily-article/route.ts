@@ -14,6 +14,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { generateArticleFull } from '@/lib/article-generator';
+import { findArticleCover } from '@/lib/unsplash';
 
 // Allow up to 5 min — la pipeline Claude prend ~3 min
 export const maxDuration = 300;
@@ -156,7 +157,14 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // 6. Insère l'article
+  // 6. Cherche une cover Unsplash (non bloquant en cas d'échec)
+  const cover = await findArticleCover({
+    focusKeyword: article.focusKeyword,
+    category: article.category,
+    title: article.title,
+  });
+
+  // 7. Insère l'article
   const { data: inserted, error: insertError } = await supabase
     .from('linova_articles')
     .insert({
@@ -171,6 +179,8 @@ export async function GET(req: NextRequest) {
       read_time: article.readTime,
       seo_score: 0,
       geo_score: 0,
+      cover_image_url: cover?.url ?? null,
+      cover_image_credit: cover?.credit ?? null,
       status: 'scheduled',
       source: 'ai_generated_daily',
       scheduled_at: scheduledAt.toISOString(),

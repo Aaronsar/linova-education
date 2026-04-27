@@ -106,7 +106,7 @@ async function getDynamicArticles(): Promise<BlogCard[]> {
 
   const { data, error } = await supabase
     .from('linova_articles')
-    .select('slug, title, excerpt, category, updated_at, scheduled_at, created_at')
+    .select('slug, title, excerpt, category, updated_at, scheduled_at, created_at, cover_image_url')
     .eq('status', 'published')
     .order('updated_at', { ascending: false });
 
@@ -125,8 +125,8 @@ async function getDynamicArticles(): Promise<BlogCard[]> {
         dateLabel: formatFrDate(publishedAt),
         categories: [a.category || 'Article'],
         excerpt: a.excerpt || '',
-        // Image réassignée plus tard par position dans la liste triée
-        image: DYNAMIC_IMAGE_POOL[0],
+        // Cover Unsplash si dispo, sinon fallback géré côté render
+        image: (a.cover_image_url as string | null) || '',
       };
     });
 }
@@ -139,15 +139,18 @@ export default async function Blog() {
     (a, b) => b.publishedAt.localeCompare(a.publishedAt)
   );
 
-  // Cover brandée Linova générée par slug → unique pour chaque article,
-  // jamais de doublon possible.
+  // Cover : si l'article a une URL stockée (Unsplash) on la garde, sinon on
+  // fallback sur une cover SVG brandée générée par slug (unique).
   const allArticles: BlogCard[] = sorted.map((article) => ({
     ...article,
-    image: generateArticleCover({
-      slug: article.slug,
-      title: article.title,
-      category: article.categories[0],
-    }),
+    image:
+      article.image && article.image.startsWith('http')
+        ? article.image
+        : generateArticleCover({
+            slug: article.slug,
+            title: article.title,
+            category: article.categories[0],
+          }),
   }));
 
   return (
