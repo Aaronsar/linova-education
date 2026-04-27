@@ -16,8 +16,9 @@ export const ALL_SLOTS = [
 ];
 
 // Holidays where the school is closed (YYYY-MM-DD)
+// Note: 1er mai 2026 ouvert exceptionnellement.
 const CLOSED_DATES = [
-  '2026-05-01', '2026-05-08', '2026-05-21', '2026-06-01',
+  '2026-05-08', '2026-05-21', '2026-06-01',
   '2026-07-14', '2026-08-15', '2026-11-01', '2026-11-11',
   '2026-12-25', '2026-01-01', '2026-04-01',
   // Summer closure
