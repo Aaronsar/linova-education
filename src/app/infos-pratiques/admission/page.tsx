@@ -263,7 +263,7 @@ export default function Admission() {
               <ul className="space-y-3 mb-8">
                 {[
                   '12 semaines de stage obligatoire',
-                  'Tarif : 4 500 euros par an',
+                  'Tarif : 6 000 euros par an',
                   'Echelonnement des paiements possible',
                   'Cours en presentiel du lundi au vendredi',
                   'Accompagnement a la recherche de stage',
