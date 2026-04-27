@@ -78,7 +78,34 @@ const STATIC_ARTICLES: BlogCard[] = [
   { title: 'Quel salaire apres un BTS Biologie Medicale ? Grille complete 2026', slug: 'salaire-bts-biologie-medicale', dateLabel: '16 septembre 2025', publishedAt: parseFrDate('16 septembre 2025'), categories: ['Debouches'], excerpt: "De 1 800 a 2 800 euros : grille de salaires par secteur, evolution de carriere et facteurs d'augmentation.", image: '/images/photos/etudiants-contents.png' },
 ];
 
-const DEFAULT_DYNAMIC_IMAGE = '/images/photos/etudiants-labo.png';
+// Pool d'images utilisées pour les articles dynamiques (Supabase) sans visuel propre.
+// On choisit l'image en hashant le slug pour garantir une image stable par article
+// tout en variant les visuels d'un article à l'autre.
+const DYNAMIC_IMAGE_POOL = [
+  '/images/photos/etudiants-labo.png',
+  '/images/photos/techniques-analyse.png',
+  '/images/photos/boite-petri.png',
+  '/images/photos/hematologie.png',
+  '/images/photos/microscope.png',
+  '/images/photos/travail-binome.png',
+  '/images/photos/prof-cours.jpg',
+  '/images/photos/tp-concentration.png',
+  '/images/photos/cours-amphi.png',
+  '/images/photos/future-etudiante.png',
+  '/images/photos/etudiants-contents.png',
+  '/images/photos/etudiante-bts.png',
+  '/images/photos/etudiants-pause.png',
+  '/images/photos/campus-vie.png',
+];
+
+function pickImageForSlug(slug: string): string {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = (hash * 31 + slug.charCodeAt(i)) | 0;
+  }
+  const idx = Math.abs(hash) % DYNAMIC_IMAGE_POOL.length;
+  return DYNAMIC_IMAGE_POOL[idx];
+}
 
 async function getDynamicArticles(): Promise<BlogCard[]> {
   const supabase = createClient(
@@ -107,7 +134,7 @@ async function getDynamicArticles(): Promise<BlogCard[]> {
         dateLabel: formatFrDate(publishedAt),
         categories: [a.category || 'Article'],
         excerpt: a.excerpt || '',
-        image: DEFAULT_DYNAMIC_IMAGE,
+        image: pickImageForSlug(a.slug),
       };
     });
 }
