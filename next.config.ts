@@ -38,7 +38,7 @@ const LEGACY_REDIRECTS: Redirect[] = [
   { source: "/contact-handicap", destination: "/infos-pratiques/handicap-accessibilite", permanent: true },
   { source: "/preparations/bts-biologie-medicale", destination: "/formations/bts-biologie-medicale", permanent: true },
   { source: "/contact-alternant", destination: "/rendez-vous", permanent: true },
-  { source: "/faq-generales", destination: "/infos-pratiques/admission", permanent: true },
+  { source: "/faq-generales", destination: "/faq", permanent: true },
 
   // ── Pages "remerciement" (formulaires / brochures) ──────────────────
   { source: "/remerciement-brochure", destination: "/", permanent: true },
