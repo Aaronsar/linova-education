@@ -35,7 +35,7 @@ const faqItems = [
   },
   {
     question: "Existe-t-il des aides financieres pour les etudiants en initial ?",
-    answer: "Plusieurs dispositifs d'aide existent : la bourse du CROUS (sous conditions de ressources), les aides regionales (Ile-de-France), les aides au logement (APL, ALS), les aides d'urgence du CROUS, et les prets etudiants a taux preferentiel proposes par certaines banques partenaires. Notre equipe vous oriente vers les dispositifs adaptes a votre situation.",
+    answer: "Plusieurs dispositifs d'aide existent : la bourse du CROUS (sous conditions de ressources), les aides regionales (Ile-de-France), les aides au logement (APL, ALS), les aides d'urgence du CROUS, et un pret etudiant a taux preferentiel grace a notre partenariat avec la banque LCL. Notre equipe vous oriente vers les dispositifs adaptes a votre situation.",
   },
   {
     question: "Quel est le salaire d'un alternant en BTS Biologie Medicale ?",
@@ -79,6 +79,7 @@ export default function Tarifs() {
                 {[
                   'Frais d\'inscription : 500 euros (inclus dans le tarif annuel)',
                   'Echelonnement des paiements possible (jusqu\'a 10 fois sans frais)',
+                  'Pret etudiant facilite via notre partenaire bancaire LCL',
                   'Acces complet aux laboratoires et equipements',
                   'Supports de cours et plateforme numerique inclus',
                   'Accompagnement personnalise pour le financement',
@@ -201,8 +202,8 @@ export default function Tarifs() {
                 who: 'Initial & Alternance',
               },
               {
-                title: 'Pret etudiant garanti par l\'Etat',
-                description: "Un pret etudiant a taux preferentiel, sans caution parentale, pouvant atteindre 20 000 euros. Il est propose par plusieurs banques partenaires et garanti par Bpifrance. Le remboursement ne commence qu'a la fin de vos etudes.",
+                title: 'Pret etudiant LCL (banque partenaire)',
+                description: "Linova est en partenariat avec le LCL pour faciliter l'acces a un pret etudiant a conditions preferentielles. Demarches simplifiees, taux negocie, montant adapte aux frais de scolarite et au cout de la vie etudiante. Notre service administratif vous accompagne dans le montage du dossier.",
                 who: 'Initial',
               },
               {
