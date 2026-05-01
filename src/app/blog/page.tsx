@@ -139,19 +139,28 @@ export default async function Blog() {
     (a, b) => b.publishedAt.localeCompare(a.publishedAt)
   );
 
-  // Cover : si l'article a une image (URL Unsplash ou chemin local statique),
-  // on la garde. Sinon fallback sur cover SVG brandée par slug.
-  const allArticles: BlogCard[] = sorted.map((article) => ({
-    ...article,
-    image:
-      article.image && article.image.length > 0
-        ? article.image
-        : generateArticleCover({
-            slug: article.slug,
-            title: article.title,
-            category: article.categories[0],
-          }),
-  }));
+  // RÈGLE ABSOLUE — aucun article ne doit avoir la même photo qu'un autre.
+  //
+  // 1) On parcourt la liste triée (du plus récent au plus ancien)
+  // 2) Si l'image est vide → fallback sur cover SVG brandée par slug
+  // 3) Si l'image est déjà utilisée plus haut dans la liste → fallback SVG aussi
+  // 4) Le fallback SVG est garanti unique par construction (dérivé du slug,
+  //    et tous les slugs sont uniques)
+  const usedImages = new Set<string>();
+  const allArticles: BlogCard[] = sorted.map((article) => {
+    let image = article.image && article.image.length > 0 ? article.image : '';
+
+    if (!image || usedImages.has(image)) {
+      image = generateArticleCover({
+        slug: article.slug,
+        title: article.title,
+        category: article.categories[0],
+      });
+    }
+
+    usedImages.add(image);
+    return { ...article, image };
+  });
 
   return (
     <>
