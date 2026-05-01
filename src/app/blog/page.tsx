@@ -54,6 +54,21 @@ function formatFrDate(iso: string): string {
   });
 }
 
+/**
+ * Extrait une clé d'identification stable à partir d'une URL d'image.
+ * Pour Unsplash, on isole l'ID de la photo (`photo-XXX-YYY`) — deux URLs
+ * peuvent renvoyer la même photo avec des paramètres ixid différents.
+ * Pour les autres, on garde l'URL complète.
+ */
+function imageKey(url: string): string {
+  if (!url) return '';
+  const unsplashMatch = url.match(/\/photo-([a-z0-9-]+)/i);
+  if (unsplashMatch) return `unsplash:${unsplashMatch[1]}`;
+  // SVG data URI : on hashe le contenu encodé pour avoir une clé courte
+  if (url.startsWith('data:image/svg+xml')) return url.slice(0, 200);
+  return url;
+}
+
 // ─── Articles statiques ──────────────────────────────────────────────────────
 const STATIC_ARTICLES: BlogCard[] = [
   // Métiers
@@ -141,24 +156,26 @@ export default async function Blog() {
 
   // RÈGLE ABSOLUE — aucun article ne doit avoir la même photo qu'un autre.
   //
-  // 1) On parcourt la liste triée (du plus récent au plus ancien)
-  // 2) Si l'image est vide → fallback sur cover SVG brandée par slug
-  // 3) Si l'image est déjà utilisée plus haut dans la liste → fallback SVG aussi
-  // 4) Le fallback SVG est garanti unique par construction (dérivé du slug,
-  //    et tous les slugs sont uniques)
-  const usedImages = new Set<string>();
+  // On dédoublonne sur l'ID Unsplash (la partie /photo-XXX), pas sur l'URL
+  // complète, car deux recherches Unsplash différentes peuvent renvoyer la
+  // même photo avec des paramètres ixid distincts.
+  // Si collision détectée → fallback sur cover SVG brandée par slug
+  // (unique par construction).
+  const usedImageKeys = new Set<string>();
   const allArticles: BlogCard[] = sorted.map((article) => {
     let image = article.image && article.image.length > 0 ? article.image : '';
+    let key = imageKey(image);
 
-    if (!image || usedImages.has(image)) {
+    if (!image || usedImageKeys.has(key)) {
       image = generateArticleCover({
         slug: article.slug,
         title: article.title,
         category: article.categories[0],
       });
+      key = imageKey(image);
     }
 
-    usedImages.add(image);
+    usedImageKeys.add(key);
     return { ...article, image };
   });
 
