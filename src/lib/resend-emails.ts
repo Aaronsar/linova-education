@@ -288,11 +288,39 @@ function emailLayout(opts: { title: string; iconBg: string; icon: string; intro:
 /** Email envoyé immédiatement quand le statut passe à "inscrit". */
 export async function sendInscriptionConfirmation(params: BookingEmailParams) {
   const typeLabel = TYPE_LABELS[params.appointmentType] || params.appointmentType;
+  const isAlternance = params.appointmentType === 'alternance';
+
+  const alternanceBlock = isAlternance
+    ? `
+    <div style="background-color:#EEE4D8;border-radius:12px;padding:20px;margin:24px 0;">
+      <p style="margin:0 0 8px;font-weight:700;color:#182D3C;font-size:15px;">🎯 Étape clé : trouvez votre entreprise d'accueil</p>
+      <p style="margin:0 0 12px;color:#444;">
+        Votre inscription est validée — il vous reste maintenant à <strong>décrocher votre contrat d'alternance</strong>.
+        Sans entreprise d'accueil, le démarrage de la formation ne peut être finalisé. Lancez la recherche dès maintenant !
+      </p>
+      <ul style="padding-left:20px;color:#444;margin:0;">
+        <li style="margin-bottom:6px;">Postulez en priorité dans les <strong>laboratoires d'analyses médicales</strong> (Cerba, Biogroup, Eurofins, laboratoires hospitaliers, EFS, centres de recherche).</li>
+        <li style="margin-bottom:6px;">Mobilisez votre réseau, LinkedIn, et envoyez des candidatures spontanées ciblées.</li>
+        <li style="margin-bottom:6px;">Notre équipe vous accompagne : envoyez votre CV à <a href="mailto:admissions@linova-education.fr" style="color:#182D3C;">admissions@linova-education.fr</a>, nous vous transmettrons des contacts et conseils personnalisés.</li>
+      </ul>
+      <p style="margin:12px 0 0;color:#444;font-size:13px;">
+        <strong>Bon à savoir :</strong> en alternance, votre formation est intégralement prise en charge par l'OPCO et vous percevez une rémunération mensuelle.
+      </p>
+    </div>
+  `
+    : '';
+
   const body = `
     <p>Bonjour <strong>${params.firstName}</strong>,</p>
     <p>Toute l'équipe de Linova Éducation a le plaisir de vous confirmer votre <strong>inscription au BTS Biologie Médicale — ${typeLabel}</strong>. Bienvenue parmi nous !</p>
+    ${alternanceBlock}
     <p style="margin:24px 0 12px;font-weight:700;color:#182D3C;">Les prochaines étapes :</p>
     <ul style="padding-left:20px;color:#444;">
+      ${
+        isAlternance
+          ? `<li style="margin-bottom:8px;"><strong>Trouvez votre entreprise d'accueil</strong> dès que possible (voir ci-dessus) — sans contrat signé, votre place ne peut être garantie.</li>`
+          : ''
+      }
       <li style="margin-bottom:8px;">Vous recevrez prochainement votre <strong>convocation officielle</strong> précisant la date de rentrée.</li>
       <li style="margin-bottom:8px;">Notre équipe administrative reviendra vers vous pour finaliser le dossier (paiement, attestation CVEC, signature du contrat de formation).</li>
       <li style="margin-bottom:8px;">Un kit de bienvenue contenant l'emploi du temps, les ressources pédagogiques et l'accès à l'extranet vous sera transmis avant la rentrée.</li>
@@ -307,7 +335,9 @@ export async function sendInscriptionConfirmation(params: BookingEmailParams) {
       title: 'Bienvenue chez Linova !',
       iconBg: '#E6DC40',
       icon: '🎓',
-      intro: `Votre inscription au BTS Biologie Médicale est officiellement validée.`,
+      intro: isAlternance
+        ? `Votre inscription au BTS Biologie Médicale est validée. Prochaine étape : décrocher votre alternance.`
+        : `Votre inscription au BTS Biologie Médicale est officiellement validée.`,
       body,
       footerNote: `<strong>Prochain rendez-vous :</strong> rentrée mi-septembre · 85 Avenue Ledru-Rollin, 75012 Paris.`,
     }),
