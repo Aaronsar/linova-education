@@ -5,6 +5,7 @@ import {
   sendReminder24hSms,
   sendReminder2hSms,
 } from '@/lib/appointment-reminders';
+import { sendDossierAdmission, sendCandidatureRejected } from '@/lib/resend-emails';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -70,6 +71,8 @@ export async function GET(request: NextRequest) {
     email24h: 0,
     sms24h: 0,
     sms2h: 0,
+    dossierAdmission: 0,
+    dossierRefuse: 0,
     errors: [] as string[],
   };
 
@@ -140,6 +143,75 @@ export async function GET(request: NextRequest) {
         .from('linova_appointments')
         .update({ reminder_2h_sent_at: new Date().toISOString() })
         .eq('id', appt.id);
+    }
+  }
+
+  // ─── Dossier d'admission différé (24h après dossier_accepte) ───────────────
+  const nowIso = new Date().toISOString();
+  const { data: dossierToSend } = await supabase
+    .from('linova_appointments')
+    .select('id, first_name, last_name, email, phone, appointment_type, date, time_slot, current_studies, message')
+    .eq('status', 'dossier_accepte')
+    .is('dossier_admission_email_sent_at', null)
+    .not('dossier_admission_email_send_at', 'is', null)
+    .lte('dossier_admission_email_send_at', nowIso);
+
+  for (const appt of dossierToSend || []) {
+    try {
+      await sendDossierAdmission({
+        firstName: appt.first_name,
+        lastName: appt.last_name,
+        email: appt.email,
+        phone: appt.phone,
+        appointmentType: appt.appointment_type,
+        date: appt.date,
+        timeSlot: appt.time_slot,
+        currentStudies: appt.current_studies || undefined,
+        message: appt.message || undefined,
+      });
+      await supabase
+        .from('linova_appointments')
+        .update({ dossier_admission_email_sent_at: new Date().toISOString() })
+        .eq('id', appt.id);
+      results.dossierAdmission++;
+    } catch (err) {
+      results.errors.push(
+        `dossierAdmission ${appt.id}: ${err instanceof Error ? err.message : 'unknown'}`
+      );
+    }
+  }
+
+  // ─── Candidature non retenue différée (24h après dossier_refuse) ────────────
+  const { data: refuseToSend } = await supabase
+    .from('linova_appointments')
+    .select('id, first_name, last_name, email, phone, appointment_type, date, time_slot, current_studies, message')
+    .eq('status', 'dossier_refuse')
+    .is('dossier_refuse_email_sent_at', null)
+    .not('dossier_refuse_email_send_at', 'is', null)
+    .lte('dossier_refuse_email_send_at', nowIso);
+
+  for (const appt of refuseToSend || []) {
+    try {
+      await sendCandidatureRejected({
+        firstName: appt.first_name,
+        lastName: appt.last_name,
+        email: appt.email,
+        phone: appt.phone,
+        appointmentType: appt.appointment_type,
+        date: appt.date,
+        timeSlot: appt.time_slot,
+        currentStudies: appt.current_studies || undefined,
+        message: appt.message || undefined,
+      });
+      await supabase
+        .from('linova_appointments')
+        .update({ dossier_refuse_email_sent_at: new Date().toISOString() })
+        .eq('id', appt.id);
+      results.dossierRefuse++;
+    } catch (err) {
+      results.errors.push(
+        `dossierRefuse ${appt.id}: ${err instanceof Error ? err.message : 'unknown'}`
+      );
     }
   }
 

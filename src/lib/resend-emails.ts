@@ -20,6 +20,20 @@ function formatDate(date: string): string {
   });
 }
 
+/**
+ * Si EMAIL_TEST_REDIRECT est défini, redirige tous les emails vers cette
+ * adresse et préfixe le sujet avec [TEST → vrai-destinataire@…]. Pratique
+ * pour valider les nouveaux templates avant de les activer en prod.
+ */
+function resolveRecipient(to: { email: string; name?: string }, subject: string) {
+  const testTo = process.env.EMAIL_TEST_REDIRECT?.trim();
+  if (!testTo) return { to, subject };
+  return {
+    to: { email: testTo, name: to.name },
+    subject: `[TEST → ${to.email}] ${subject}`,
+  };
+}
+
 async function sendBrevoEmail(payload: {
   to: { email: string; name?: string };
   subject: string;
@@ -28,6 +42,8 @@ async function sendBrevoEmail(payload: {
 }) {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) throw new Error('Missing BREVO_API_KEY');
+
+  const { to, subject } = resolveRecipient(payload.to, payload.subject);
 
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
@@ -38,8 +54,8 @@ async function sendBrevoEmail(payload: {
     },
     body: JSON.stringify({
       sender: { name: FROM_NAME, email: FROM_EMAIL },
-      to: [payload.to],
-      subject: payload.subject,
+      to: [to],
+      subject,
       htmlContent: payload.htmlContent,
       replyTo: payload.replyTo,
     }),
@@ -219,5 +235,148 @@ export async function sendNotificationToAdmissions(params: BookingEmailParams) {
 </body>
 </html>
     `,
+  });
+}
+
+// ─── Emails post-entretien ───────────────────────────────────────────────────
+
+/** Layout HTML commun (header navy + footer signature) */
+function emailLayout(opts: { title: string; iconBg: string; icon: string; intro: string; body: string; footerNote?: string }) {
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background-color:#F9F9F9;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F9F9F9;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background-color:#182D3C;padding:32px 40px;text-align:center;">
+              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">Linova Éducation</h1>
+              <p style="margin:4px 0 0;color:#6DA3A4;font-size:13px;">École des métiers de la santé</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 40px 0;text-align:center;">
+              <div style="display:inline-block;background-color:${opts.iconBg};border-radius:50%;width:56px;height:56px;line-height:56px;font-size:24px;margin-bottom:16px;">${opts.icon}</div>
+              <h2 style="margin:0 0 8px;color:#182D3C;font-size:24px;font-weight:700;">${opts.title}</h2>
+              <p style="margin:0;color:#666;font-size:15px;line-height:1.5;">${opts.intro}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px;color:#222;font-size:14px;line-height:1.6;">
+              ${opts.body}
+            </td>
+          </tr>
+          ${opts.footerNote ? `<tr><td style="padding:0 40px 24px;"><div style="background-color:#EEE4D8;border-radius:8px;padding:16px 20px;color:#182D3C;font-size:13px;line-height:1.6;">${opts.footerNote}</div></td></tr>` : ''}
+          <tr>
+            <td style="background-color:#182D3C;padding:24px 40px;text-align:center;">
+              <p style="margin:0;color:#6DA3A4;font-size:12px;">© 2025 Linova Éducation · 85 Av. Ledru-Rollin, 75012 Paris</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+/** Email envoyé immédiatement quand le statut passe à "inscrit". */
+export async function sendInscriptionConfirmation(params: BookingEmailParams) {
+  const typeLabel = TYPE_LABELS[params.appointmentType] || params.appointmentType;
+  const body = `
+    <p>Bonjour <strong>${params.firstName}</strong>,</p>
+    <p>Toute l'équipe de Linova Éducation a le plaisir de vous confirmer votre <strong>inscription au BTS Biologie Médicale — ${typeLabel}</strong>. Bienvenue parmi nous !</p>
+    <p style="margin:24px 0 12px;font-weight:700;color:#182D3C;">Les prochaines étapes :</p>
+    <ul style="padding-left:20px;color:#444;">
+      <li style="margin-bottom:8px;">Vous recevrez prochainement votre <strong>convocation officielle</strong> précisant la date de rentrée.</li>
+      <li style="margin-bottom:8px;">Notre équipe administrative reviendra vers vous pour finaliser le dossier (paiement, attestation CVEC, signature du contrat de formation).</li>
+      <li style="margin-bottom:8px;">Un kit de bienvenue contenant l'emploi du temps, les ressources pédagogiques et l'accès à l'extranet vous sera transmis avant la rentrée.</li>
+    </ul>
+    <p style="margin-top:24px;">Pour toute question, n'hésitez pas à nous écrire à <a href="mailto:admissions@linova-education.fr" style="color:#6DA3A4;">admissions@linova-education.fr</a> ou à nous appeler au <strong>01 89 71 99 44</strong>.</p>
+    <p>À très vite,<br><strong>L'équipe admissions Linova</strong></p>
+  `;
+  await sendBrevoEmail({
+    to: { email: params.email, name: `${params.firstName} ${params.lastName}` },
+    subject: 'Confirmation de votre inscription au BTS Biologie Médicale — Linova',
+    htmlContent: emailLayout({
+      title: 'Bienvenue chez Linova !',
+      iconBg: '#E6DC40',
+      icon: '🎓',
+      intro: `Votre inscription au BTS Biologie Médicale est officiellement validée.`,
+      body,
+      footerNote: `<strong>Prochain rendez-vous :</strong> rentrée mi-septembre · 85 Avenue Ledru-Rollin, 75012 Paris.`,
+    }),
+  });
+}
+
+/** Email envoyé 24 h après le passage à "dossier_accepte" — contient le dossier d'inscription. */
+export async function sendDossierAdmission(params: BookingEmailParams) {
+  const typeLabel = TYPE_LABELS[params.appointmentType] || params.appointmentType;
+  const dossierUrl = 'https://linova-education.fr/dossier-inscription-alternance';
+  const body = `
+    <p>Bonjour <strong>${params.firstName}</strong>,</p>
+    <p>Suite à votre entretien d'admission au <strong>BTS Biologie Médicale — ${typeLabel}</strong>, nous avons le plaisir de vous informer que <strong>votre candidature a été retenue</strong>. Bravo !</p>
+    <p>Pour officialiser votre admission, merci de remplir le <strong>dossier d'inscription</strong> en cliquant sur le lien ci-dessous :</p>
+    <p style="text-align:center;margin:28px 0;">
+      <a href="${dossierUrl}" style="display:inline-block;background-color:#182D3C;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:9999px;font-weight:700;font-size:15px;">Compléter mon dossier d'inscription</a>
+    </p>
+    <p style="margin:24px 0 12px;font-weight:700;color:#182D3C;">Pièces à préparer :</p>
+    <ul style="padding-left:20px;color:#444;">
+      <li style="margin-bottom:6px;">Pièce d'identité (CNI ou passeport en cours de validité)</li>
+      <li style="margin-bottom:6px;">Photo d'identité récente</li>
+      <li style="margin-bottom:6px;">Dernier diplôme obtenu et derniers bulletins scolaires</li>
+      <li style="margin-bottom:6px;">CV à jour</li>
+      <li style="margin-bottom:6px;">Attestation CVEC (à obtenir sur cvec.etudiant.gouv.fr)</li>
+    </ul>
+    <p style="margin-top:24px;">Merci de finaliser votre dossier <strong>sous 14 jours</strong> pour garantir votre place.</p>
+    <p>Une question ? Nous sommes à votre disposition à <a href="mailto:admissions@linova-education.fr" style="color:#6DA3A4;">admissions@linova-education.fr</a> ou au <strong>01 89 71 99 44</strong>.</p>
+    <p>À très vite,<br><strong>L'équipe admissions Linova</strong></p>
+  `;
+  await sendBrevoEmail({
+    to: { email: params.email, name: `${params.firstName} ${params.lastName}` },
+    subject: 'Votre dossier d\'admission BTS Biologie Médicale — Linova',
+    htmlContent: emailLayout({
+      title: 'Votre admission est confirmée !',
+      iconBg: '#6DA3A4',
+      icon: '📋',
+      intro: `Félicitations ${params.firstName}, votre candidature au BTS Biologie Médicale est retenue.`,
+      body,
+      footerNote: `<strong>Délai de retour :</strong> 14 jours · <strong>Lieu :</strong> 85 Avenue Ledru-Rollin, 75012 Paris.`,
+    }),
+  });
+}
+
+/** Email envoyé immédiatement quand le statut passe à "dossier_refuse". */
+export async function sendCandidatureRejected(params: BookingEmailParams) {
+  const body = `
+    <p>Bonjour <strong>${params.firstName}</strong>,</p>
+    <p>Nous avons étudié avec attention votre candidature au BTS Biologie Médicale, et nous vous remercions sincèrement de l'intérêt que vous portez à Linova Éducation.</p>
+    <p>Après analyse, nous sommes au regret de vous informer que <strong>votre candidature n'a pas été retenue</strong> pour cette session.</p>
+    <p>Cette décision ne remet en aucun cas en cause vos qualités personnelles ou votre parcours. Le nombre de places étant limité, nous avons dû opérer une sélection difficile parmi de très nombreuses candidatures de qualité.</p>
+    <p style="margin:24px 0 12px;font-weight:700;color:#182D3C;">Et maintenant ?</p>
+    <ul style="padding-left:20px;color:#444;">
+      <li style="margin-bottom:8px;">D'autres formations en biologie médicale ou en santé peuvent correspondre à votre projet — nous vous invitons à les explorer.</li>
+      <li style="margin-bottom:8px;">Vous pouvez recandidater l'année prochaine si votre profil évolue (nouvelle expérience, formation complémentaire, projet précisé).</li>
+      <li style="margin-bottom:8px;">Notre équipe reste disponible pour échanger sur les pistes d'orientation possibles.</li>
+    </ul>
+    <p style="margin-top:24px;">Nous vous souhaitons sincèrement <strong>beaucoup de succès dans la suite de votre parcours</strong>. Quel que soit le chemin choisi, nous sommes convaincus que votre détermination vous portera loin.</p>
+    <p>Avec nos meilleurs encouragements,<br><strong>L'équipe admissions Linova</strong></p>
+  `;
+  await sendBrevoEmail({
+    to: { email: params.email, name: `${params.firstName} ${params.lastName}` },
+    subject: 'Suite donnée à votre candidature — Linova Éducation',
+    htmlContent: emailLayout({
+      title: 'Suite à votre candidature',
+      iconBg: '#EEE4D8',
+      icon: '✉️',
+      intro: `Merci pour votre candidature et votre intérêt pour notre école.`,
+      body,
+      footerNote: `Pour échanger : <a href="mailto:admissions@linova-education.fr" style="color:#182D3C;">admissions@linova-education.fr</a> · 01 89 71 99 44`,
+    }),
   });
 }

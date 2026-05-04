@@ -15,7 +15,7 @@ interface Appointment {
   phone: string;
   current_studies: string | null;
   message: string | null;
-  status: 'confirmed' | 'cancelled' | 'completed';
+  status: 'confirmed' | 'cancelled' | 'completed' | 'dossier_accepte' | 'dossier_refuse' | 'inscrit';
   google_event_id: string | null;
   reminder_24h_sent_at: string | null;
   reminder_2h_sent_at: string | null;
@@ -30,7 +30,18 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
   confirmed: { label: 'Confirmé', bg: 'bg-green-100', text: 'text-green-700' },
   cancelled: { label: 'Annulé', bg: 'bg-red-100', text: 'text-red-700' },
   completed: { label: 'Effectué', bg: 'bg-gray-100', text: 'text-gray-700' },
+  dossier_accepte: { label: 'Dossier accepté', bg: 'bg-teal/15', text: 'text-teal-700' },
+  dossier_refuse: { label: 'Dossier refusé', bg: 'bg-orange-100', text: 'text-orange-700' },
+  inscrit: { label: 'Inscrit', bg: 'bg-yellow/30', text: 'text-yellow-700' },
 };
+
+// Statuts disponibles dans le sélecteur du modal pour un rendez-vous passé
+const PAST_STATUS_OPTIONS: { value: Appointment['status']; label: string }[] = [
+  { value: 'dossier_accepte', label: 'Effectué — dossier accepté' },
+  { value: 'dossier_refuse', label: 'Effectué — dossier refusé' },
+  { value: 'inscrit', label: 'Inscrit' },
+  { value: 'cancelled', label: 'Annulé' },
+];
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr + 'T12:00:00');
@@ -59,6 +70,8 @@ export default function RendezVousAdminPage() {
   const [search, setSearch] = useState('');
   const [updating, setUpdating] = useState<string | null>(null);
   const [selected, setSelected] = useState<Appointment | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<Appointment['status'] | ''>('');
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
   const fetchAppointments = useCallback(async () => {
     const today = new Date().toISOString().split('T')[0];
@@ -90,12 +103,43 @@ export default function RendezVousAdminPage() {
     };
   }, [fetchAppointments]);
 
+  // Reset le sélecteur quand on change de rdv ou ferme le modal
+  useEffect(() => {
+    setPendingStatus('');
+    setUpdateError(null);
+  }, [selected?.id]);
+
   const updateStatus = async (id: string, status: Appointment['status']) => {
     setUpdating(id);
-    await supabase.from('linova_appointments').update({ status }).eq('id', id);
-    await fetchAppointments();
-    setUpdating(null);
-    if (selected?.id === id) setSelected((prev) => (prev ? { ...prev, status } : null));
+    setUpdateError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) {
+        setUpdateError('Session expirée, veuillez vous reconnecter.');
+        return;
+      }
+      const res = await fetch('/api/rendez-vous/update-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ appointmentId: id, newStatus: status }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setUpdateError(data.error || 'Erreur lors de la mise à jour');
+        return;
+      }
+      if (data.emailWarning) {
+        setUpdateError(`Statut mis à jour mais : ${data.emailWarning}`);
+      }
+      await fetchAppointments();
+      if (selected?.id === id) setSelected((prev) => (prev ? { ...prev, status } : null));
+    } finally {
+      setUpdating(null);
+    }
   };
 
   const filtered = appointments.filter((a) => {
@@ -435,31 +479,58 @@ export default function RendezVousAdminPage() {
               )}
             </div>
 
-            <div className="flex gap-2 mt-5 pt-4 border-t border-gray-100">
-              <a
-                href={`mailto:${selected.email}?subject=Votre entretien d'admission Linova`}
-                className="flex-1 text-center py-2.5 bg-navy text-white rounded-xl text-sm font-semibold hover:bg-navy-dark transition-colors"
-              >
-                Envoyer un email
-              </a>
-              {selected.status === 'confirmed' && selected.date < today && (
-                <button
-                  onClick={() => updateStatus(selected.id, 'completed')}
-                  disabled={updating === selected.id}
-                  className="px-4 py-2.5 border border-green-200 text-green-600 rounded-xl text-sm font-semibold hover:bg-green-50 transition-colors cursor-pointer disabled:opacity-50"
-                >
-                  Marquer effectué
-                </button>
-              )}
-              {selected.status === 'confirmed' && selected.date >= today && (
+            {/* Mise à jour du statut */}
+            <div className="mt-5 pt-4 border-t border-gray-100">
+              {selected.date < today ? (
+                <>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                    Mettre à jour le statut
+                  </p>
+                  <div className="flex gap-2">
+                    <select
+                      value={pendingStatus || ''}
+                      onChange={(e) => setPendingStatus(e.target.value as Appointment['status'])}
+                      className="flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal bg-white text-dark"
+                      disabled={updating === selected.id}
+                    >
+                      <option value="">— Choisir un statut —</option>
+                      {PAST_STATUS_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => {
+                        if (pendingStatus) updateStatus(selected.id, pendingStatus);
+                      }}
+                      disabled={!pendingStatus || updating === selected.id}
+                      className="px-4 py-2.5 bg-navy text-white rounded-xl text-sm font-semibold hover:bg-navy-dark transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {updating === selected.id ? '...' : 'Valider'}
+                    </button>
+                  </div>
+                </>
+              ) : selected.status === 'confirmed' ? (
                 <button
                   onClick={() => updateStatus(selected.id, 'cancelled')}
                   disabled={updating === selected.id}
-                  className="px-4 py-2.5 border border-red-200 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
+                  className="w-full py-2.5 border border-red-200 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  Annuler
+                  Annuler le rendez-vous
                 </button>
+              ) : null}
+
+              {updateError && (
+                <p className="text-xs text-red-600 mt-2">{updateError}</p>
               )}
+
+              <a
+                href={`mailto:${selected.email}?subject=Votre entretien d'admission Linova`}
+                className="block mt-3 text-center py-2.5 border border-navy text-navy rounded-xl text-sm font-semibold hover:bg-navy hover:text-white transition-colors"
+              >
+                Envoyer un email
+              </a>
             </div>
           </div>
         </div>
