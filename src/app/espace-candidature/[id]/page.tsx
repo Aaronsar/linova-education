@@ -119,9 +119,12 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
       .update({ statut: newStatus })
       .eq('id', inscription.id);
 
-    if (!error) {
+    if (error) {
+      console.error('updateStatus error:', error);
+      showSaveMessage(`Erreur : ${error.message}`);
+    } else {
       setInscription((prev) => prev ? { ...prev, statut: newStatus } : prev);
-      showSaveMessage('Statut mis a jour');
+      showSaveMessage('Statut mis à jour');
     }
     setSavingStatus(false);
   };
@@ -134,8 +137,11 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
       .update({ notes_admin: notesAdmin })
       .eq('id', inscription.id);
 
-    if (!error) {
-      showSaveMessage('Notes enregistrees');
+    if (error) {
+      console.error('saveNotes error:', error);
+      showSaveMessage(`Erreur : ${error.message}`);
+    } else {
+      showSaveMessage('Notes enregistrées');
     }
     setSavingNotes(false);
   };
