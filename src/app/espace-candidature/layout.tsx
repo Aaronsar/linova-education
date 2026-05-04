@@ -15,6 +15,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   const tabs = [
     { href: '/espace-candidature', label: 'Inscriptions' },
     { href: '/espace-candidature/rendez-vous', label: 'Rendez-vous' },
+    { href: '/espace-candidature/tests', label: 'Tests admission' },
   ];
 
   const isActiveTab = (href: string) => {
