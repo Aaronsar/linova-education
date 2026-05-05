@@ -23,7 +23,19 @@ interface AdmissionTest {
   max_score: number;
   per_question: PerQuestion[];
   linked_appointment_id: string | null;
+  started_at: string | null;
+  time_expired: boolean;
   created_at: string;
+}
+
+function formatDuration(startIso: string | null, endIso: string): string {
+  if (!startIso) return '—';
+  const ms = new Date(endIso).getTime() - new Date(startIso).getTime();
+  if (ms < 0) return '—';
+  const totalSec = Math.floor(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m} min ${String(s).padStart(2, '0')}`;
 }
 
 const QUESTION_BY_ID = Object.fromEntries(QCM_QUESTIONS.map((q) => [q.id, q]));
@@ -55,7 +67,7 @@ export default function AdmissionTestsPage() {
   const fetchTests = useCallback(async () => {
     const { data, error } = await supabase
       .from('linova_admission_tests')
-      .select('id, first_name, last_name, email, phone, score, max_score, per_question, linked_appointment_id, created_at')
+      .select('id, first_name, last_name, email, phone, score, max_score, per_question, linked_appointment_id, started_at, time_expired, created_at')
       .order('created_at', { ascending: false });
     if (!error && data) setTests(data as AdmissionTest[]);
     setLoading(false);
@@ -214,7 +226,17 @@ export default function AdmissionTestsPage() {
                 <p className="text-xs text-gray-500 mt-1">
                   {selected.email} · {selected.phone}
                 </p>
-                <p className="text-xs text-gray-400 mt-0.5">Soumis le {formatDateTime(selected.created_at)}</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Soumis le {formatDateTime(selected.created_at)}
+                  {selected.started_at && (
+                    <> · Durée : <strong>{formatDuration(selected.started_at, selected.created_at)}</strong></>
+                  )}
+                  {selected.time_expired && (
+                    <span className="ml-2 inline-flex px-2 py-0.5 bg-red-50 text-red-700 rounded-full text-[10px] font-bold">
+                      ⏱ Temps écoulé
+                    </span>
+                  )}
+                </p>
               </div>
               <div className="flex items-center gap-3">
                 <span className={`inline-flex px-3 py-1.5 rounded-full text-sm font-bold ${scoreColor(selected.score, selected.max_score)}`}>

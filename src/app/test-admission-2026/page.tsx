@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { QCM_QUESTIONS, type QcmQuestion } from '@/lib/admission-qcm-questions';
 
 type Letter = 'A' | 'B' | 'C' | 'D';
+
+const TEST_DURATION_MS = 40 * 60 * 1000; // 40 minutes
 
 interface Identity {
   firstName: string;
@@ -20,6 +22,9 @@ export default function TestAdmissionPage() {
   const [answers, setAnswers] = useState<Record<string, Letter[]>>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  const [now, setNow] = useState<number>(() => Date.now());
+  const submittedRef = useRef(false);
 
   const canStartQcm =
     identity.firstName.trim() &&
@@ -28,6 +33,13 @@ export default function TestAdmissionPage() {
     identity.phone.trim().length >= 8;
 
   const allAnswered = QCM_QUESTIONS.every((q) => (answers[q.id]?.length ?? 0) > 0);
+
+  // Tick toutes les secondes pendant le QCM pour rafraîchir le countdown
+  useEffect(() => {
+    if (step !== 'qcm') return;
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, [step]);
 
   function toggleAnswer(qId: string, letter: Letter) {
     setAnswers((prev) => {
@@ -39,7 +51,9 @@ export default function TestAdmissionPage() {
     });
   }
 
-  async function submitTest() {
+  const submitTest = useCallback(async (timeExpired = false) => {
+    if (submittedRef.current) return;
+    submittedRef.current = true;
     setSubmitting(true);
     setError(null);
     try {
@@ -52,19 +66,38 @@ export default function TestAdmissionPage() {
           email: identity.email.trim(),
           phone: identity.phone.trim(),
           answers: Object.entries(answers).map(([id, selected]) => ({ id, selected })),
+          startedAt: startedAt ? new Date(startedAt).toISOString() : null,
+          timeExpired,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || 'Une erreur est survenue. Veuillez réessayer.');
+        submittedRef.current = false;
         return;
       }
       setStep('done');
     } catch {
       setError('Erreur de connexion. Veuillez réessayer.');
+      submittedRef.current = false;
     } finally {
       setSubmitting(false);
     }
+  }, [identity, answers, startedAt]);
+
+  // Auto-submit à expiration du timer
+  const remainingMs = startedAt ? Math.max(0, TEST_DURATION_MS - (now - startedAt)) : TEST_DURATION_MS;
+  useEffect(() => {
+    if (step !== 'qcm' || !startedAt) return;
+    if (remainingMs <= 0 && !submittedRef.current) {
+      submitTest(true);
+    }
+  }, [remainingMs, step, startedAt, submitTest]);
+
+  function startQcm() {
+    setStartedAt(Date.now());
+    setNow(Date.now());
+    setStep('qcm');
   }
 
   return (
@@ -88,7 +121,7 @@ export default function TestAdmissionPage() {
             identity={identity}
             setIdentity={setIdentity}
             canStart={!!canStartQcm}
-            onStart={() => setStep('qcm')}
+            onStart={startQcm}
           />
         )}
 
@@ -99,7 +132,8 @@ export default function TestAdmissionPage() {
             allAnswered={allAnswered}
             submitting={submitting}
             error={error}
-            onSubmit={submitTest}
+            onSubmit={() => submitTest(false)}
+            remainingMs={remainingMs}
           />
         )}
 
@@ -226,6 +260,7 @@ function QcmStep({
   submitting,
   error,
   onSubmit,
+  remainingMs,
 }: {
   answers: Record<string, Letter[]>;
   toggleAnswer: (qId: string, letter: Letter) => void;
@@ -233,6 +268,7 @@ function QcmStep({
   submitting: boolean;
   error: string | null;
   onSubmit: () => void;
+  remainingMs: number;
 }) {
   // Regroupe par catégorie pour l'affichage
   const grouped = QCM_QUESTIONS.reduce<Record<string, QcmQuestion[]>>((acc, q) => {
@@ -242,21 +278,38 @@ function QcmStep({
 
   const answeredCount = QCM_QUESTIONS.filter((q) => (answers[q.id]?.length ?? 0) > 0).length;
 
+  // Couleur du timer en fonction du temps restant
+  const totalSec = Math.ceil(remainingMs / 1000);
+  const minutes = Math.floor(totalSec / 60);
+  const seconds = totalSec % 60;
+  const isUrgent = remainingMs <= 5 * 60 * 1000; // < 5 min
+  const isWarning = remainingMs <= 10 * 60 * 1000 && !isUrgent; // 5-10 min
+  const timerClass = isUrgent
+    ? 'bg-red-500 text-white animate-pulse'
+    : isWarning
+      ? 'bg-orange-100 text-orange-700'
+      : 'bg-teal/15 text-teal-700';
+
   return (
     <>
-      {/* Sticky progress */}
+      {/* Sticky progress + timer */}
       <div className="sticky top-0 z-10 bg-light/95 backdrop-blur py-3 mb-4 -mx-4 px-4">
-        <div className="bg-white rounded-xl border border-gray-100 p-3 flex items-center justify-between">
-          <span className="text-sm font-semibold text-navy">
-            {answeredCount} / {QCM_QUESTIONS.length} questions
+        <div className="bg-white rounded-xl border border-gray-100 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <span className={`px-3 py-1.5 rounded-lg text-sm font-mono font-bold tabular-nums flex items-center gap-2 ${timerClass}`}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
           </span>
-          <div className="flex-1 mx-4 h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-teal transition-all"
               style={{ width: `${(answeredCount / QCM_QUESTIONS.length) * 100}%` }}
             />
           </div>
-          <span className="text-xs text-gray-500 hidden sm:inline">Plusieurs réponses possibles</span>
+          <span className="text-sm font-semibold text-navy text-right">
+            {answeredCount} / {QCM_QUESTIONS.length}
+          </span>
         </div>
       </div>
 

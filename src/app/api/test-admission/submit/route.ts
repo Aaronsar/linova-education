@@ -20,6 +20,8 @@ interface SubmitBody {
   email?: string;
   phone?: string;
   answers?: { id: string; selected: AnswerLetter[] }[];
+  startedAt?: string;       // ISO date — début du QCM côté client
+  timeExpired?: boolean;    // true si auto-submit après 40 min
 }
 
 const isValidEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
@@ -87,6 +89,10 @@ export async function POST(req: NextRequest) {
     if (match) linkedAppointmentId = match.id;
   }
 
+  const startedAt = body.startedAt && !Number.isNaN(Date.parse(body.startedAt))
+    ? new Date(body.startedAt).toISOString()
+    : null;
+
   const { data: inserted, error: insertError } = await supabase
     .from('linova_admission_tests')
     .insert({
@@ -100,6 +106,8 @@ export async function POST(req: NextRequest) {
       max_score: maxScore,
       per_question: perQuestion,
       linked_appointment_id: linkedAppointmentId,
+      started_at: startedAt,
+      time_expired: !!body.timeExpired,
       user_agent: req.headers.get('user-agent') || null,
     })
     .select('id')
