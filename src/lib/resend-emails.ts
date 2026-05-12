@@ -99,6 +99,11 @@ export async function sendConfirmationToCandidate(params: BookingEmailParams) {
       <td style="padding:32px 28px 48px;">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:720px;margin:0;">
           <tr>
+            <td style="padding:0 0 24px;">
+              <img src="https://linova-education.fr/images/logos/logo-baseline-email.png" alt="Linova Éducation — École des métiers de la santé" width="180" style="display:block;max-width:180px;height:auto;border:0;outline:none;text-decoration:none;" />
+            </td>
+          </tr>
+          <tr>
             <td style="font-size:15px;line-height:1.55;color:#202124;">
               <p style="margin:0 0 16px;">Bonjour ${params.firstName},</p>
 
@@ -170,7 +175,12 @@ export async function sendNotificationToAdmissions(params: BookingEmailParams) {
       <td align="center">
         <table width="560" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
           <tr>
-            <td style="background-color:#182D3C;padding:24px 40px;">
+            <td style="background-color:#ffffff;padding:24px 40px;text-align:center;border-bottom:1px solid #EFEFEF;">
+              <img src="https://linova-education.fr/images/logos/logo-baseline-email.png" alt="Linova Éducation — École des métiers de la santé" width="200" style="display:block;margin:0 auto;max-width:200px;height:auto;border:0;outline:none;text-decoration:none;" />
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#182D3C;padding:20px 40px;">
               <h1 style="margin:0;color:#E6DC40;font-size:18px;font-weight:700;">Nouveau rendez-vous d'admission</h1>
             </td>
           </tr>
@@ -226,7 +236,9 @@ export async function sendNotificationToAdmissions(params: BookingEmailParams) {
 
 // ─── Emails post-entretien ───────────────────────────────────────────────────
 
-/** Layout HTML commun (header navy + footer signature) */
+const LOGO_URL = 'https://linova-education.fr/images/logos/logo-baseline-email.png';
+
+/** Layout HTML commun (header logo + footer signature) */
 function emailLayout(opts: { title: string; iconBg: string; icon: string; intro: string; body: string; footerNote?: string }) {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -240,9 +252,8 @@ function emailLayout(opts: { title: string; iconBg: string; icon: string; intro:
       <td align="center">
         <table width="560" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
           <tr>
-            <td style="background-color:#182D3C;padding:32px 40px;text-align:center;">
-              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">Linova Éducation</h1>
-              <p style="margin:4px 0 0;color:#6DA3A4;font-size:13px;">École des métiers de la santé</p>
+            <td style="background-color:#ffffff;padding:32px 40px 24px;text-align:center;border-bottom:1px solid #EFEFEF;">
+              <img src="${LOGO_URL}" alt="Linova Éducation — École des métiers de la santé" width="220" style="display:block;margin:0 auto;max-width:220px;height:auto;border:0;outline:none;text-decoration:none;" />
             </td>
           </tr>
           <tr>
