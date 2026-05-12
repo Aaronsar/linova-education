@@ -18,6 +18,8 @@ const statusConfig: Record<string, { label: string; bg: string; text: string }> 
   en_cours: { label: 'En traitement', bg: 'bg-yellow/20', text: 'text-yellow-700' },
   entretien: { label: 'Dossier complet', bg: 'bg-teal/15', text: 'text-teal-700' },
   accepte: { label: 'Inscrit', bg: 'bg-green-100', text: 'text-green-700' },
+  accepte_alternance: { label: 'Inscrit · Alternance', bg: 'bg-green-100', text: 'text-green-700' },
+  accepte_initial: { label: 'Inscrit · Initial', bg: 'bg-teal/20', text: 'text-teal-700' },
   refuse: { label: 'Refuse', bg: 'bg-red-100', text: 'text-red-700' },
 };
 
@@ -56,7 +58,7 @@ export default function AdminDashboard() {
     total: inscriptions.length,
     nouveau: inscriptions.filter((c) => !c.statut || c.statut === 'nouveau').length,
     en_cours: inscriptions.filter((c) => c.statut === 'en_cours' || c.statut === 'entretien').length,
-    accepte: inscriptions.filter((c) => c.statut === 'accepte').length,
+    accepte: inscriptions.filter((c) => c.statut === 'accepte' || c.statut === 'accepte_alternance' || c.statut === 'accepte_initial').length,
   };
 
   const formatDate = (dateStr: string) => {

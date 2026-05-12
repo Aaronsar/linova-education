@@ -14,9 +14,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendInscriptionConfirmation } from '@/lib/resend-emails';
 
-type CandidatureStatus = 'nouveau' | 'en_cours' | 'entretien' | 'accepte' | 'refuse';
+type CandidatureStatus =
+  | 'nouveau'
+  | 'en_cours'
+  | 'entretien'
+  | 'accepte'            // legacy (avant split)
+  | 'accepte_alternance' // Inscrit en alternance
+  | 'accepte_initial'    // Inscrit en initial
+  | 'refuse';
 
-const VALID_STATUSES: CandidatureStatus[] = ['nouveau', 'en_cours', 'entretien', 'accepte', 'refuse'];
+const VALID_STATUSES: CandidatureStatus[] = [
+  'nouveau',
+  'en_cours',
+  'entretien',
+  'accepte',
+  'accepte_alternance',
+  'accepte_initial',
+  'refuse',
+];
+
+const ACCEPTED_STATUSES: CandidatureStatus[] = ['accepte', 'accepte_alternance', 'accepte_initial'];
 
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
 
@@ -88,17 +105,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
-  // Envoi immédiat de l'email d'inscription
-  if (newStatus === 'accepte' && !cand.inscription_email_sent_at) {
+  // Envoi immédiat de l'email d'inscription (sur tous les statuts "accepte*")
+  if (ACCEPTED_STATUSES.includes(newStatus) && !cand.inscription_email_sent_at) {
+    // Détermine le type d'inscription pour adapter le template (bloc alternance ou non).
+    // 'accepte' legacy = alternance par défaut (les anciens dossiers le sont).
+    const appointmentType: 'alternance' | 'initial' =
+      newStatus === 'accepte_initial' ? 'initial' : 'alternance';
     try {
       await sendInscriptionConfirmation({
         firstName: cand.prenom,
         lastName: cand.nom,
         email: cand.email,
         phone: cand.telephone,
-        // Le formulaire de candidature est dédié à l'alternance — on suppose
-        // alternance par défaut (active le bloc "Trouvez votre entreprise d'accueil")
-        appointmentType: 'alternance',
+        appointmentType,
         date: '',
         timeSlot: '',
         currentStudies: cand.niveau_etudes || undefined,

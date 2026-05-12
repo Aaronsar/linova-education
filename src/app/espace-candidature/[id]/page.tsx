@@ -44,8 +44,11 @@ const statusOptions = [
   { value: 'nouveau', label: 'Recu', bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-400' },
   { value: 'en_cours', label: 'En traitement', bg: 'bg-yellow/20', text: 'text-yellow-700', dot: 'bg-yellow-500' },
   { value: 'entretien', label: 'Dossier complet', bg: 'bg-teal/15', text: 'text-teal-700', dot: 'bg-teal' },
-  { value: 'accepte', label: 'Inscrit', bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
+  { value: 'accepte_alternance', label: 'Inscrit en alternance', bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
+  { value: 'accepte_initial', label: 'Inscrit en initial', bg: 'bg-teal/20', text: 'text-teal-700', dot: 'bg-teal' },
   { value: 'refuse', label: 'Refuse', bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' },
+  // Legacy : ancien statut 'accepte' (avant split). Conservé pour rétrocompat.
+  { value: 'accepte', label: 'Inscrit (legacy)', bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
 ];
 
 function calculateAge(dateStr: string): number | null {
