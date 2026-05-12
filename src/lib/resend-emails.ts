@@ -100,7 +100,7 @@ export async function sendConfirmationToCandidate(params: BookingEmailParams) {
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:720px;margin:0;">
           <tr>
             <td style="padding:0 0 24px;">
-              <img src="https://linova-education.fr/images/logos/logo-baseline-email.png" alt="Linova Éducation — École des métiers de la santé" width="180" style="display:block;max-width:180px;height:auto;border:0;outline:none;text-decoration:none;" />
+              <img src="https://linova-education.fr/images/logos/logo-baseline-email.png" alt="Linova Éducation — École des métiers de la santé" width="90" style="display:block;max-width:90px;height:auto;border:0;outline:none;text-decoration:none;" />
             </td>
           </tr>
           <tr>
@@ -176,7 +176,7 @@ export async function sendNotificationToAdmissions(params: BookingEmailParams) {
         <table width="560" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
           <tr>
             <td style="background-color:#ffffff;padding:24px 40px;text-align:center;border-bottom:1px solid #EFEFEF;">
-              <img src="https://linova-education.fr/images/logos/logo-baseline-email.png" alt="Linova Éducation — École des métiers de la santé" width="200" style="display:block;margin:0 auto;max-width:200px;height:auto;border:0;outline:none;text-decoration:none;" />
+              <img src="https://linova-education.fr/images/logos/logo-baseline-email.png" alt="Linova Éducation — École des métiers de la santé" width="100" style="display:block;margin:0 auto;max-width:100px;height:auto;border:0;outline:none;text-decoration:none;" />
             </td>
           </tr>
           <tr>
@@ -253,7 +253,7 @@ function emailLayout(opts: { title: string; iconBg: string; icon: string; intro:
         <table width="560" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
           <tr>
             <td style="background-color:#ffffff;padding:32px 40px 24px;text-align:center;border-bottom:1px solid #EFEFEF;">
-              <img src="${LOGO_URL}" alt="Linova Éducation — École des métiers de la santé" width="220" style="display:block;margin:0 auto;max-width:220px;height:auto;border:0;outline:none;text-decoration:none;" />
+              <img src="${LOGO_URL}" alt="Linova Éducation — École des métiers de la santé" width="110" style="display:block;margin:0 auto;max-width:110px;height:auto;border:0;outline:none;text-decoration:none;" />
             </td>
           </tr>
           <tr>
