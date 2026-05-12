@@ -290,17 +290,21 @@ export async function sendInscriptionConfirmation(params: BookingEmailParams) {
   const alternanceBlock = isAlternance
     ? `
     <div style="background-color:#EEE4D8;border-radius:12px;padding:20px;margin:24px 0;">
-      <p style="margin:0 0 8px;font-weight:700;color:#182D3C;font-size:15px;">🎯 Étape clé : trouvez votre entreprise d'accueil</p>
+      <p style="margin:0 0 8px;font-weight:700;color:#182D3C;font-size:15px;">🤝 Nous vous accompagnons pour trouver votre entreprise</p>
       <p style="margin:0 0 12px;color:#444;">
-        Votre inscription est validée — il vous reste maintenant à <strong>décrocher votre contrat d'alternance</strong>.
-        Sans entreprise d'accueil, le démarrage de la formation ne peut être finalisé. Lancez la recherche dès maintenant !
+        Trouver une alternance est une étape clé — et <strong>vous n'êtes pas seul·e</strong>. Notre équipe va vous contacter dans les prochains jours pour vous épauler activement : mise en relation avec nos partenaires, relecture de CV, préparation aux entretiens.
       </p>
+      <p style="margin:0 0 12px;color:#444;font-weight:600;">Ce que nous mettons en place pour vous :</p>
       <ul style="padding-left:20px;color:#444;margin:0;">
-        <li style="margin-bottom:6px;">Postulez en priorité dans les <strong>laboratoires d'analyses médicales</strong> (Cerba, Biogroup, Eurofins, laboratoires hospitaliers, EFS, centres de recherche).</li>
-        <li style="margin-bottom:6px;">Mobilisez votre réseau, LinkedIn, et envoyez des candidatures spontanées ciblées.</li>
-        <li style="margin-bottom:6px;">Notre équipe vous accompagne : envoyez votre CV à <a href="mailto:admissions@linova-education.fr" style="color:#182D3C;">admissions@linova-education.fr</a>, nous vous transmettrons des contacts et conseils personnalisés.</li>
+        <li style="margin-bottom:6px;"><strong>Accès à notre réseau d'entreprises partenaires</strong> (laboratoires Cerba, Biogroup, Eurofins, laboratoires hospitaliers, EFS, centres de recherche…) qui recrutent activement des alternants Linova.</li>
+        <li style="margin-bottom:6px;"><strong>Relecture personnalisée</strong> de votre CV et lettre de motivation.</li>
+        <li style="margin-bottom:6px;"><strong>Coaching entretien</strong> pour maximiser vos chances de signer rapidement.</li>
+        <li style="margin-bottom:6px;"><strong>Suivi régulier</strong> jusqu'à la signature de votre contrat d'apprentissage.</li>
       </ul>
-      <p style="margin:12px 0 0;color:#444;font-size:13px;">
+      <p style="margin:14px 0 0;color:#182D3C;font-size:14px;">
+        👉 <strong>Première action :</strong> envoyez votre CV à <a href="mailto:admissions@linova-education.fr" style="color:#182D3C;">admissions@linova-education.fr</a> dès cette semaine, nous reviendrons vers vous très rapidement.
+      </p>
+      <p style="margin:10px 0 0;color:#444;font-size:13px;">
         <strong>Bon à savoir :</strong> en alternance, votre formation est intégralement prise en charge par l'OPCO et vous percevez une rémunération mensuelle.
       </p>
     </div>
@@ -334,10 +338,12 @@ export async function sendInscriptionConfirmation(params: BookingEmailParams) {
       iconBg: '#E6DC40',
       icon: '🎓',
       intro: isAlternance
-        ? `Votre inscription au BTS Biologie Médicale est validée. Prochaine étape : décrocher votre alternance.`
+        ? `Votre inscription au BTS Biologie Médicale est validée. Prochaine étape : décrocher votre alternance — et nous vous accompagnons.`
         : `Votre inscription au BTS Biologie Médicale est officiellement validée.`,
       body,
-      footerNote: `<strong>Prochain rendez-vous :</strong> rentrée mi-septembre · 85 Avenue Ledru-Rollin, 75012 Paris.`,
+      footerNote: isAlternance
+        ? `<strong>Vous n'êtes pas seul·e :</strong> notre équipe va vous contacter dans les prochains jours pour vous accompagner dans la recherche d'entreprise (mise en relation avec nos partenaires, relecture de CV, préparation aux entretiens). N'attendez pas — envoyez dès aujourd'hui votre CV à <a href="mailto:admissions@linova-education.fr" style="color:#182D3C;">admissions@linova-education.fr</a>.`
+        : `<strong>Prochain rendez-vous :</strong> rentrée mi-septembre · 85 Avenue Ledru-Rollin, 75012 Paris.`,
     }),
   });
 }
