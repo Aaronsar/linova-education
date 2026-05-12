@@ -132,19 +132,40 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
   const updateStatus = async (newStatus: string) => {
     if (!inscription) return;
     setSavingStatus(true);
-    const { error } = await supabase
-      .from('candidatures')
-      .update({ statut: newStatus })
-      .eq('id', inscription.id);
-
-    if (error) {
-      console.error('updateStatus error:', error);
-      showSaveMessage(`Erreur : ${error.message}`);
-    } else {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) {
+        showSaveMessage('Session expirée, veuillez vous reconnecter');
+        return;
+      }
+      const res = await fetch('/api/candidatures/update-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ candidatureId: inscription.id, newStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.error('updateStatus error:', data.error);
+        showSaveMessage(`Erreur : ${data.error || 'mise à jour échouée'}`);
+        return;
+      }
       setInscription((prev) => prev ? { ...prev, statut: newStatus } : prev);
-      showSaveMessage('Statut mis à jour');
+      if (data.emailWarning) {
+        showSaveMessage(`Statut mis à jour · ${data.emailWarning}`);
+      } else if (newStatus === 'accepte') {
+        showSaveMessage('Statut mis à jour · email d\'inscription envoyé');
+      } else if (newStatus === 'refuse') {
+        showSaveMessage('Statut mis à jour · email de refus programmé (J+1)');
+      } else {
+        showSaveMessage('Statut mis à jour');
+      }
+    } finally {
+      setSavingStatus(false);
     }
-    setSavingStatus(false);
   };
 
   const saveNotes = async () => {

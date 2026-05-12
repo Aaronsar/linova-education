@@ -73,6 +73,7 @@ export async function GET(request: NextRequest) {
     sms2h: 0,
     dossierAdmission: 0,
     dossierRefuse: 0,
+    candidatureRefuse: 0,
     errors: [] as string[],
   };
 
@@ -211,6 +212,39 @@ export async function GET(request: NextRequest) {
     } catch (err) {
       results.errors.push(
         `dossierRefuse ${appt.id}: ${err instanceof Error ? err.message : 'unknown'}`
+      );
+    }
+  }
+
+  // ─── Candidatures refusées : email différé 24 h après statut=refuse ────────
+  const { data: candRefuseToSend } = await supabase
+    .from('candidatures')
+    .select('id, prenom, nom, email, telephone, niveau_etudes')
+    .eq('statut', 'refuse')
+    .is('refuse_email_sent_at', null)
+    .not('refuse_email_send_at', 'is', null)
+    .lte('refuse_email_send_at', nowIso);
+
+  for (const cand of candRefuseToSend || []) {
+    try {
+      await sendCandidatureRejected({
+        firstName: cand.prenom,
+        lastName: cand.nom,
+        email: cand.email,
+        phone: cand.telephone,
+        appointmentType: 'alternance',
+        date: '',
+        timeSlot: '',
+        currentStudies: cand.niveau_etudes || undefined,
+      });
+      await supabase
+        .from('candidatures')
+        .update({ refuse_email_sent_at: new Date().toISOString() })
+        .eq('id', cand.id);
+      results.candidatureRefuse++;
+    } catch (err) {
+      results.errors.push(
+        `candidatureRefuse ${cand.id}: ${err instanceof Error ? err.message : 'unknown'}`
       );
     }
   }
