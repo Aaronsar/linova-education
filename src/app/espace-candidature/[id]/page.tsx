@@ -90,6 +90,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
   const [savingNotes, setSavingNotes] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchInscription();
@@ -107,6 +108,23 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
     if (!error && data) {
       setInscription(data);
       setNotesAdmin(data.notes_admin || '');
+      // Pré-charge les URLs signées pour les fichiers (bucket privé : on ne peut
+      // pas utiliser getPublicUrl, il faut signer chaque accès). Validité 1 h.
+      const paths = [data.fichier_cni_url, data.fichier_photos_url, data.fichier_releve_url].filter(
+        (p): p is string => Boolean(p)
+      );
+      if (paths.length) {
+        const { data: signed } = await supabase.storage
+          .from('candidatures')
+          .createSignedUrls(paths, 3600);
+        if (signed) {
+          const map: Record<string, string> = {};
+          signed.forEach((item) => {
+            if (item.path && item.signedUrl) map[item.path] = item.signedUrl;
+          });
+          setSignedUrls(map);
+        }
+      }
     }
     setLoading(false);
   };
@@ -153,8 +171,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
 
   const getFileDownloadUrl = (path: string): string | null => {
     if (!path) return null;
-    const { data } = supabase.storage.from('candidatures').getPublicUrl(path);
-    return data?.publicUrl || null;
+    return signedUrls[path] || null;
   };
 
   if (loading) {
