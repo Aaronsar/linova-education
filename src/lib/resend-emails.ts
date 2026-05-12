@@ -93,67 +93,53 @@ export async function sendConfirmationToCandidate(params: BookingEmailParams) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin:0;padding:0;background-color:#F9F9F9;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F9F9F9;padding:40px 20px;">
+<body style="margin:0;padding:0;background-color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#202124;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
     <tr>
-      <td align="center">
-        <table width="560" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+      <td style="padding:32px 28px 48px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:720px;margin:0;">
           <tr>
-            <td style="background-color:#182D3C;padding:32px 40px;text-align:center;">
-              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">Linova Éducation</h1>
-              <p style="margin:4px 0 0;color:#6DA3A4;font-size:13px;">École des métiers de la santé</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:32px 40px 0;text-align:center;">
-              <div style="display:inline-block;background-color:#E6DC40;border-radius:50%;width:56px;height:56px;line-height:56px;font-size:24px;margin-bottom:16px;">✓</div>
-              <h2 style="margin:0 0 8px;color:#182D3C;font-size:24px;font-weight:700;">Rendez-vous confirmé !</h2>
-              <p style="margin:0;color:#666;font-size:15px;">Bonjour ${params.firstName}, votre entretien d'admission est bien enregistré.</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:24px 40px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F9F9F9;border-radius:12px;padding:24px;">
+            <td style="font-size:15px;line-height:1.55;color:#202124;">
+              <p style="margin:0 0 16px;">Bonjour ${params.firstName},</p>
+
+              <p style="margin:0 0 16px;">
+                Nous vous confirmons votre <strong>rendez-vous d'admission</strong> pour le <strong>BTS Biologie Médicale — ${typeLabel}</strong>.
+                L'entretien se déroulera dans nos locaux, en présence d'un membre de l'équipe pédagogique.
+              </p>
+
+              <table cellpadding="0" cellspacing="0" style="margin:18px 0 22px;border-collapse:collapse;">
                 <tr>
-                  <td>
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td style="padding-bottom:16px;border-bottom:1px solid #EFEFEF;">
-                          <p style="margin:0 0 4px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Type d'entretien</p>
-                          <p style="margin:0;color:#182D3C;font-size:15px;font-weight:600;">BTS Biologie Médicale — ${typeLabel}</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding:16px 0;border-bottom:1px solid #EFEFEF;">
-                          <p style="margin:0 0 4px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Date</p>
-                          <p style="margin:0;color:#182D3C;font-size:15px;font-weight:600;">${formattedDate}</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding-top:16px;">
-                          <p style="margin:0 0 4px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Heure</p>
-                          <p style="margin:0;color:#182D3C;font-size:15px;font-weight:600;">${params.timeSlot}</p>
-                        </td>
-                      </tr>
-                    </table>
+                  <td style="border-left:3px solid #6DA3A4;padding:6px 0 6px 14px;">
+                    <p style="margin:0 0 6px;font-size:14px;color:#202124;">
+                      <span style="color:#5f6368;">Date&nbsp;:</span> <strong>${formattedDate}</strong>
+                    </p>
+                    <p style="margin:0 0 6px;font-size:14px;color:#202124;">
+                      <span style="color:#5f6368;">Heure&nbsp;:</span> <strong>${params.timeSlot}</strong>
+                    </p>
+                    <p style="margin:0;font-size:14px;color:#202124;">
+                      <span style="color:#5f6368;">Lieu&nbsp;:</span> <strong>85 Avenue Ledru-Rollin, 75012 Paris</strong>
+                    </p>
                   </td>
                 </tr>
               </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:0 40px 24px;">
-              <div style="background-color:#EEE4D8;border-radius:8px;padding:16px 20px;">
-                <p style="margin:0;color:#182D3C;font-size:13px;line-height:1.6;">
-                  <strong>Lieu :</strong> 85 Avenue Ledru-Rollin, 75012 Paris<br>
-                  Présentez-vous 5 minutes avant l'heure prévue. En cas d'empêchement, contactez-nous à <a href="mailto:admissions@linova-education.fr" style="color:#182D3C;">admissions@linova-education.fr</a>
-                </p>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td style="background-color:#182D3C;padding:24px 40px;text-align:center;">
-              <p style="margin:0;color:#6DA3A4;font-size:12px;">© 2025 Linova Éducation · 85 Av. Ledru-Rollin, 75012 Paris</p>
+
+              <p style="margin:0 0 16px;">
+                Merci de vous présenter <strong>5 minutes avant l'heure prévue</strong>, et de prévoir une pièce d'identité ainsi que votre dernier bulletin scolaire si vous le possédez.
+                Si vous avez un empêchement de dernière minute, prévenez-nous au plus vite afin que nous puissions reprogrammer l'entretien.
+              </p>
+
+              <p style="margin:0 0 16px;">
+                En cas de question, vous pouvez nous écrire à <a href="mailto:admissions@linova-education.fr" style="color:#1a73e8;text-decoration:none;">admissions@linova-education.fr</a>
+                ou nous appeler au <strong>01 89 71 99 44</strong>.
+              </p>
+
+              <p style="margin:24px 0 4px;">À très bientôt,</p>
+              <p style="margin:0 0 4px;"><strong>L'équipe admissions</strong></p>
+              <p style="margin:0;color:#5f6368;font-size:13px;">Linova Éducation — École des métiers de la santé</p>
+
+              <p style="margin:28px 0 0;color:#9aa0a6;font-size:12px;line-height:1.5;border-top:1px solid #f1f3f4;padding-top:14px;">
+                85 Avenue Ledru-Rollin, 75012 Paris · 01 89 71 99 44 · admissions@linova-education.fr
+              </p>
             </td>
           </tr>
         </table>
@@ -318,11 +304,12 @@ export async function sendInscriptionConfirmation(params: BookingEmailParams) {
     <ul style="padding-left:20px;color:#444;">
       ${
         isAlternance
-          ? `<li style="margin-bottom:8px;"><strong>Trouvez votre entreprise d'accueil</strong> dès que possible (voir ci-dessus) — sans contrat signé, votre place ne peut être garantie.</li>`
-          : ''
+          ? `<li style="margin-bottom:8px;"><strong>Trouvez votre entreprise d'accueil</strong> dès que possible (voir ci-dessus) — sans contrat signé, votre place ne peut être garantie.</li>
+      <li style="margin-bottom:8px;"><strong>Une fois votre contrat d'alternance signé</strong>, vous recevrez votre <strong>convocation officielle</strong> précisant la date de rentrée.</li>
+      <li style="margin-bottom:8px;">Notre équipe administrative reviendra vers vous pour finaliser le dossier (attestation CVEC, signature du contrat de formation, transmission à l'OPCO).</li>`
+          : `<li style="margin-bottom:8px;">Vous recevrez prochainement votre <strong>convocation officielle</strong> précisant la date de rentrée.</li>
+      <li style="margin-bottom:8px;">Notre équipe administrative reviendra vers vous pour finaliser le dossier (paiement, attestation CVEC, signature du contrat de formation).</li>`
       }
-      <li style="margin-bottom:8px;">Vous recevrez prochainement votre <strong>convocation officielle</strong> précisant la date de rentrée.</li>
-      <li style="margin-bottom:8px;">Notre équipe administrative reviendra vers vous pour finaliser le dossier (paiement, attestation CVEC, signature du contrat de formation).</li>
       <li style="margin-bottom:8px;">Un kit de bienvenue contenant l'emploi du temps, les ressources pédagogiques et l'accès à l'extranet vous sera transmis avant la rentrée.</li>
     </ul>
     <p style="margin-top:24px;">Pour toute question, n'hésitez pas à nous écrire à <a href="mailto:admissions@linova-education.fr" style="color:#6DA3A4;">admissions@linova-education.fr</a> ou à nous appeler au <strong>01 89 71 99 44</strong>.</p>
