@@ -5,9 +5,9 @@ import FAQ from '@/components/FAQ';
 import { CandidaterButton } from '@/components/CandidaterModal';
 
 export const metadata: Metadata = {
-  title: 'Tarifs BTS Biologie Medicale - Initial 6000 euros/an, Alternance gratuite | Linova Paris',
+  title: 'Tarifs BTS Biologie Medicale - Alternance gratuite, Initial sur devis | Linova Paris',
   description:
-    "Tarifs du BTS Biologie Medicale chez Linova Education Paris 12e : 6 000 euros/an en initial (dont 500 euros de frais d'inscription), 0 euro en alternance (finance par l'OPCO). Echelonnement possible. Salaire alternant de 795 a 1 766 euros/mois.",
+    "Tarifs du BTS Biologie Medicale chez Linova Education Paris 12e : initial sur devis (echelonnement et pret etudiant LCL disponibles), 0 euro en alternance (finance par l'OPCO). Salaire alternant de 795 a 1 766 euros/mois.",
   keywords: [
     'tarif BTS Biologie Medicale',
     'cout formation laboratoire Paris',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 const faqItems = [
   {
     question: "Quel est le cout total de la formation en initial ?",
-    answer: "Le cout total de la formation initiale est de 6 000 euros par an, soit 12 000 euros pour les deux annees du BTS. Ce tarif comprend l'ensemble de la scolarite, l'acces aux laboratoires et equipements pedagogiques, les supports de cours et la plateforme numerique. Des frais d'inscription de 500 euros (inclus dans les 6 000 euros) sont a regler a la confirmation de l'inscription.",
+    answer: "Le cout total de la formation initiale est etabli sur devis personnalise. Notre equipe admissions vous transmet le devis precis apres un premier echange. Ce tarif comprend l'ensemble de la scolarite, l'acces aux laboratoires et equipements pedagogiques, les supports de cours et la plateforme numerique. Des frais d'inscription sont a regler a la confirmation de l'inscription.",
   },
   {
     question: "Comment fonctionne le financement de l'alternance ?",
@@ -72,12 +72,8 @@ export default function Tarifs() {
               <span className="inline-block px-3 py-1 bg-teal/10 text-teal text-xs font-semibold rounded-full mb-6">
                 Formation initiale
               </span>
-              <div className="text-5xl font-bold text-dark mb-2">6 000 &euro;</div>
-              <p className="text-gray-500 mb-2">par an</p>
-              <p className="text-sm text-gray-400 mb-8">Soit 12 000 euros pour les 2 annees du BTS</p>
               <ul className="space-y-4 mb-8">
                 {[
-                  'Frais d\'inscription : 500 euros (inclus dans le tarif annuel)',
                   'Echelonnement des paiements possible (jusqu\'a 10 fois sans frais)',
                   'Pret etudiant facilite via notre partenaire bancaire LCL',
                   'Acces complet aux laboratoires et equipements',
@@ -249,7 +245,7 @@ export default function Tarifs() {
               </thead>
               <tbody>
                 {[
-                  { critere: 'Frais de scolarite (2 ans)', initial: '12 000 euros', alternance: '0 euro' },
+                  { critere: 'Frais de scolarite (2 ans)', initial: '—', alternance: '0 euro' },
                   { critere: 'Salaire mensuel', initial: 'Aucun', alternance: '795 a 1 766 euros brut' },
                   { critere: 'Experience professionnelle', initial: '12 semaines de stage', alternance: '3 jours/semaine en entreprise' },
                   { critere: 'Financement', initial: 'A la charge de l\'etudiant', alternance: 'OPCO de l\'entreprise' },
@@ -282,11 +278,11 @@ export default function Tarifs() {
                 {[
                   {
                     title: 'Echelonnement en 10 fois sans frais',
-                    description: 'Repartissez le cout annuel de 6 000 euros en 10 mensualites de 600 euros, sans frais supplementaires ni interets.',
+                    description: 'Repartissez le cout annuel en 10 mensualites, sans frais supplementaires ni interets.',
                   },
                   {
                     title: 'Reglement en 3 fois',
-                    description: 'Versez 2 000 euros a l\'inscription, 2 000 euros en janvier et 2 000 euros en avril.',
+                    description: 'Versez un tiers a l\'inscription, un tiers en janvier et un tiers en avril.',
                   },
                   {
                     title: 'Paiement en une fois',

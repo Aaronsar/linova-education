@@ -193,8 +193,6 @@ export default function BTSBiologieMedicale() {
                   </li>
                 ))}
               </ul>
-              <div className="text-3xl font-bold text-dark mb-1">6 000 &euro;/an</div>
-              <p className="text-sm text-gray-500 mb-1">dont 500 &euro; de frais d&apos;inscription</p>
               <p className="text-xs text-teal font-medium mb-6">Pret etudiant facilite via notre partenaire LCL</p>
               <CandidaterButton variant="teal" className="px-6 py-2.5 text-sm">
                 Candidater en initial
@@ -492,8 +490,6 @@ export default function BTSBiologieMedicale() {
               <div className="space-y-4">
                 <div className="bg-light rounded-xl p-6">
                   <h3 className="font-bold text-dark mb-2">Formation initiale</h3>
-                  <p className="text-2xl font-bold text-dark">6 000 &euro; <span className="text-sm font-normal text-gray-500">/ an</span></p>
-                  <p className="text-sm text-gray-500 mt-1">dont 500 &euro; de frais d&apos;inscription</p>
                   <p className="text-xs text-teal font-medium mt-2">Pret etudiant facilite via notre partenaire LCL</p>
                 </div>
                 <div className="bg-navy rounded-xl p-6 text-white">

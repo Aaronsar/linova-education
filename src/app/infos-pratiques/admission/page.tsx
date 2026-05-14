@@ -263,7 +263,6 @@ export default function Admission() {
               <ul className="space-y-3 mb-8">
                 {[
                   '12 semaines de stage obligatoire',
-                  'Tarif : 6 000 euros par an',
                   'Echelonnement des paiements possible',
                   'Pret etudiant facilite via notre partenaire LCL',
                   'Cours en presentiel du lundi au vendredi',

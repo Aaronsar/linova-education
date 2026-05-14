@@ -45,7 +45,7 @@ const FORMATION_FAQ = [
   {
     question: "Quelle est la différence entre le format initial et l'alternance ?",
     answer:
-      "En formation initiale, vous êtes étudiant à plein temps avec 12 semaines de stage obligatoires sur les 2 ans. Tarif : 6 000 €/an (dont 500 € de frais d'inscription). En alternance, vous alternez 2 jours/3 jours entre l'école et un laboratoire d'accueil. Vous êtes salarié, votre formation est gratuite (prise en charge par l'OPCO) et vous percevez une rémunération mensuelle (de 795 € à 1 766 € brut selon âge et année).",
+      "En formation initiale, vous êtes étudiant à plein temps avec 12 semaines de stage obligatoires sur les 2 ans. En alternance, vous alternez 2 jours/3 jours entre l'école et un laboratoire d'accueil. Vous êtes salarié, votre formation est gratuite (prise en charge par l'OPCO) et vous percevez une rémunération mensuelle (de 795 € à 1 766 € brut selon âge et année).",
   },
   {
     question: "Combien d'heures de cours par semaine ?",
@@ -73,7 +73,7 @@ const TARIFS_FAQ = [
   {
     question: "Combien coûte la formation ?",
     answer:
-      "En initial : 6 000 € par an, soit 12 000 € pour les 2 ans (frais d'inscription de 500 € inclus). En alternance : 0 €, la formation est intégralement prise en charge par l'OPCO de l'entreprise d'accueil. Vous percevez en plus une rémunération mensuelle. Voir notre page tarifs pour le détail des facilités de paiement.",
+      "En alternance, la formation est intégralement prise en charge par l'OPCO de l'entreprise d'accueil — vous ne payez rien et vous percevez en plus une rémunération mensuelle. En formation initiale, contactez notre service admissions pour un échange personnalisé sur les modalités. Des facilités de paiement (échelonnement, prêt étudiant LCL) sont proposées.",
   },
   {
     question: "Quelles aides au financement existe-t-il ?",

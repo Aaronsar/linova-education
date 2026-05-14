@@ -342,8 +342,8 @@ export default function Qualiopi() {
                 },
                 {
                   title: 'Financement personnel',
-                  description: "En formation initiale, le cout est de 6 000 euros par an (dont 500 euros de frais d'inscription). Des facilites de paiement sont proposees.",
-                  highlight: '6 000 euros/an en initial',
+                  description: "En formation initiale, des facilites de paiement sont proposees (echelonnement, pret etudiant LCL). Contactez le service admissions pour un echange personnalise.",
+                  highlight: 'Facilites de paiement',
                 },
               ].map((item, i) => (
                 <div key={i} className="bg-light rounded-xl p-6">

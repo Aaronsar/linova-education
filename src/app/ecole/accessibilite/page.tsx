@@ -332,7 +332,7 @@ export default function Accessibilite() {
                     "Aucune discrimination a l'admission : evaluation sur la motivation et le projet professionnel",
                     "Parite dans les processus de selection et dans l'equipe pedagogique",
                     "Accompagnement renforce pour les etudiants en situation de precarite",
-                    "Facilites de paiement pour la formation initiale (6 000 euros/an)",
+                    "Facilites de paiement pour la formation initiale",
                     "Aide a la recherche de logement et d'aides sociales",
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3">

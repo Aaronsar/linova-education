@@ -55,7 +55,7 @@ const faqItems = [
   {
     question: 'La formation est-elle disponible en alternance ?',
     answer:
-      "Oui, le BTS Biologie Medicale est disponible en formation initiale (6 000 euros par an) et en alternance. En alternance, les frais de scolarite sont integralement pris en charge par l'OPCO de l'entreprise d'accueil. L'etudiant percoit une remuneration mensuelle et acquiert une experience professionnelle significative de deux ans en laboratoire.",
+      "Oui, le BTS Biologie Medicale est disponible en formation initiale et en alternance. En alternance, les frais de scolarite sont integralement pris en charge par l'OPCO de l'entreprise d'accueil. L'etudiant percoit une remuneration mensuelle et acquiert une experience professionnelle significative de deux ans en laboratoire.",
   },
   {
     question: 'Comment se deroule le processus de candidature ?',
@@ -325,9 +325,7 @@ export default function PourquoiLinova() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center">
-              <h3 className="text-xl font-bold text-white mb-2">Formation initiale</h3>
-              <div className="text-4xl font-bold text-yellow my-4">6 000 &euro;/an</div>
-              <p className="text-gray-300 text-sm mb-6">dont 500 &euro; de frais d&apos;inscription</p>
+              <h3 className="text-xl font-bold text-white mb-6">Formation initiale</h3>
               <ul className="text-left text-gray-300 text-sm space-y-3 mb-8">
                 <li className="flex items-start gap-2">
                   <svg className="w-4 h-4 text-yellow flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
