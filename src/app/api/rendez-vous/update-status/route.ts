@@ -14,6 +14,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendInscriptionConfirmation } from '@/lib/resend-emails';
+import { notifyCrmStatusChanged } from '@/lib/crm-webhook';
 
 type AppointmentStatus =
   | 'confirmed'
@@ -139,6 +140,14 @@ export async function POST(req: NextRequest) {
       });
     }
   }
+
+  // Webhook sortant vers le CRM (non bloquant, ne fait rien si pas d'external_id)
+  await notifyCrmStatusChanged({
+    appointmentId,
+    externalId: appt.external_id || null,
+    previousStatus: (appt.status as AppointmentStatus) || null,
+    newStatus,
+  });
 
   return NextResponse.json({ success: true, status: newStatus });
 }
