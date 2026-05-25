@@ -59,10 +59,11 @@ function safeCompare(a: string, b: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  // 1. Auth API Key
-  const expectedKey = process.env.LINOVA_EXTERNAL_API_KEY;
+  // 1. Auth API Key (on accepte LINOVA_EXTERNAL_API_KEY ou LINOVA_API_KEY pour
+  //    flexibilité de naming côté Vercel)
+  const expectedKey = process.env.LINOVA_EXTERNAL_API_KEY || process.env.LINOVA_API_KEY;
   if (!expectedKey) {
-    console.error('[external/appointments] LINOVA_EXTERNAL_API_KEY manquant côté serveur');
+    console.error('[external/appointments] LINOVA_EXTERNAL_API_KEY (ou LINOVA_API_KEY) manquant côté serveur');
     return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
   }
   const providedKey = bearerTokenFromHeader(request.headers.get('authorization'));
