@@ -19,7 +19,7 @@ import { DIPLOMA_API_BASE, resolveDiplomaFormSlug, type DiplomaFormKey } from '@
 interface Props {
   embedded?: boolean;
   /** Type de formation pré-rempli si le formulaire est sur une page spécifique */
-  defaultFormationType?: 'initial' | 'alternance';
+  defaultFormationType?: 'En initial' | 'En alternance';
   /** Personnalise le titre — laisser vide pour le titre par défaut */
   title?: string;
   /** Personnalise le sous-titre */
@@ -32,9 +32,20 @@ interface Props {
   successTitle?: string;
   /** Texte du paragraphe sous le bouton (défaut : mention RGPD candidature) */
   legalText?: string;
-  /** Masque le select "Type de formation" — utile pour un form brochure par ex. */
+  /** Masque le select "Initial ou Alternance ?" — utile pour le form brochure */
   hideFormationType?: boolean;
 }
+
+const CLASSES_ACTUELLES = [
+  'Troisième',
+  'Seconde',
+  'Première',
+  'Terminale',
+  'LSPS 1',
+  'LSPS 2',
+  'LSPS 3',
+  'Autre',
+];
 
 const isValidEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 
@@ -53,6 +64,8 @@ export default function ContactForm({
   const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [classeActuelle, setClasseActuelle] = useState<string>('');
+  const [departement, setDepartement] = useState<string>('');
   const [formationType, setFormationType] = useState<string>(defaultFormationType || '');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +94,9 @@ export default function ContactForm({
         lastname: lastname.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        ...(formationType ? { type_de_formation: formationType } : {}),
+        ...(classeActuelle ? { classe_actuelle: classeActuelle } : {}),
+        ...(departement ? { departement: departement } : {}),
+        ...(formationType ? { linova__initial_ou_alternance__: formationType } : {}),
       },
       hp: '', // honeypot
       source_url: typeof window !== 'undefined' ? window.location.href : '',
@@ -215,17 +230,46 @@ export default function ContactForm({
           />
         </div>
 
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Quelle est votre classe actuelle ?</label>
+          <select
+            value={classeActuelle}
+            onChange={(e) => setClasseActuelle(e.target.value)}
+            className={inputClass}
+          >
+            <option value="">— Sélectionner —</option>
+            {CLASSES_ACTUELLES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Département (ex. 75)</label>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]{2,3}"
+            maxLength={3}
+            value={departement}
+            onChange={(e) => setDepartement(e.target.value.replace(/\D/g, '').slice(0, 3))}
+            placeholder="75"
+            className={inputClass}
+          />
+        </div>
+
         {!hideFormationType && (
         <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Type de formation</label>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Initial ou Alternance ?</label>
           <select
             value={formationType}
             onChange={(e) => setFormationType(e.target.value)}
             className={inputClass}
           >
-            <option value="">À définir</option>
-            <option value="initial">Initial</option>
-            <option value="alternance">Alternance</option>
+            <option value="">— Sélectionner —</option>
+            <option value="En initial">En initial</option>
+            <option value="En alternance">En alternance</option>
+            <option value="Je ne sais pas">Je ne sais pas</option>
           </select>
         </div>
         )}
