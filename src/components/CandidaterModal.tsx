@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DiplomaFormEmbed from './DiplomaFormEmbed';
+import ContactForm from './ContactForm';
 
 export function CandidaterButton({
   children = 'Candidater',
@@ -75,17 +75,7 @@ export default function CandidaterModal() {
         </button>
 
         <div className="p-6 pt-8">
-          <h3 className="font-[var(--font-outfit)] text-xl font-bold text-dark mb-1">
-            Candidater au BTS Biologie Médicale
-          </h3>
-          <p className="text-sm text-gray-500 mb-4">
-            Remplissez le formulaire, notre équipe vous recontacte sous 48&nbsp;h.
-          </p>
-          <DiplomaFormEmbed
-            form="contact"
-            hideTitle
-            onSuccess={() => setTimeout(() => setOpen(false), 2500)}
-          />
+          <ContactForm embedded={false} form="contact" />
         </div>
       </div>
     </div>

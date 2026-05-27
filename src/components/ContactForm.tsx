@@ -3,12 +3,18 @@
 /**
  * Formulaire de candidature compact aux couleurs Linova.
  *
- * - 4 champs essentiels : Prénom, Nom, Email, Téléphone (+ type de formation optionnel)
- * - Soumission via /api/hubspot/submit (proxy server-side vers HubSpot Forms API)
- * - Pas d'iframe ni de script HubSpot : style 100% intégré au site
+ * Style figé (champs hardcodés Prénom / Nom / Email / Téléphone / Type de
+ * formation) pour garder un rendu visuel constant sur tout le site.
+ * Le backend pointe vers le CRM Diploma Santé via le slug `form`
+ * (default "contact"). Le CRM transmet ensuite vers HubSpot/HBspot
+ * via son intégration native.
+ *
+ * - Pas d'iframe ni de script tiers : tout est dans notre DOM
+ * - Honeypot anti-spam + UTM auto depuis l'URL
  */
 
 import { useState } from 'react';
+import { DIPLOMA_API_BASE, resolveDiplomaFormSlug, type DiplomaFormKey } from '@/lib/diploma-forms';
 
 interface Props {
   embedded?: boolean;
@@ -18,6 +24,8 @@ interface Props {
   title?: string;
   /** Personnalise le sous-titre */
   subtitle?: string;
+  /** Slug du CRM Diploma Santé (clé du dictionnaire DIPLOMA_FORMS ou slug brut) */
+  form?: DiplomaFormKey | string;
 }
 
 const isValidEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
@@ -27,6 +35,7 @@ export default function ContactForm({
   defaultFormationType,
   title = 'Candidater au BTS Biologie Médicale',
   subtitle = 'Remplissez le formulaire, notre équipe vous recontacte sous 48h.',
+  form = 'contact',
 }: Props) {
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
@@ -51,26 +60,56 @@ export default function ContactForm({
     setSubmitting(true);
     setError(null);
 
+    const slug = resolveDiplomaFormSlug(form);
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+
+    const payload = {
+      data: {
+        firstname: firstname.trim(),
+        lastname: lastname.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        ...(formationType ? { type_de_formation: formationType } : {}),
+      },
+      hp: '', // honeypot
+      source_url: typeof window !== 'undefined' ? window.location.href : '',
+      utm_source: urlParams?.get('utm_source') || '',
+      utm_medium: urlParams?.get('utm_medium') || '',
+      utm_campaign: urlParams?.get('utm_campaign') || '',
+      utm_term: urlParams?.get('utm_term') || '',
+      utm_content: urlParams?.get('utm_content') || '',
+    };
+
     try {
-      const res = await fetch('/api/hubspot/submit', {
+      const res = await fetch(`${DIPLOMA_API_BASE}/api/forms/${encodeURIComponent(slug)}/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstname: firstname.trim(),
-          lastname: lastname.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-          formationType: formationType || undefined,
-          pageUri: typeof window !== 'undefined' ? window.location.href : '',
-          pageName: typeof document !== 'undefined' ? document.title : '',
-        }),
+        body: JSON.stringify(payload),
       });
-      const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Une erreur est survenue. Veuillez réessayer.');
+        let message = `Erreur ${res.status}`;
+        try {
+          const data = await res.json();
+          message = data.error || message;
+        } catch {
+          /* ignore */
+        }
+        setError(message);
         return;
       }
       setSuccess(true);
+
+      // Tracking best-effort
+      try {
+        const w = window as unknown as {
+          dataLayer?: { push: (e: unknown) => void };
+          fbq?: (cmd: string, evt: string) => void;
+        };
+        w.dataLayer?.push({ event: 'form_submit', form_slug: slug });
+        w.fbq?.('track', 'Contact');
+      } catch {
+        /* ignore */
+      }
     } catch {
       setError('Erreur de connexion. Veuillez réessayer.');
     } finally {
@@ -176,6 +215,17 @@ export default function ContactForm({
             <option value="alternance">Alternance</option>
           </select>
         </div>
+
+        {/* Honeypot anti-spam — ne devrait jamais être rempli par un humain */}
+        <input
+          type="text"
+          name="hp"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+          onChange={() => {}}
+        />
 
         {error && (
           <div className="bg-red-50 text-red-700 rounded-lg px-3 py-2 text-xs">{error}</div>
