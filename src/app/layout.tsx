@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CandidaterModal from "@/components/CandidaterModal";
+import BrochureModal from "@/components/BrochureModal";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://linova-education.fr"),
@@ -96,6 +97,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <CandidaterModal />
+        <BrochureModal />
       </body>
     </html>
   );

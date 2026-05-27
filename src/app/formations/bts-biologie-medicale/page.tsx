@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import ContactForm from '@/components/ContactForm';
+import DiplomaFormEmbed from '@/components/DiplomaFormEmbed';
 import { CandidaterButton } from '@/components/CandidaterModal';
 import FAQ from '@/components/FAQ';
 import CTASection from '@/components/CTASection';
@@ -93,8 +93,14 @@ export default function BTSBiologieMedicale() {
                 ))}
               </div>
             </div>
-            <div>
-              <ContactForm />
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm ml-auto">
+              <h3 className="font-[var(--font-outfit)] text-xl font-bold text-dark mb-1">
+                Candidater au BTS Biologie Médicale
+              </h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Remplissez le formulaire, notre équipe vous recontacte sous 48&nbsp;h.
+              </p>
+              <DiplomaFormEmbed form="contact" hideTitle />
             </div>
           </div>
         </div>

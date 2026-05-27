@@ -106,12 +106,13 @@ export default function Header() {
               </svg>
               +33 1 89 71 99 44
             </a>
-            <Link
-              href="#brochure"
-              className="px-5 py-2.5 text-sm font-semibold border-2 border-dark text-dark rounded-full hover:bg-dark hover:text-white transition-all"
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-brochure-modal'))}
+              className="px-5 py-2.5 text-sm font-semibold border-2 border-dark text-dark rounded-full hover:bg-dark hover:text-white transition-all cursor-pointer"
             >
               Notre brochure
-            </Link>
+            </button>
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('open-candidater-modal'))}
               className="px-5 py-2.5 text-sm font-semibold bg-yellow text-dark rounded-full hover:brightness-95 transition-all cursor-pointer"
@@ -184,9 +185,13 @@ export default function Header() {
               <a href="tel:+33189719944" className="block text-center text-sm text-dark">
                 +33 1 89 71 99 44
               </a>
-              <Link href="#brochure" className="block text-center px-5 py-2.5 text-sm font-semibold border-2 border-dark text-dark rounded-full">
+              <button
+                type="button"
+                onClick={() => { setMobileOpen(false); window.dispatchEvent(new CustomEvent('open-brochure-modal')); }}
+                className="block w-full text-center px-5 py-2.5 text-sm font-semibold border-2 border-dark text-dark rounded-full cursor-pointer"
+              >
                 Notre brochure
-              </Link>
+              </button>
               <button
                 onClick={() => { setMobileOpen(false); window.dispatchEvent(new CustomEvent('open-candidater-modal')); }}
                 className="block w-full text-center px-5 py-2.5 text-sm font-semibold bg-yellow text-dark rounded-full cursor-pointer"
