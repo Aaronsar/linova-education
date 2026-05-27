@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import DiplomaFormEmbed from './DiplomaFormEmbed';
+import ContactForm from './ContactForm';
 
 export default function BrochureModal() {
   const [open, setOpen] = useState(false);
@@ -51,17 +51,15 @@ export default function BrochureModal() {
         </button>
 
         <div className="p-6 pt-8">
-          <h3 className="font-[var(--font-outfit)] text-xl font-bold text-dark mb-1">
-            Recevoir la brochure
-          </h3>
-          <p className="text-sm text-gray-500 mb-4">
-            Téléchargez la brochure du BTS Biologie Médicale — programme, débouchés,
-            tarifs et modalités d&apos;admission.
-          </p>
-          <DiplomaFormEmbed
+          <ContactForm
+            embedded={false}
             form="brochure"
-            hideTitle
-            onSuccess={() => setTimeout(() => setOpen(false), 2500)}
+            title="Recevoir la brochure"
+            subtitle="Téléchargez la brochure du BTS Biologie Médicale — programme, débouchés, modalités d'admission."
+            submitLabel="Recevoir la brochure"
+            successTitle="Brochure envoyée !"
+            legalText="En soumettant, vous acceptez de recevoir la brochure et d'être recontacté par Linova Éducation. Vos données sont traitées conformément à notre politique de confidentialité."
+            hideFormationType
           />
         </div>
       </div>

@@ -26,6 +26,14 @@ interface Props {
   subtitle?: string;
   /** Slug du CRM Diploma Santé (clé du dictionnaire DIPLOMA_FORMS ou slug brut) */
   form?: DiplomaFormKey | string;
+  /** Texte du bouton submit (défaut : "Envoyer ma candidature") */
+  submitLabel?: string;
+  /** Titre affiché après soumission (défaut : "Candidature envoyée !") */
+  successTitle?: string;
+  /** Texte du paragraphe sous le bouton (défaut : mention RGPD candidature) */
+  legalText?: string;
+  /** Masque le select "Type de formation" — utile pour un form brochure par ex. */
+  hideFormationType?: boolean;
 }
 
 const isValidEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
@@ -36,6 +44,10 @@ export default function ContactForm({
   title = 'Candidater au BTS Biologie Médicale',
   subtitle = 'Remplissez le formulaire, notre équipe vous recontacte sous 48h.',
   form = 'contact',
+  submitLabel = 'Envoyer ma candidature',
+  successTitle = 'Candidature envoyée !',
+  legalText = "En soumettant, vous acceptez d'être recontacté par Linova Éducation. Vos données sont traitées conformément à notre politique de confidentialité.",
+  hideFormationType = false,
 }: Props) {
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
@@ -133,7 +145,7 @@ export default function ContactForm({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 className="font-bold text-dark text-lg mb-2">Candidature envoyée !</h3>
+          <h3 className="font-bold text-dark text-lg mb-2">{successTitle}</h3>
           <p className="text-sm text-gray-500">
             Merci {firstname}, notre équipe vous recontacte sous 48h.
           </p>
@@ -203,6 +215,7 @@ export default function ContactForm({
           />
         </div>
 
+        {!hideFormationType && (
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1">Type de formation</label>
           <select
@@ -215,6 +228,7 @@ export default function ContactForm({
             <option value="alternance">Alternance</option>
           </select>
         </div>
+        )}
 
         {/* Honeypot anti-spam — ne devrait jamais être rempli par un humain */}
         <input
@@ -243,7 +257,7 @@ export default function ContactForm({
             </>
           ) : (
             <>
-              Envoyer ma candidature
+              {submitLabel}
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -252,8 +266,7 @@ export default function ContactForm({
         </button>
 
         <p className="text-[10px] text-gray-400 text-center mt-2 leading-relaxed">
-          En soumettant, vous acceptez d&apos;être recontacté par Linova Éducation.
-          Vos données sont traitées conformément à notre politique de confidentialité.
+          {legalText}
         </p>
       </form>
     </div>
