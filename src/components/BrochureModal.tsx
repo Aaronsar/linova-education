@@ -60,6 +60,7 @@ export default function BrochureModal() {
             successTitle="Brochure envoyée !"
             legalText="En soumettant, vous acceptez de recevoir la brochure et d'être recontacté par Linova Éducation. Vos données sont traitées conformément à notre politique de confidentialité."
             hideFormationType
+            pixelEvent="CompleteRegistration"
           />
         </div>
       </div>

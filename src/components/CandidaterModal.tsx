@@ -75,7 +75,7 @@ export default function CandidaterModal() {
         </button>
 
         <div className="p-6 pt-8">
-          <ContactForm embedded={false} form="contact" />
+          <ContactForm embedded={false} form="contact" pixelEvent="InitiateCheckout" />
         </div>
       </div>
     </div>

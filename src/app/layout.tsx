@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CandidaterModal from "@/components/CandidaterModal";
 import BrochureModal from "@/components/BrochureModal";
+import MetaPixel from "@/components/MetaPixel";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://linova-education.fr"),
@@ -98,6 +99,7 @@ export default function RootLayout({
         <Footer />
         <CandidaterModal />
         <BrochureModal />
+        <MetaPixel />
       </body>
     </html>
   );

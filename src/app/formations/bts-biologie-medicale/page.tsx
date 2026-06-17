@@ -94,7 +94,7 @@ export default function BTSBiologieMedicale() {
               </div>
             </div>
             <div>
-              <ContactForm form="contact" />
+              <ContactForm form="contact" pixelEvent="CandidatureBTSBM" />
             </div>
           </div>
         </div>

@@ -15,6 +15,7 @@
 
 import { useState } from 'react';
 import { DIPLOMA_API_BASE, resolveDiplomaFormSlug, type DiplomaFormKey } from '@/lib/diploma-forms';
+import { trackPixelEvent } from './MetaPixel';
 
 interface Props {
   embedded?: boolean;
@@ -34,6 +35,12 @@ interface Props {
   legalText?: string;
   /** Masque le select "Initial ou Alternance ?" — utile pour le form brochure */
   hideFormationType?: boolean;
+  /**
+   * Événement Meta Pixel déclenché à la soumission réussie. Auto-détecte
+   * standard vs custom (fbq('track', ...) vs fbq('trackCustom', ...)).
+   * Exemples : 'InitiateCheckout', 'CompleteRegistration', 'CandidatureBTSBM'.
+   */
+  pixelEvent?: string;
 }
 
 const CLASSES_ACTUELLES = [
@@ -59,6 +66,7 @@ export default function ContactForm({
   successTitle = 'Candidature envoyée !',
   legalText = "En soumettant, vous acceptez d'être recontacté par Linova Éducation. Vos données sont traitées conformément à notre politique de confidentialité.",
   hideFormationType = false,
+  pixelEvent,
 }: Props) {
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
@@ -126,14 +134,14 @@ export default function ContactForm({
       }
       setSuccess(true);
 
-      // Tracking best-effort
+      // Tracking : dataLayer générique + event Meta Pixel spécifique (plan de
+      // taggage Linova : InitiateCheckout, CompleteRegistration, CandidatureBTSBM…)
       try {
-        const w = window as unknown as {
-          dataLayer?: { push: (e: unknown) => void };
-          fbq?: (cmd: string, evt: string) => void;
-        };
-        w.dataLayer?.push({ event: 'form_submit', form_slug: slug });
-        w.fbq?.('track', 'Contact');
+        const w = window as unknown as { dataLayer?: { push: (e: unknown) => void } };
+        w.dataLayer?.push({ event: 'form_submit', form_slug: slug, pixel_event: pixelEvent });
+        if (pixelEvent) {
+          trackPixelEvent(pixelEvent);
+        }
       } catch {
         /* ignore */
       }
