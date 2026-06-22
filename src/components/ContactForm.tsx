@@ -36,11 +36,15 @@ interface Props {
   /** Masque le select "Initial ou Alternance ?" — utile pour le form brochure */
   hideFormationType?: boolean;
   /**
-   * Événement Meta Pixel déclenché à la soumission réussie. Auto-détecte
+   * Événement(s) Meta Pixel déclenché(s) à la soumission réussie. Auto-détecte
    * standard vs custom (fbq('track', ...) vs fbq('trackCustom', ...)).
-   * Exemples : 'InitiateCheckout', 'CompleteRegistration', 'CandidatureBTSBM'.
+   * Accepte une chaîne ou un tableau pour firer plusieurs events à la fois
+   * (utile : un standard event pour l'optim des campagnes Meta + un custom
+   * event pour le reporting granulaire).
+   * Exemples : 'InitiateCheckout' | 'CompleteRegistration'
+   *          | ['Contact', 'CandidatureBTSBM']
    */
-  pixelEvent?: string;
+  pixelEvent?: string | string[];
 }
 
 const CLASSES_ACTUELLES = [
@@ -134,14 +138,15 @@ export default function ContactForm({
       }
       setSuccess(true);
 
-      // Tracking : dataLayer générique + event Meta Pixel spécifique (plan de
-      // taggage Linova : InitiateCheckout, CompleteRegistration, CandidatureBTSBM…)
+      // Tracking : dataLayer générique + event(s) Meta Pixel (plan de taggage
+      // Linova : InitiateCheckout, CompleteRegistration, CandidatureBTSBM, Contact…)
       try {
+        const events = pixelEvent
+          ? Array.isArray(pixelEvent) ? pixelEvent : [pixelEvent]
+          : [];
         const w = window as unknown as { dataLayer?: { push: (e: unknown) => void } };
-        w.dataLayer?.push({ event: 'form_submit', form_slug: slug, pixel_event: pixelEvent });
-        if (pixelEvent) {
-          trackPixelEvent(pixelEvent);
-        }
+        w.dataLayer?.push({ event: 'form_submit', form_slug: slug, pixel_events: events });
+        for (const e of events) trackPixelEvent(e);
       } catch {
         /* ignore */
       }
