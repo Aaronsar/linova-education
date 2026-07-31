@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/dossier-inscription-alternance', '/espace-candidature'],
+      disallow: ['/dossier-inscription-alternance', '/inscription-initial', '/espace-candidature'],
     },
     sitemap: 'https://linova-education.fr/sitemap.xml',
   };

@@ -12,6 +12,7 @@ const SITE_PAGES = [
       { url: '/', label: 'Accueil', description: 'Page d\'accueil du site', status: 'published' },
       { url: '/entreprises', label: 'Entreprises', description: 'Page partenaires entreprises', status: 'published' },
       { url: '/dossier-inscription-alternance', label: 'Dossier inscription alternance', description: 'Formulaire de dossier', status: 'published' },
+      { url: '/inscription-initial', label: 'Dossier inscription initiale', description: 'Formulaire formation initiale 2026-2028', status: 'published' },
     ],
   },
   {

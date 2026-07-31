@@ -134,6 +134,7 @@ export default function AdminSidebar() {
       items: [
         { label: 'BTS Biologie Médicale', href: '/formations/bts-biologie-medicale', external: true },
         { label: 'Dossier inscription alternance', href: '/dossier-inscription-alternance', external: true },
+        { label: 'Dossier inscription initiale', href: '/inscription-initial', external: true },
       ],
     },
     {
