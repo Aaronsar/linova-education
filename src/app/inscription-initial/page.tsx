@@ -1020,6 +1020,10 @@ export default function InscriptionInitial() {
                   Remboursement intégral : échec au bac, refus de titre de séjour, formation non
                   ouverte.
                 </li>
+                <li>
+                  Si vous trouvez une <strong>alternance</strong> et basculez sur ce parcours,
+                  l&apos;acompte de formation initiale vous est remboursé.
+                </li>
                 <li>Tout remboursement dû sous 30 jours maximum.</li>
               </ul>
             </div>
@@ -1789,7 +1793,8 @@ export default function InscriptionInitial() {
                 </p>
                 <p>
                   <strong>Art. 9 —</strong> Remboursement intégral : non-obtention du bac, refus de
-                  visa/titre de séjour, formation non ouverte.
+                  visa/titre de séjour, formation non ouverte, ou obtention d&apos;un contrat
+                  d&apos;alternance entraînant le basculement hors formation initiale.
                 </p>
                 <p>
                   <strong>Art. 14 —</strong> Données personnelles traitées pour la candidature et
