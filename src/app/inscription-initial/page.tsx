@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
-import { ACOMPTE_LABEL, ECHEANCES_CHEQUE_MAX, montantParChequeEuros, type ModeAcompte } from '@/lib/acompte';
+import { ACOMPTE_LABEL, ECHEANCES_CHEQUE_MAX, montantParChequeEuros, type ModeAcompte, INSCRIPTION_DRAFT_KEY } from '@/lib/acompte';
 import StripeAcompteBlock from '@/components/StripeAcompteBlock';
 import SignaturePad from '@/components/SignaturePad';
 
@@ -585,15 +585,201 @@ export default function InscriptionInitial() {
     }
   };
 
-  const handleCardPaid = async (paymentIntentId: string) => {
-    if (!planChequesOk) {
-      setSubmitError(`Indiquez d’abord le nombre de chèques pour l’année (1 à ${ECHEANCES_CHEQUE_MAX}).`);
-      return;
+  /** Sauvegarde le dossier avant redirection Stripe Buy Button (les File ne passent pas). */
+  const saveDraftForStripe = async () => {
+    // Upload des fichiers encore locaux pour ne pas les perdre au retour Stripe
+    const mergedExisting: Partial<Record<FileKey, string>> = { ...existingFiles };
+    const uploadMap: { key: FileKey; folder: string }[] = [
+      { key: 'fichier_cni', folder: 'cni' },
+      { key: 'fichier_photos', folder: 'photos' },
+      { key: 'fichier_releve', folder: 'releves' },
+      { key: 'fichier_bulletins', folder: 'bulletins' },
+      { key: 'fichier_cv', folder: 'cv' },
+      { key: 'fichier_motivation', folder: 'motivation' },
+      { key: 'fichier_jdc', folder: 'jdc' },
+      { key: 'fichier_rc', folder: 'rc' },
+      { key: 'fichier_bourse', folder: 'bourse' },
+    ];
+
+    for (const { key, folder } of uploadMap) {
+      const file = files[key];
+      if (file) {
+        mergedExisting[key] = await uploadFile(file, folder);
+      }
     }
-    handleChange('mode_acompte', 'carte');
-    handleChange('stripe_payment_intent_id', paymentIntentId);
-    await handleSubmit({ mode_acompte: 'carte', stripe_payment_intent_id: paymentIntentId });
+
+    let signature_url = '';
+    if (formData.signature_image?.startsWith('data:')) {
+      const res = await fetch(formData.signature_image);
+      const blob = await res.blob();
+      const file = new File([blob], `signature_${Date.now()}.png`, { type: 'image/png' });
+      signature_url = await uploadFile(file, 'signatures');
+    }
+
+    setExistingFiles(mergedExisting);
+    setFiles({ ...EMPTY_FILES });
+
+    const draft = {
+      formData: {
+        ...formData,
+        mode_acompte: 'carte' as const,
+        signature_image: signature_url || formData.signature_image,
+      },
+      existingFiles: mergedExisting,
+      fileNames,
+      dossierExistant,
+      signature_url,
+      savedAt: new Date().toISOString(),
+    };
+    sessionStorage.setItem(INSCRIPTION_DRAFT_KEY, JSON.stringify(draft));
   };
+
+  /** Retour Stripe Buy Button → finalise le dossier depuis le brouillon. */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    const paiementOk = params.get('paiement') === 'ok';
+    if (!sessionId && !paiementOk) return;
+
+    const raw = sessionStorage.getItem(INSCRIPTION_DRAFT_KEY);
+    if (!raw) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const draft = JSON.parse(raw) as {
+          formData: FormData;
+          existingFiles: Partial<Record<FileKey, string>>;
+          fileNames: FileNames;
+          dossierExistant: typeof dossierExistant;
+          signature_url?: string;
+        };
+
+        setFormData({ ...draft.formData, mode_acompte: 'carte' });
+        setExistingFiles(draft.existingFiles || {});
+        setFileNames(draft.fileNames || { ...EMPTY_FILE_NAMES });
+        setDossierExistant(draft.dossierExistant || null);
+        setStep(6);
+
+        const stripeRef = sessionId || `buybtn_${Date.now()}`;
+        // Réutilise la logique d'envoi avec l'état du brouillon (évite les closures stale)
+        setIsSubmitting(true);
+        setSubmitError('');
+
+        const fd = draft.formData;
+        const uploads = { ...(draft.existingFiles || {}) };
+        const bacLabel = BAC_OPTIONS.find((o) => o.value === fd.type_bac)?.label || fd.type_bac;
+        const filiere =
+          fd.precision_bac.trim().length > 0 ? `${bacLabel} — ${fd.precision_bac.trim()}` : bacLabel;
+        const source =
+          fd.source_decouverte === 'Recommandation' && fd.source_recommandation
+            ? `Recommandation : ${fd.source_recommandation}`
+            : fd.source_decouverte;
+        const montantCheque = montantParChequeEuros(fd.nb_cheques);
+
+        const remarques = [
+          '=== DOSSIER FORMATION INITIALE 2026-2028 ===',
+          draft.dossierExistant
+            ? `Prérempli depuis un dossier existant (${draft.dossierExistant.origine}) · ${draft.dossierExistant.docsCount} doc(s) réutilisé(s)`
+            : null,
+          `Motivation : ${fd.motivation}`,
+          `Poursuite d'études : ${fd.poursuite_etudes}`,
+          `Contact urgence : ${fd.urgence_nom} — ${fd.urgence_telephone} (${fd.urgence_lien})`,
+          `Situation particulière : ${fd.situation_particuliere || 'Non'}`,
+          `Droit à l'image : ${fd.droit_image}`,
+          `Bulletin joint déclaré : ${fd.bulletin_joint ? 'Oui' : 'Non'}`,
+          fd.precision_bac ? `Précision bac : ${fd.precision_bac}` : null,
+          uploads.fichier_bulletins ? `Bulletins : ${uploads.fichier_bulletins}` : null,
+          uploads.fichier_motivation ? `Lettre motivation : ${uploads.fichier_motivation}` : null,
+          uploads.fichier_jdc ? `JDC : ${uploads.fichier_jdc}` : null,
+          uploads.fichier_rc ? `RC : ${uploads.fichier_rc}` : null,
+          uploads.fichier_bourse ? `Bourse : ${uploads.fichier_bourse}` : null,
+          `CGI acceptées : oui`,
+          `CGS acceptées : oui`,
+          `Signature électronique : ${fd.signature_nom} · ${new Date().toISOString()}`,
+          draft.signature_url ||
+          (typeof fd.signature_image === 'string' && fd.signature_image.startsWith('initial/'))
+            ? `Signature image : ${draft.signature_url || fd.signature_image}`
+            : null,
+          `Acompte pré-inscription (${ACOMPTE_LABEL}) : payé par carte (Stripe Buy Button) · ref=${stripeRef}`,
+          `Paiement annuel : ${fd.nb_cheques} chèque(s) · ~${montantCheque.toFixed(2)} € / chèque (indicatif hors tarif boursier)`,
+        ]
+          .filter(Boolean)
+          .join('\n');
+
+        if (cancelled) return;
+
+        const { data, error } = await supabase
+          .from('candidatures')
+          .insert({
+            prenom: fd.prenom,
+            nom: fd.nom,
+            date_naissance: fd.date_naissance || null,
+            lieu_naissance: fd.lieu_naissance,
+            nationalite: fd.nationalite,
+            adresse: fd.adresse,
+            code_postal: fd.code_postal,
+            ville: fd.ville,
+            departement: fd.departement,
+            email: fd.email,
+            telephone: fd.telephone,
+            niveau_etudes: fd.annee_obtention ? `Bac ${fd.annee_obtention}` : 'Bac',
+            filiere_bac: filiere,
+            annee_obtention: fd.annee_obtention,
+            etablissement: fd.etablissement,
+            dernier_diplome: filiere,
+            numero_secu: '',
+            numero_cni: '',
+            niveau_anglais: '',
+            fichier_cni_url: uploads.fichier_cni || '',
+            fichier_photos_url: uploads.fichier_photos || '',
+            fichier_releve_url: uploads.fichier_releve || '',
+            fichier_cv_url: uploads.fichier_cv || '',
+            entreprise_trouvee: 'Formation initiale',
+            nom_entreprise: '',
+            aide_recherche: false,
+            disponible_echange: 'Oui',
+            creneaux_preferes: '',
+            source_decouverte: source,
+            newsletter: false,
+            remarques,
+            statut: 'nouveau',
+          })
+          .select('id')
+          .single();
+
+        if (error) throw new Error(error.message);
+
+        sessionStorage.removeItem(INSCRIPTION_DRAFT_KEY);
+        window.history.replaceState({}, '', '/inscription-initial');
+        const ref = data?.id
+          ? `INI-${String(data.id).slice(0, 8).toUpperCase()}`
+          : `INI-${Date.now().toString(36).toUpperCase()}`;
+        if (!cancelled) {
+          setReference(ref);
+          setSubmitted(true);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setSubmitError(
+            err instanceof Error
+              ? err.message
+              : 'Paiement reçu, mais l’envoi du dossier a échoué. Contactez-nous.'
+          );
+          setStep(6);
+        }
+      } finally {
+        if (!cancelled) setIsSubmitting(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const inputClass =
     'w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal';
@@ -1901,13 +2087,20 @@ export default function InscriptionInitial() {
                       Indiquez d&apos;abord le nombre de chèques pour l&apos;année.
                     </p>
                   ) : (
-                    <StripeAcompteBlock
-                      email={formData.email}
-                      prenom={formData.prenom}
-                      nom={formData.nom}
-                      onPaid={handleCardPaid}
-                      disabled={isSubmitting}
-                    />
+                    <>
+                      <StripeAcompteBlock
+                        email={formData.email}
+                        prenom={formData.prenom}
+                        nom={formData.nom}
+                        clientReferenceId={formData.email}
+                        onBeforeCheckout={saveDraftForStripe}
+                        disabled={isSubmitting}
+                      />
+                      <p className="text-xs text-gray-500 text-center mt-3">
+                        Après le paiement, vous revenez ici automatiquement : votre dossier est
+                        alors envoyé.
+                      </p>
+                    </>
                   )}
                   {isSubmitting && (
                     <p className="text-sm text-gray-500 text-center mt-4">

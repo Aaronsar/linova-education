@@ -12,11 +12,19 @@ export const ECHEANCES_CHEQUE_MAX = 10;
 
 export type ModeAcompte = 'carte' | 'cheque';
 
+/** Stripe Buy Button — frais d'inscription. */
 export const STRIPE_PUBLISHABLE_KEY =
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim() || '';
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim() ||
+  'pk_live_zORywa2gPbUKO9G3GHQJjM6p00ZHsuGZ7d';
+
+export const STRIPE_BUY_BUTTON_ID =
+  process.env.NEXT_PUBLIC_STRIPE_BUY_BUTTON_ID?.trim() ||
+  'buy_btn_1TzHvhJlLyuMN0ehzX1yEQWv';
+
+export const INSCRIPTION_DRAFT_KEY = 'linova_inscription_initial_draft';
 
 export function isStripeConfiguredClient(): boolean {
-  return STRIPE_PUBLISHABLE_KEY.length > 0;
+  return STRIPE_PUBLISHABLE_KEY.length > 0 && STRIPE_BUY_BUTTON_ID.length > 0;
 }
 
 /** Montant indicatif par chèque du solde (après acompte), en euros. */
