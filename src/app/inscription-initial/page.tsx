@@ -159,6 +159,15 @@ export default function InscriptionInitial() {
 
   const [files, setFiles] = useState<FileData>({ ...EMPTY_FILES });
   const [fileNames, setFileNames] = useState<FileNames>({ ...EMPTY_FILE_NAMES });
+  /** Chemins storage déjà présents (dossier alternance / candidature existante). */
+  const [existingFiles, setExistingFiles] = useState<Partial<Record<FileKey, string>>>({});
+  const [dossierExistant, setDossierExistant] = useState<{
+    docsCount: number;
+    origine: string;
+  } | null>(null);
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const emailLookupRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastLookupEmail = useRef('');
 
   const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -177,6 +186,136 @@ export default function InscriptionInitial() {
     setSubmitError('');
     setFiles((prev) => ({ ...prev, [field]: file }));
     setFileNames((prev) => ({ ...prev, [field]: file ? file.name : '' }));
+    if (file) {
+      setExistingFiles((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  };
+
+  const applyExistingCandidature = (c: {
+    prenom: string;
+    nom: string;
+    date_naissance: string;
+    lieu_naissance: string;
+    nationalite: string;
+    adresse: string;
+    code_postal: string;
+    ville: string;
+    departement: string;
+    email: string;
+    telephone: string;
+    filiere_bac: string;
+    annee_obtention: string;
+    etablissement: string;
+    source_decouverte: string;
+    entreprise_trouvee: string;
+    docs: Partial<Record<FileKey, string>>;
+    docsCount: number;
+  }) => {
+    const filiere = (c.filiere_bac || '').toLowerCase();
+    let type_bac = '';
+    if (filiere.includes('stl')) type_bac = 'stl';
+    else if (filiere.includes('pro') || filiere.includes('assp') || filiere.includes('sapat'))
+      type_bac = 'pro';
+    else if (filiere.includes('étranger') || filiere.includes('etranger')) type_bac = 'etranger';
+    else if (filiere.includes('général') || filiere.includes('general') || filiere)
+      type_bac = 'general';
+
+    const sourceMap: Record<string, string> = {
+      'Réseaux sociaux': 'Réseaux sociaux',
+      'Reseaux sociaux': 'Réseaux sociaux',
+      Google: 'Internet',
+      Internet: 'Internet',
+      "Conseiller d'orientation": 'Établissement scolaire',
+      'Bouche-à-oreille': 'Recommandation',
+      Salon: 'Salon étudiant',
+    };
+    const source =
+      sourceMap[c.source_decouverte] ||
+      (SOURCE_OPTIONS.includes(c.source_decouverte as (typeof SOURCE_OPTIONS)[number])
+        ? c.source_decouverte
+        : '');
+
+    setFormData((prev) => ({
+      ...prev,
+      prenom: c.prenom || prev.prenom,
+      nom: c.nom || prev.nom,
+      date_naissance: c.date_naissance ? String(c.date_naissance).slice(0, 10) : prev.date_naissance,
+      lieu_naissance: c.lieu_naissance || prev.lieu_naissance,
+      nationalite: c.nationalite || prev.nationalite,
+      adresse: c.adresse || prev.adresse,
+      code_postal: c.code_postal || prev.code_postal,
+      ville: c.ville || prev.ville,
+      departement: c.departement || prev.departement,
+      email: c.email || prev.email,
+      telephone: c.telephone || prev.telephone,
+      type_bac: type_bac || prev.type_bac,
+      precision_bac: c.filiere_bac && type_bac !== 'stl' ? c.filiere_bac : prev.precision_bac,
+      annee_obtention: c.annee_obtention || prev.annee_obtention,
+      etablissement: c.etablissement || prev.etablissement,
+      source_decouverte: source || prev.source_decouverte,
+    }));
+
+    const reused: Partial<Record<FileKey, string>> = {};
+    const names: Partial<FileNames> = {};
+    (['fichier_cni', 'fichier_photos', 'fichier_releve', 'fichier_cv'] as FileKey[]).forEach(
+      (key) => {
+        const path = c.docs[key];
+        if (path) {
+          reused[key] = path;
+          names[key] = `Déjà en dossier · ${path.split('/').pop() || 'document'}`;
+        }
+      }
+    );
+    setExistingFiles(reused);
+    setFileNames((prev) => ({ ...prev, ...names }));
+    setFiles((prev) => {
+      const next = { ...prev };
+      (Object.keys(reused) as FileKey[]).forEach((k) => {
+        next[k] = null;
+      });
+      return next;
+    });
+
+    const origine = (c.entreprise_trouvee || '').toLowerCase().includes('initial')
+      ? 'formation initiale'
+      : 'alternance';
+    setDossierExistant({ docsCount: c.docsCount, origine });
+  };
+
+  const lookupByEmail = (email: string) => {
+    if (emailLookupRef.current) clearTimeout(emailLookupRef.current);
+    const normalized = email.trim().toLowerCase();
+    if (!normalized.includes('@') || normalized.length < 5) {
+      setDossierExistant(null);
+      return;
+    }
+    if (normalized === lastLookupEmail.current) return;
+
+    emailLookupRef.current = setTimeout(async () => {
+      setLookupLoading(true);
+      try {
+        const res = await fetch('/api/inscription-initial/lookup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: normalized }),
+        });
+        const data = await res.json();
+        lastLookupEmail.current = normalized;
+        if (data.found && data.candidature) {
+          applyExistingCandidature(data.candidature);
+        } else {
+          setDossierExistant(null);
+        }
+      } catch {
+        /* silencieux */
+      } finally {
+        setLookupLoading(false);
+      }
+    }, 450);
   };
 
   const fetchAddressSuggestions = (query: string) => {
@@ -330,7 +469,11 @@ export default function InscriptionInitial() {
 
       for (const { key, folder } of uploadMap) {
         const file = files[key];
-        if (file) uploads[key] = await uploadFile(file, folder);
+        if (file) {
+          uploads[key] = await uploadFile(file, folder);
+        } else if (existingFiles[key]) {
+          uploads[key] = existingFiles[key]!;
+        }
       }
 
       let signature_url = '';
@@ -361,6 +504,9 @@ export default function InscriptionInitial() {
 
       const remarques = [
         '=== DOSSIER FORMATION INITIALE 2026-2028 ===',
+        dossierExistant
+          ? `Prérempli depuis un dossier existant (${dossierExistant.origine}) · ${dossierExistant.docsCount} doc(s) réutilisé(s)`
+          : null,
         `Motivation : ${formData.motivation}`,
         `Poursuite d'études : ${formData.poursuite_etudes}`,
         `Contact urgence : ${formData.urgence_nom} — ${formData.urgence_telephone} (${formData.urgence_lien})`,
@@ -464,40 +610,54 @@ export default function InscriptionInitial() {
     label: string;
     required?: boolean;
     accept?: string;
-  }) => (
-    <div>
-      <label className="block text-sm font-medium text-dark mb-1.5">
-        {label}
-        {required ? ' *' : ' (facultatif)'}
-      </label>
-      <div
-        className={`border-2 border-dashed rounded-xl p-5 text-center transition-colors cursor-pointer ${
-          fileNames[fileKey] ? 'border-teal bg-teal/5' : 'border-gray-200 hover:border-teal'
-        }`}
-      >
-        <input
-          type="file"
-          accept={accept}
-          className="hidden"
-          id={`file-${fileKey}`}
-          onChange={(e) => handleFileChange(fileKey, e.target.files?.[0] || null)}
-        />
-        <label htmlFor={`file-${fileKey}`} className="cursor-pointer block">
-          {fileNames[fileKey] ? (
-            <>
-              <p className="text-sm text-teal font-medium">{fileNames[fileKey]}</p>
-              <p className="text-xs text-gray-400 mt-1">Cliquez pour changer</p>
-            </>
-          ) : (
-            <>
-              <p className="text-sm text-gray-500">Cliquez pour téléverser</p>
-              <p className="text-xs text-gray-400 mt-1">PDF, JPG ou PNG — 10 Mo max</p>
-            </>
-          )}
+  }) => {
+    const hasNew = Boolean(fileNames[fileKey] && files[fileKey]);
+    const hasExisting = Boolean(existingFiles[fileKey]) && !hasNew;
+    const shown = hasNew || hasExisting;
+
+    return (
+      <div>
+        <label className="block text-sm font-medium text-dark mb-1.5">
+          {label}
+          {required ? ' *' : ' (facultatif)'}
         </label>
+        <div
+          className={`border-2 border-dashed rounded-xl p-5 text-center transition-colors cursor-pointer ${
+            shown ? 'border-teal bg-teal/5' : 'border-gray-200 hover:border-teal'
+          }`}
+        >
+          <input
+            type="file"
+            accept={accept}
+            className="hidden"
+            id={`file-${fileKey}`}
+            onChange={(e) => handleFileChange(fileKey, e.target.files?.[0] || null)}
+          />
+          <label htmlFor={`file-${fileKey}`} className="cursor-pointer block">
+            {hasExisting ? (
+              <>
+                <p className="text-sm text-teal font-medium">Document déjà en dossier</p>
+                <p className="text-xs text-gray-500 mt-1 break-all">
+                  {fileNames[fileKey] || existingFiles[fileKey]}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">Cliquez pour remplacer si besoin</p>
+              </>
+            ) : fileNames[fileKey] ? (
+              <>
+                <p className="text-sm text-teal font-medium">{fileNames[fileKey]}</p>
+                <p className="text-xs text-gray-400 mt-1">Cliquez pour changer</p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-gray-500">Cliquez pour téléverser</p>
+                <p className="text-xs text-gray-400 mt-1">PDF, JPG ou PNG — 10 Mo max</p>
+              </>
+            )}
+          </label>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (submitted) {
     return (
@@ -610,11 +770,20 @@ export default function InscriptionInitial() {
               <h2 className="font-[var(--font-outfit)] text-2xl font-bold text-dark mb-4">
                 Bienvenue chez Linova
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 mb-6">
                 S&apos;inscrire chez Linova, c&apos;est rejoindre une école entièrement dédiée aux
                 métiers de la santé. Ce dossier concerne le{' '}
-                <strong>BTS Biologie Médicale en formation initiale</strong> (cycle 2026-2028). La
-                saisie prend environ <strong>15 minutes</strong>.
+                <strong>BTS Biologie Médicale en formation initiale</strong> (cycle 2026-2028).
+              </p>
+              <button
+                onClick={next}
+                className="w-full py-4 bg-yellow text-dark font-semibold rounded-xl hover:brightness-95 transition-all text-lg cursor-pointer"
+              >
+                Commencer mon inscription
+              </button>
+              <p className="text-xs text-gray-400 text-center mt-3">
+                Environ 15 minutes · si vous avez déjà candidaté en alternance, votre e-mail
+                préremplira une grande partie du dossier.
               </p>
             </div>
 
@@ -661,7 +830,10 @@ export default function InscriptionInitial() {
               <p className="font-semibold text-dark mb-2">Remboursement — en un coup d&apos;œil</p>
               <ul className="space-y-1 list-disc list-inside">
                 <li>Droit de rétractation de 14 jours (acompte remboursé).</li>
-                <li>Remboursement intégral : échec au bac, refus de titre de séjour, formation non ouverte.</li>
+                <li>
+                  Remboursement intégral : échec au bac, refus de titre de séjour, formation non
+                  ouverte.
+                </li>
                 <li>Tout remboursement dû sous 30 jours maximum.</li>
               </ul>
             </div>
@@ -730,6 +902,50 @@ export default function InscriptionInitial() {
             </p>
 
             <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-dark mb-1.5">
+                  Adresse e-mail *
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="votre@email.com"
+                  value={formData.email}
+                  onChange={(e) => {
+                    handleChange('email', e.target.value);
+                    lookupByEmail(e.target.value);
+                  }}
+                  onBlur={(e) => lookupByEmail(e.target.value)}
+                  className={inputClass}
+                />
+                {lookupLoading && (
+                  <p className="text-xs text-gray-400 mt-1.5">Recherche d&apos;un dossier existant…</p>
+                )}
+              </div>
+
+              {dossierExistant && (
+                <div className="rounded-xl border border-teal/30 bg-teal/5 p-4 text-sm text-gray-700 space-y-2">
+                  <p className="font-semibold text-dark">
+                    On a retrouvé un dossier lié à cet e-mail
+                  </p>
+                  <p>
+                    Vous avez déjà un dossier en cours (souvent une candidature{' '}
+                    <strong>{dossierExistant.origine}</strong>). On a prérempli identité, parcours
+                    et {dossierExistant.docsCount > 0 ? (
+                      <>
+                        <strong>{dossierExistant.docsCount} document
+                        {dossierExistant.docsCount > 1 ? 's' : ''}</strong> déjà déposé
+                        {dossierExistant.docsCount > 1 ? 's' : ''}
+                      </>
+                    ) : (
+                      'les infos disponibles'
+                    )}
+                    — pas besoin de tout ressaisir. Vérifiez juste que tout est à jour, puis
+                    complétez ce qui manque pour la formation initiale.
+                  </p>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-dark mb-1.5">Prénom *</label>
@@ -904,19 +1120,6 @@ export default function InscriptionInitial() {
                     placeholder="06 12 34 56 78"
                     value={formData.telephone}
                     onChange={(e) => handleChange('telephone', e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-dark mb-1.5">
-                    Adresse e-mail *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="votre@email.com"
-                    value={formData.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
                     className={inputClass}
                   />
                 </div>

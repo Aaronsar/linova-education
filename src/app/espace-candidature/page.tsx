@@ -11,6 +11,7 @@ interface Inscription {
   telephone: string;
   statut: string;
   created_at: string;
+  entreprise_trouvee: string | null;
 }
 
 const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
@@ -36,7 +37,7 @@ export default function AdminDashboard() {
     setLoading(true);
     const { data, error } = await supabase
       .from('candidatures')
-      .select('id, prenom, nom, email, telephone, statut, created_at')
+      .select('id, prenom, nom, email, telephone, statut, created_at, entreprise_trouvee')
       .order('created_at', { ascending: false });
 
     if (!error && data) {
@@ -169,6 +170,11 @@ export default function AdminDashboard() {
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-dark">{c.prenom} {c.nom}</p>
+                            {(c.entreprise_trouvee || '').toLowerCase().includes('initial') ? (
+                              <p className="text-xs text-teal font-medium">Formation initiale</p>
+                            ) : c.entreprise_trouvee ? (
+                              <p className="text-xs text-gray-400">Alternance</p>
+                            ) : null}
                           </div>
                         </div>
                       </td>
@@ -214,6 +220,11 @@ export default function AdminDashboard() {
                     </span>
                   </div>
                   <div className="pl-12 space-y-0.5">
+                    {(c.entreprise_trouvee || '').toLowerCase().includes('initial') ? (
+                      <p className="text-xs text-teal font-medium">Formation initiale</p>
+                    ) : c.entreprise_trouvee ? (
+                      <p className="text-xs text-gray-400">Alternance</p>
+                    ) : null}
                     <p className="text-sm text-gray-600">{c.email}</p>
                     <p className="text-xs text-gray-400">{formatDate(c.created_at)}</p>
                   </div>
