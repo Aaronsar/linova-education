@@ -5,7 +5,6 @@ import {
   ACOMPTE_LABEL,
   STRIPE_BUY_BUTTON_ID,
   STRIPE_PUBLISHABLE_KEY,
-  isStripeConfiguredClient,
 } from '@/lib/acompte';
 
 interface StripeAcompteBlockProps {
@@ -34,6 +33,10 @@ declare module 'react' {
   }
 }
 
+const PUBLISHABLE_KEY =
+  STRIPE_PUBLISHABLE_KEY || 'pk_live_zORywa2gPbUKO9G3GHQJjM6p00ZHsuGZ7d';
+const BUY_BUTTON_ID = STRIPE_BUY_BUTTON_ID || 'buy_btn_1TzHvhJlLyuMN0ehzX1yEQWv';
+
 export default function StripeAcompteBlock({
   email,
   prenom,
@@ -42,13 +45,10 @@ export default function StripeAcompteBlock({
   onBeforeCheckout,
   disabled,
 }: StripeAcompteBlockProps) {
-  const configured = isStripeConfiguredClient();
   const [scriptReady, setScriptReady] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!configured) return;
-
     const existing = document.querySelector<HTMLScriptElement>(
       'script[src="https://js.stripe.com/v3/buy-button.js"]'
     );
@@ -61,10 +61,10 @@ export default function StripeAcompteBlock({
     script.src = 'https://js.stripe.com/v3/buy-button.js';
     script.async = true;
     script.onload = () => setScriptReady(true);
+    script.onerror = () => setScriptReady(false);
     document.body.appendChild(script);
-  }, [configured]);
+  }, []);
 
-  /** Sauvegarde le brouillon dès qu'on interagit avec le bouton Stripe. */
   useEffect(() => {
     const el = wrapRef.current;
     if (!el || !onBeforeCheckout) return;
@@ -80,21 +80,10 @@ export default function StripeAcompteBlock({
     };
   }, [onBeforeCheckout, scriptReady]);
 
-  if (!configured) {
-    return (
-      <div className="rounded-xl border border-dashed border-teal/40 bg-teal/5 p-6 space-y-3">
-        <p className="font-semibold text-dark text-sm">Stripe Buy Button non configuré</p>
-        <p className="text-xs text-gray-500 font-mono">
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY · NEXT_PUBLIC_STRIPE_BUY_BUTTON_ID
-        </p>
-      </div>
-    );
-  }
-
   if (!scriptReady) {
     return (
       <div className="rounded-xl border border-gray-200 p-8 text-center text-sm text-gray-500">
-        Chargement du paiement sécurisé…
+        Chargement du paiement sécurisé Stripe…
       </div>
     );
   }
@@ -116,8 +105,8 @@ export default function StripeAcompteBlock({
           paiement.
         </p>
         <stripe-buy-button
-          buy-button-id={STRIPE_BUY_BUTTON_ID}
-          publishable-key={STRIPE_PUBLISHABLE_KEY}
+          buy-button-id={BUY_BUTTON_ID}
+          publishable-key={PUBLISHABLE_KEY}
           customer-email={email || undefined}
           client-reference-id={refId}
         />
