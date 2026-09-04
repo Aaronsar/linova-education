@@ -4,6 +4,7 @@
  * - statut='accepte' (Inscrit) → email "Confirmation d'inscription" immédiat
  * - statut='refuse' → email "Candidature non retenue" envoyé 24 h après
  *   (relayé par le cron appointment-reminders)
+ * - statut='desinscrit' → désinscription / réorientation, aucun email de refus
  * - autres statuts → pas d'email
  *
  * Auth : token Supabase utilisateur (cookie/Bearer).
@@ -21,6 +22,7 @@ type CandidatureStatus =
   | 'accepte'            // legacy (avant split)
   | 'accepte_alternance' // Inscrit en alternance
   | 'accepte_initial'    // Inscrit en initial
+  | 'desinscrit'         // Désinscrit / réorienté (demande du candidat)
   | 'refuse';
 
 const VALID_STATUSES: CandidatureStatus[] = [
@@ -30,6 +32,7 @@ const VALID_STATUSES: CandidatureStatus[] = [
   'accepte',
   'accepte_alternance',
   'accepte_initial',
+  'desinscrit',
   'refuse',
 ];
 
@@ -93,6 +96,11 @@ export async function POST(req: NextRequest) {
   // Programmation de l'email "refuse" à J+24h
   if (newStatus === 'refuse' && !cand.refuse_email_sent_at) {
     updates.refuse_email_send_at = in24h;
+  }
+
+  // Désinscription / réorientation : pas d'email de refus. Annule un envoi déjà programmé.
+  if (newStatus !== 'refuse' && cand.refuse_email_send_at && !cand.refuse_email_sent_at) {
+    updates.refuse_email_send_at = null;
   }
 
   const { error: updateError } = await supabase

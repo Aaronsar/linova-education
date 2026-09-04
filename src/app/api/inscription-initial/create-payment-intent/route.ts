@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: ACOMPTE_CENTS,
       currency: ACOMPTE_CURRENCY,
-      automatic_payment_methods: { enabled: true },
+      automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
       receipt_email: email || undefined,
       description: 'Acompte pré-inscription BTS Biologie Médicale — formation initiale 2026-2028',
       metadata: {

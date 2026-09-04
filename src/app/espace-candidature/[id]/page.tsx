@@ -2,6 +2,14 @@
 
 import { useState, useEffect, use } from 'react';
 import { supabase } from '@/lib/supabase';
+import { extractExtraDocPaths, extractSignaturePaths } from '@/lib/contrat-remarques';
+import {
+  ACOMPTE_BADGE,
+  acompteDisplayKind,
+  parseAcompteFromRemarques,
+  stripeDashboardUrl,
+  type StripeAcompteLive,
+} from '@/lib/parse-acompte';
 
 interface Inscription {
   id: string;
@@ -27,6 +35,7 @@ interface Inscription {
   fichier_cni_url: string;
   fichier_photos_url: string;
   fichier_releve_url: string;
+  fichier_cv_url?: string;
   entreprise_trouvee: string;
   nom_entreprise: string;
   aide_recherche: string;
@@ -46,6 +55,7 @@ const statusOptions = [
   { value: 'entretien', label: 'Dossier complet', bg: 'bg-teal/15', text: 'text-teal-700', dot: 'bg-teal' },
   { value: 'accepte_alternance', label: 'Inscrit en alternance', bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
   { value: 'accepte_initial', label: 'Inscrit en initial', bg: 'bg-teal/20', text: 'text-teal-700', dot: 'bg-teal' },
+  { value: 'desinscrit', label: 'Désinscrit / réorienté', bg: 'bg-orange-100', text: 'text-orange-800', dot: 'bg-orange-500' },
   { value: 'refuse', label: 'Refuse', bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' },
   // Legacy : ancien statut 'accepte' (avant split). Conservé pour rétrocompat.
   { value: 'accepte', label: 'Inscrit (legacy)', bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
@@ -94,6 +104,9 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
   const [savingStatus, setSavingStatus] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
+  const [generatingContrat, setGeneratingContrat] = useState(false);
+  const [stripeLive, setStripeLive] = useState<StripeAcompteLive | null>(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
 
   useEffect(() => {
     fetchInscription();
@@ -111,11 +124,19 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
     if (!error && data) {
       setInscription(data);
       setNotesAdmin(data.notes_admin || '');
-      // Pré-charge les URLs signées pour les fichiers (bucket privé : on ne peut
-      // pas utiliser getPublicUrl, il faut signer chaque accès). Validité 1 h.
-      const paths = [data.fichier_cni_url, data.fichier_photos_url, data.fichier_releve_url].filter(
-        (p): p is string => Boolean(p)
-      );
+      void fetchStripeLive(data.id);
+      const fromRemarques = extractSignaturePaths(data.remarques || '');
+      const extras = extractExtraDocPaths(data.remarques || '');
+      const paths = [
+        data.fichier_cni_url,
+        data.fichier_photos_url,
+        data.fichier_releve_url,
+        data.fichier_cv_url,
+        fromRemarques.contratPdf,
+        fromRemarques.signature,
+        fromRemarques.signaturePrelevement,
+        ...extras.map((e) => e.path),
+      ].filter((p): p is string => Boolean(p));
       if (paths.length) {
         const { data: signed } = await supabase.storage
           .from('candidatures')
@@ -127,13 +148,87 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
           });
           setSignedUrls(map);
         }
+      } else {
+        setSignedUrls({});
       }
     }
     setLoading(false);
   };
 
-  const updateStatus = async (newStatus: string) => {
+  const fetchStripeLive = async (candidatureId: string) => {
+    setStripeLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) return;
+      const res = await fetch(`/api/candidatures/stripe-acompte?id=${encodeURIComponent(candidatureId)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const payload = await res.json();
+      if (res.ok) {
+        setStripeLive(payload.stripe || null);
+      }
+    } catch {
+      // Le dossier reste lisible même si Stripe est indisponible.
+    } finally {
+      setStripeLoading(false);
+    }
+  };
+
+  const generateContrat = async () => {
     if (!inscription) return;
+    setGeneratingContrat(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) {
+        showSaveMessage('Session expirée, veuillez vous reconnecter');
+        return;
+      }
+      const res = await fetch('/api/candidatures/generate-contrat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ candidatureId: inscription.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showSaveMessage(`Erreur : ${data.error || 'génération impossible'}`);
+        return;
+      }
+      setInscription((prev) =>
+        prev ? { ...prev, remarques: data.remarques || prev.remarques } : prev
+      );
+      if (data.path) {
+        const { data: signed } = await supabase.storage
+          .from('candidatures')
+          .createSignedUrls([data.path], 3600);
+        if (signed?.[0]?.signedUrl) {
+          setSignedUrls((prev) => ({ ...prev, [data.path]: signed[0].signedUrl! }));
+        }
+      }
+      showSaveMessage(data.alreadyHad ? 'Contrat PDF régénéré' : 'Contrat PDF généré');
+    } finally {
+      setGeneratingContrat(false);
+    }
+  };
+
+  const updateStatus = async (newStatus: string, { skipConfirm = false } = {}) => {
+    if (!inscription) return;
+    if (!skipConfirm && newStatus === 'refuse') {
+      const ok = window.confirm(
+        'Refuser cette candidature ? Un email « candidature non retenue » sera envoyé demain.'
+      );
+      if (!ok) return;
+    }
+    if (!skipConfirm && newStatus === 'desinscrit') {
+      const ok = window.confirm(
+        'Marquer ce dossier comme désinscrit ou réorienté ? Aucun email de refus ne sera envoyé.'
+      );
+      if (!ok) return;
+    }
     setSavingStatus(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -163,6 +258,8 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
         showSaveMessage('Statut mis à jour · email d\'inscription envoyé');
       } else if (newStatus === 'refuse') {
         showSaveMessage('Statut mis à jour · email de refus programmé (J+1)');
+      } else if (newStatus === 'desinscrit') {
+        showSaveMessage('Statut mis à jour · désinscrit / réorienté (aucun email de refus)');
       } else {
         showSaveMessage('Statut mis à jour');
       }
@@ -230,6 +327,21 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
 
   const age = calculateAge(inscription.date_naissance);
   const currentStatus = statusOptions.find((s) => s.value === (inscription.statut || 'nouveau')) || statusOptions[0];
+  const docPaths = extractSignaturePaths(inscription.remarques || '');
+  const extraDocs = extractExtraDocPaths(inscription.remarques || '');
+  const isInitiale = String(inscription.entreprise_trouvee || '')
+    .toLowerCase()
+    .includes('initiale');
+  const parsedAcompte = parseAcompteFromRemarques(inscription.remarques);
+  const acompteKind = acompteDisplayKind(parsedAcompte, stripeLive);
+  const acompteBadge = ACOMPTE_BADGE[acompteKind];
+  const stripeLink =
+    stripeLive?.dashboardUrl ||
+    (parsedAcompte.paymentIntentId
+      ? stripeDashboardUrl(parsedAcompte.paymentIntentId, true)
+      : parsedAcompte.checkoutSessionId
+        ? stripeDashboardUrl(parsedAcompte.checkoutSessionId, true)
+        : null);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -302,19 +414,39 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
             <p className="text-xs text-gray-400 mt-2">Dossier recu le {formatDateTime(inscription.created_at)}</p>
           </div>
 
-          {/* Status dropdown */}
+          {/* Status dropdown + quick actions */}
           <div className="flex-shrink-0 w-full sm:w-auto">
             <label className="block text-xs font-medium text-gray-500 mb-1">Changer le statut</label>
             <select
               value={inscription.statut || 'nouveau'}
               onChange={(e) => updateStatus(e.target.value)}
               disabled={savingStatus}
-              className="w-full sm:w-44 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal bg-white disabled:opacity-50"
+              className="w-full sm:w-52 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal bg-white disabled:opacity-50"
             >
               {statusOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
+            {inscription.statut !== 'desinscrit' && inscription.statut !== 'refuse' && (
+              <div className="mt-3 flex flex-col gap-2">
+                <button
+                  type="button"
+                  disabled={savingStatus}
+                  onClick={() => void updateStatus('desinscrit')}
+                  className="w-full px-3 py-2 rounded-lg border border-orange-200 bg-orange-50 text-orange-800 text-xs font-semibold hover:bg-orange-100 transition-colors disabled:opacity-50"
+                >
+                  Désinscrire / réorienter
+                </button>
+                <button
+                  type="button"
+                  disabled={savingStatus}
+                  onClick={() => void updateStatus('refuse')}
+                  className="w-full px-3 py-2 rounded-lg border border-red-200 bg-red-50 text-red-700 text-xs font-semibold hover:bg-red-100 transition-colors disabled:opacity-50"
+                >
+                  Refuser
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -370,6 +502,66 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
 
         {/* Right column: documents, admin notes, identity */}
         <div className="space-y-6">
+          <Section title="Acompte">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${acompteBadge.bg} ${acompteBadge.text}`}>
+                  {acompteBadge.label}
+                </span>
+                {stripeLoading && (
+                  <span className="text-xs text-gray-400">Vérification Stripe…</span>
+                )}
+              </div>
+              {parsedAcompte.mode === 'carte' && (
+                <p className="text-sm text-dark">Règlement par carte</p>
+              )}
+              {parsedAcompte.pendingCheque && (
+                <p className="text-sm text-dark">Règlement par chèque — en attente de réception</p>
+              )}
+              {stripeLive && (
+                <div className="text-sm text-gray-600 space-y-1">
+                  <p>
+                    Stripe : <span className="font-medium text-dark">{stripeLive.status}</span>
+                    {stripeLive.amount > 0 && (
+                      <> · {(stripeLive.amount / 100).toFixed(0)} €</>
+                    )}
+                  </p>
+                  {stripeLive.created > 0 && (
+                    <p>
+                      Payé le{' '}
+                      {new Date(stripeLive.created * 1000).toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  )}
+                </div>
+              )}
+              {(parsedAcompte.stripeRef || stripeLive?.id) && (
+                <p className="text-xs text-gray-400 break-all">
+                  Réf. {stripeLive?.id || parsedAcompte.stripeRef}
+                </p>
+              )}
+              {parsedAcompte.detail && (
+                <p className="text-xs text-gray-500 leading-relaxed">{parsedAcompte.detail}</p>
+              )}
+              {!parsedAcompte.hasAcompteLine && !stripeLive && (
+                <p className="text-sm text-gray-500">Pas d&apos;acompte enregistré sur ce dossier (souvent alternance).</p>
+              )}
+              {stripeLink && (
+                <a
+                  href={stripeLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-navy text-white text-sm font-semibold hover:brightness-110 transition-all"
+                >
+                  Ouvrir dans Stripe
+                </a>
+              )}
+            </div>
+          </Section>
+
           {/* Identite administrative */}
           <Section title="Identite administrative">
             <div className="space-y-3">
@@ -381,9 +573,77 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
           {/* Documents */}
           <Section title="Documents">
             <div className="space-y-3">
+              {isInitiale && (
+                <div className="rounded-xl border-2 border-teal/30 bg-teal/5 p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-teal/15 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-dark">Contrat d&apos;inscription (PDF)</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        CGI / CGS, modalités de paiement et signatures électroniques.
+                      </p>
+                    </div>
+                  </div>
+                  {docPaths.contratPdf && getFileDownloadUrl(docPaths.contratPdf) ? (
+                    <a
+                      href={getFileDownloadUrl(docPaths.contratPdf)!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-teal text-white text-sm font-semibold hover:brightness-110 transition-all"
+                    >
+                      Télécharger le contrat PDF
+                    </a>
+                  ) : (
+                    <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      {docPaths.signature
+                        ? 'Contrat pas encore généré — cliquez ci-dessous.'
+                        : 'Pas de signature électronique enregistrée (dossier ancien ou hors parcours initiale).'}
+                    </p>
+                  )}
+                  {docPaths.signature && (
+                    <button
+                      type="button"
+                      onClick={() => void generateContrat()}
+                      disabled={generatingContrat}
+                      className="w-full py-2 rounded-lg border border-teal/40 text-teal text-sm font-semibold hover:bg-teal/10 transition-all disabled:opacity-50"
+                    >
+                      {generatingContrat
+                        ? 'Génération…'
+                        : docPaths.contratPdf
+                          ? 'Régénérer le contrat PDF'
+                          : 'Générer le contrat PDF'}
+                    </button>
+                  )}
+                </div>
+              )}
+
               <FileLink label="Carte d'identite" path={inscription.fichier_cni_url} getUrl={getFileDownloadUrl} />
               <FileLink label="Photos d'identite" path={inscription.fichier_photos_url} getUrl={getFileDownloadUrl} />
               <FileLink label="Releve de notes / Diplome" path={inscription.fichier_releve_url} getUrl={getFileDownloadUrl} />
+              {inscription.fichier_cv_url && (
+                <FileLink label="CV" path={inscription.fichier_cv_url} getUrl={getFileDownloadUrl} />
+              )}
+              {extraDocs.map((doc) => (
+                <FileLink key={doc.path} label={doc.label} path={doc.path} getUrl={getFileDownloadUrl} />
+              ))}
+              {docPaths.signature && (
+                <SignaturePreview
+                  label="Signature contrat"
+                  path={docPaths.signature}
+                  getUrl={getFileDownloadUrl}
+                />
+              )}
+              {docPaths.signaturePrelevement && (
+                <SignaturePreview
+                  label="Signature prélèvement"
+                  path={docPaths.signaturePrelevement}
+                  getUrl={getFileDownloadUrl}
+                />
+              )}
             </div>
           </Section>
 
@@ -516,5 +776,32 @@ function FileLink({
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
       </svg>
     </a>
+  );
+}
+
+function SignaturePreview({
+  label,
+  path,
+  getUrl,
+}: {
+  label: string;
+  path: string;
+  getUrl: (p: string) => string | null;
+}) {
+  const url = getUrl(path);
+  return (
+    <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+      <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">{label}</p>
+      {url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={url}
+          alt={label}
+          className="max-h-20 bg-white border border-gray-200 rounded-md p-1"
+        />
+      ) : (
+        <p className="text-xs text-gray-400">Chargement…</p>
+      )}
+    </div>
   );
 }

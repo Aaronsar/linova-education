@@ -6,6 +6,14 @@ export const ACOMPTE_CURRENCY = 'eur';
 /** Solde annuel : frais annuels − acompte (indicatif, hors tarif boursier). */
 export const FRAIS_ANNUELS_CENTS = 600_000; // 6 000 €
 export const FRAIS_ANNUELS_LABEL = '6 000 €';
+export const FRAIS_BOURSIERS_CENTS = 500_000; // 5 000 €
+export const FRAIS_BOURSIERS_LABEL = '5 000 €';
+
+/** Variante /inscription-initial-2a — tarif annuel 5 000 € (4 000 € boursiers). */
+export const FRAIS_ANNUELS_2A_CENTS = 500_000; // 5 000 €
+export const FRAIS_ANNUELS_2A_LABEL = '5 000 €';
+export const FRAIS_BOURSIERS_2A_CENTS = 400_000; // 4 000 €
+export const FRAIS_BOURSIERS_2A_LABEL = '4 000 €';
 
 /** Nombre max de chèques pour le solde annuel. */
 export const ECHEANCES_CHEQUE_MAX = 10;
@@ -28,8 +36,11 @@ export function isStripeConfiguredClient(): boolean {
 }
 
 /** Montant indicatif par chèque du solde (après acompte), en euros. */
-export function montantParChequeEuros(n: number): number {
-  const solde = FRAIS_ANNUELS_CENTS - ACOMPTE_CENTS;
+export function montantParChequeEuros(
+  n: number,
+  fraisAnnuelsCents: number = FRAIS_ANNUELS_CENTS
+): number {
+  const solde = Math.max(0, fraisAnnuelsCents - ACOMPTE_CENTS);
   if (n < 1) return solde / 100;
   return Math.round(solde / n) / 100;
 }
