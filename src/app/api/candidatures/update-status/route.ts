@@ -14,6 +14,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendInscriptionConfirmation } from '@/lib/resend-emails';
+import {
+  applyDesinscritTag,
+  stripDesinscritTag,
+} from '@/lib/candidature-statut';
 
 type CandidatureStatus =
   | 'nouveau'
@@ -103,10 +107,37 @@ export async function POST(req: NextRequest) {
     updates.refuse_email_send_at = null;
   }
 
-  const { error: updateError } = await supabase
+  if (newStatus === 'desinscrit') {
+    updates.notes_admin = applyDesinscritTag(cand.notes_admin);
+  } else if (stripDesinscritTag(cand.notes_admin) !== (cand.notes_admin || '').trim()) {
+    updates.notes_admin = stripDesinscritTag(cand.notes_admin) || null;
+  }
+
+  let { error: updateError } = await supabase
     .from('candidatures')
     .update(updates)
     .eq('id', candidatureId);
+
+  // La contrainte Postgres n'inclut pas encore `desinscrit` : on retombe sur
+  // un statut autorisé + tag interne, sans email de refus.
+  let storedStatus: CandidatureStatus = newStatus;
+  if (
+    updateError &&
+    newStatus === 'desinscrit' &&
+    updateError.message.includes('candidatures_statut_check')
+  ) {
+    storedStatus = 'refuse';
+    const fallback = {
+      statut: storedStatus,
+      refuse_email_send_at: null,
+      notes_admin: applyDesinscritTag(cand.notes_admin),
+    };
+    const retry = await supabase
+      .from('candidatures')
+      .update(fallback)
+      .eq('id', candidatureId);
+    updateError = retry.error;
+  }
 
   if (updateError) {
     console.error('[candidatures/update-status] update error:', updateError.message);
@@ -140,10 +171,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         status: newStatus,
+        storedStatus,
+        notes_admin: updates.notes_admin ?? cand.notes_admin ?? null,
         emailWarning: `Email d'inscription non envoyé : ${message}`,
       });
     }
   }
 
-  return NextResponse.json({ success: true, status: newStatus });
+  return NextResponse.json({
+    success: true,
+    status: newStatus,
+    storedStatus,
+    notes_admin: updates.notes_admin ?? cand.notes_admin ?? null,
+  });
 }

@@ -10,6 +10,12 @@ import {
   stripeDashboardUrl,
   type StripeAcompteLive,
 } from '@/lib/parse-acompte';
+import {
+  applyDesinscritTag,
+  displayStatut,
+  isDesinscrit,
+  stripDesinscritTag,
+} from '@/lib/candidature-statut';
 
 interface Inscription {
   id: string;
@@ -103,6 +109,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
   const [savingNotes, setSavingNotes] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [saveIsError, setSaveIsError] = useState(false);
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const [generatingContrat, setGeneratingContrat] = useState(false);
   const [stripeLive, setStripeLive] = useState<StripeAcompteLive | null>(null);
@@ -123,7 +130,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
 
     if (!error && data) {
       setInscription(data);
-      setNotesAdmin(data.notes_admin || '');
+      setNotesAdmin(stripDesinscritTag(data.notes_admin || ''));
       void fetchStripeLive(data.id);
       const fromRemarques = extractSignaturePaths(data.remarques || '');
       const extras = extractExtraDocPaths(data.remarques || '');
@@ -182,7 +189,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
       if (!token) {
-        showSaveMessage('Session expirée, veuillez vous reconnecter');
+        showSaveMessage('Session expirée, veuillez vous reconnecter', true);
         return;
       }
       const res = await fetch('/api/candidatures/generate-contrat', {
@@ -195,7 +202,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
       });
       const data = await res.json();
       if (!res.ok) {
-        showSaveMessage(`Erreur : ${data.error || 'génération impossible'}`);
+        showSaveMessage(`Erreur : ${data.error || 'génération impossible'}`, true);
         return;
       }
       setInscription((prev) =>
@@ -234,7 +241,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
       if (!token) {
-        showSaveMessage('Session expirée, veuillez vous reconnecter');
+        showSaveMessage('Session expirée, veuillez vous reconnecter', true);
         return;
       }
       const res = await fetch('/api/candidatures/update-status', {
@@ -248,12 +255,19 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
       const data = await res.json();
       if (!res.ok) {
         console.error('updateStatus error:', data.error);
-        showSaveMessage(`Erreur : ${data.error || 'mise à jour échouée'}`);
+        showSaveMessage(`Erreur : ${data.error || 'mise à jour échouée'}`, true);
         return;
       }
-      setInscription((prev) => prev ? { ...prev, statut: newStatus } : prev);
+      setInscription((prev) => prev ? {
+        ...prev,
+        statut: data.storedStatus || newStatus,
+        notes_admin: data.notes_admin ?? prev.notes_admin,
+      } : prev);
+      if (newStatus !== 'desinscrit') {
+        setNotesAdmin((prev) => stripDesinscritTag(prev));
+      }
       if (data.emailWarning) {
-        showSaveMessage(`Statut mis à jour · ${data.emailWarning}`);
+        showSaveMessage(`Statut mis à jour · ${data.emailWarning}`, true);
       } else if (newStatus === 'accepte') {
         showSaveMessage('Statut mis à jour · email d\'inscription envoyé');
       } else if (newStatus === 'refuse') {
@@ -271,23 +285,28 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
   const saveNotes = async () => {
     if (!inscription) return;
     setSavingNotes(true);
+    const payload = isDesinscrit(inscription.statut, inscription.notes_admin)
+      ? applyDesinscritTag(notesAdmin)
+      : stripDesinscritTag(notesAdmin);
     const { error } = await supabase
       .from('candidatures')
-      .update({ notes_admin: notesAdmin })
+      .update({ notes_admin: payload || null })
       .eq('id', inscription.id);
 
     if (error) {
       console.error('saveNotes error:', error);
-      showSaveMessage(`Erreur : ${error.message}`);
+      showSaveMessage(`Erreur : ${error.message}`, true);
     } else {
+      setInscription((prev) => prev ? { ...prev, notes_admin: payload } : prev);
       showSaveMessage('Notes enregistrées');
     }
     setSavingNotes(false);
   };
 
-  const showSaveMessage = (msg: string) => {
+  const showSaveMessage = (msg: string, isError = false) => {
     setSaveMessage(msg);
-    setTimeout(() => setSaveMessage(''), 3000);
+    setSaveIsError(isError);
+    setTimeout(() => setSaveMessage(''), 4000);
   };
 
   const getFileDownloadUrl = (path: string): string | null => {
@@ -326,7 +345,8 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
   }
 
   const age = calculateAge(inscription.date_naissance);
-  const currentStatus = statusOptions.find((s) => s.value === (inscription.statut || 'nouveau')) || statusOptions[0];
+  const effectiveStatut = displayStatut(inscription.statut, inscription.notes_admin);
+  const currentStatus = statusOptions.find((s) => s.value === effectiveStatut) || statusOptions[0];
   const docPaths = extractSignaturePaths(inscription.remarques || '');
   const extraDocs = extractExtraDocPaths(inscription.remarques || '');
   const isInitiale = String(inscription.entreprise_trouvee || '')
@@ -347,9 +367,13 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Save notification */}
       {saveMessage && (
-        <div className="fixed top-20 right-6 z-50 bg-green-600 text-white px-5 py-2.5 rounded-lg shadow-lg text-sm font-medium flex items-center gap-2 animate-fade-in">
+        <div className={`fixed top-20 right-6 z-50 ${saveIsError ? 'bg-red-600' : 'bg-green-600'} text-white px-5 py-2.5 rounded-lg shadow-lg text-sm font-medium flex items-center gap-2 animate-fade-in`}>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            {saveIsError ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            )}
           </svg>
           {saveMessage}
         </div>
@@ -418,7 +442,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
           <div className="flex-shrink-0 w-full sm:w-auto">
             <label className="block text-xs font-medium text-gray-500 mb-1">Changer le statut</label>
             <select
-              value={inscription.statut || 'nouveau'}
+              value={effectiveStatut}
               onChange={(e) => updateStatus(e.target.value)}
               disabled={savingStatus}
               className="w-full sm:w-52 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal bg-white disabled:opacity-50"
@@ -427,7 +451,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
-            {inscription.statut !== 'desinscrit' && inscription.statut !== 'refuse' && (
+            {effectiveStatut !== 'desinscrit' && effectiveStatut !== 'refuse' && (
               <div className="mt-3 flex flex-col gap-2">
                 <button
                   type="button"

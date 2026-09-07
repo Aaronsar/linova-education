@@ -9,6 +9,7 @@ import {
   type ParsedAcompte,
   type StripeAcompteLive,
 } from '@/lib/parse-acompte';
+import { displayStatut, isDesinscrit } from '@/lib/candidature-statut';
 
 interface Inscription {
   id: string;
@@ -20,6 +21,7 @@ interface Inscription {
   created_at: string;
   entreprise_trouvee: string | null;
   remarques: string | null;
+  notes_admin: string | null;
 }
 
 type ListFilter = 'all' | 'acompte_paye' | 'cheque' | 'desinscrit';
@@ -63,7 +65,7 @@ export default function AdminDashboard() {
     const [{ data, error }, sessionRes] = await Promise.all([
       supabase
         .from('candidatures')
-        .select('id, prenom, nom, email, telephone, statut, created_at, entreprise_trouvee, remarques')
+        .select('id, prenom, nom, email, telephone, statut, created_at, entreprise_trouvee, remarques, notes_admin')
         .order('created_at', { ascending: false }),
       supabase.auth.getSession(),
     ]);
@@ -115,7 +117,7 @@ export default function AdminDashboard() {
     if (!textOk) return false;
     if (filter === 'acompte_paye') return kindFor(c) === 'paye_stripe';
     if (filter === 'cheque') return kindFor(c) === 'cheque';
-    if (filter === 'desinscrit') return c.statut === 'desinscrit';
+    if (filter === 'desinscrit') return isDesinscrit(c.statut, c.notes_admin);
     return true;
   });
 
@@ -137,8 +139,8 @@ export default function AdminDashboard() {
     });
   };
 
-  const getStatus = (statut: string | null) => {
-    const key = statut || 'nouveau';
+  const getStatus = (c: Inscription) => {
+    const key = displayStatut(c.statut, c.notes_admin);
     return statusConfig[key] || statusConfig.nouveau;
   };
 
@@ -283,7 +285,7 @@ export default function AdminDashboard() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filtered.map((c) => {
-                  const status = getStatus(c.statut);
+                  const status = getStatus(c);
                   const kind = kindFor(c);
                   const badge = ACOMPTE_BADGE[kind];
                   const stripe = stripeById[c.id];
@@ -349,7 +351,7 @@ export default function AdminDashboard() {
 
           <div className="md:hidden space-y-3">
             {filtered.map((c) => {
-              const status = getStatus(c.statut);
+              const status = getStatus(c);
               const kind = kindFor(c);
               const badge = ACOMPTE_BADGE[kind];
               return (
