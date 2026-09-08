@@ -2,13 +2,13 @@
 
 import { ACOMPTE_LABEL } from '@/lib/acompte';
 
-export type AcompteMode = 'carte' | 'cheque' | 'especes' | null;
-export type ManualAcompteMode = 'especes' | 'cheque';
+export type AcompteMode = 'carte' | 'cheque' | 'especes' | 'virement' | null;
+export type ManualAcompteMode = 'especes' | 'cheque' | 'virement';
 
 export type ParsedAcompte = {
   hasAcompteLine: boolean;
   mode: AcompteMode;
-  /** Acompte déclaré payé dans le dossier (carte, espèces, chèque reçu — hors vérif Stripe live). */
+  /** Acompte déclaré payé dans le dossier (carte, espèces, virement, chèque reçu — hors vérif Stripe live). */
   paid: boolean;
   pendingCheque: boolean;
   paymentIntentId: string | null;
@@ -56,15 +56,17 @@ export function parseAcompteFromRemarques(remarques: string | null | undefined):
   const buyButton = /Stripe Buy Button/i.test(line);
   const carte = /carte/i.test(line) || buyButton || Boolean(piMatch) || Boolean(csMatch);
   const especes = /esp[eè]ces/i.test(line);
+  const virement = /virement/i.test(line);
   const cheque = /ch[eè]que/i.test(line);
   const chequeRecu = cheque && /re[cç]u/i.test(line);
   const paidCarte = carte && (/pay[eé]/i.test(line) || Boolean(piMatch) || Boolean(csMatch) || buyButton);
   const paidEspeces = especes && /pay[eé]/i.test(line);
-  const paid = paidCarte || paidEspeces || chequeRecu;
+  const paidVirement = virement && /pay[eé]/i.test(line);
+  const paid = paidCarte || paidEspeces || paidVirement || chequeRecu;
 
   return {
     hasAcompteLine: true,
-    mode: carte ? 'carte' : especes ? 'especes' : cheque ? 'cheque' : null,
+    mode: carte ? 'carte' : especes ? 'especes' : virement ? 'virement' : cheque ? 'cheque' : null,
     paid,
     pendingCheque: cheque && !chequeRecu && !carte,
     paymentIntentId: piMatch?.[1] || null,
@@ -92,13 +94,19 @@ export function normalizeEmail(email: string | null | undefined): string {
 export type AcompteDisplayKind =
   | 'paye_stripe'
   | 'paye_especes'
+  | 'paye_virement'
   | 'paye_cheque'
   | 'cheque'
   | 'non_concerne'
   | 'inconnu';
 
 export function isAcomptePayeKind(kind: AcompteDisplayKind): boolean {
-  return kind === 'paye_stripe' || kind === 'paye_especes' || kind === 'paye_cheque';
+  return (
+    kind === 'paye_stripe' ||
+    kind === 'paye_especes' ||
+    kind === 'paye_virement' ||
+    kind === 'paye_cheque'
+  );
 }
 
 export function acompteDisplayKind(
@@ -107,6 +115,7 @@ export function acompteDisplayKind(
 ): AcompteDisplayKind {
   if (stripe?.paid || (parsed.paid && parsed.mode === 'carte')) return 'paye_stripe';
   if (parsed.paid && parsed.mode === 'especes') return 'paye_especes';
+  if (parsed.paid && parsed.mode === 'virement') return 'paye_virement';
   if (parsed.paid && parsed.mode === 'cheque') return 'paye_cheque';
   if (parsed.paid) return 'paye_stripe';
   if (parsed.pendingCheque || parsed.mode === 'cheque') return 'cheque';
@@ -120,6 +129,7 @@ export const ACOMPTE_BADGE: Record<
 > = {
   paye_stripe: { label: 'Acompte payé', bg: 'bg-green-100', text: 'text-green-700' },
   paye_especes: { label: 'Payé espèces', bg: 'bg-green-100', text: 'text-green-700' },
+  paye_virement: { label: 'Payé virement', bg: 'bg-green-100', text: 'text-green-700' },
   paye_cheque: { label: 'Chèque reçu', bg: 'bg-green-100', text: 'text-green-700' },
   cheque: { label: 'Chèque en attente', bg: 'bg-amber-100', text: 'text-amber-800' },
   non_concerne: { label: '—', bg: 'bg-gray-100', text: 'text-gray-500' },
@@ -138,10 +148,12 @@ export function upsertManualAcompteLine(
     month: '2-digit',
     year: 'numeric',
   });
-  const line =
-    mode === 'especes'
-      ? `Acompte pré-inscription (${ACOMPTE_LABEL}) : payé en espèces · saisi manuellement le ${date}`
-      : `Acompte pré-inscription (${ACOMPTE_LABEL}) : chèque reçu · saisi manuellement le ${date}`;
+  const lineByMode: Record<ManualAcompteMode, string> = {
+    especes: `Acompte pré-inscription (${ACOMPTE_LABEL}) : payé en espèces · saisi manuellement le ${date}`,
+    virement: `Acompte pré-inscription (${ACOMPTE_LABEL}) : payé par virement · saisi manuellement le ${date}`,
+    cheque: `Acompte pré-inscription (${ACOMPTE_LABEL}) : chèque reçu · saisi manuellement le ${date}`,
+  };
+  const line = lineByMode[mode];
 
   const lines = (remarques || '').split('\n');
   const idx = lines.findIndex((l) => ACOMPTE_LINE_RE.test(l.trim()));

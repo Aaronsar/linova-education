@@ -226,11 +226,12 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
 
   const markAcomptePaye = async (mode: ManualAcompteMode) => {
     if (!inscription) return;
-    const ok = window.confirm(
-      mode === 'especes'
-        ? 'Marquer l’acompte comme payé en espèces ?'
-        : 'Marquer le chèque d’acompte comme reçu ?'
-    );
+    const confirmByMode: Record<ManualAcompteMode, string> = {
+      especes: 'Marquer l’acompte comme payé en espèces ?',
+      virement: 'Marquer l’acompte comme payé par virement ?',
+      cheque: 'Marquer le chèque d’acompte comme reçu ?',
+    };
+    const ok = window.confirm(confirmByMode[mode]);
     if (!ok) return;
     setMarkingAcompte(true);
     try {
@@ -254,9 +255,12 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
         return;
       }
       setInscription((prev) => prev ? { ...prev, remarques: data.remarques } : prev);
-      showSaveMessage(
-        mode === 'especes' ? 'Acompte marqué payé en espèces' : 'Chèque d’acompte marqué reçu'
-      );
+      const successByMode: Record<ManualAcompteMode, string> = {
+        especes: 'Acompte marqué payé en espèces',
+        virement: 'Acompte marqué payé par virement',
+        cheque: 'Chèque d’acompte marqué reçu',
+      };
+      showSaveMessage(successByMode[mode]);
     } finally {
       setMarkingAcompte(false);
     }
@@ -582,6 +586,9 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
               {parsedAcompte.mode === 'especes' && parsedAcompte.paid && (
                 <p className="text-sm text-dark">Règlement en espèces</p>
               )}
+              {parsedAcompte.mode === 'virement' && parsedAcompte.paid && (
+                <p className="text-sm text-dark">Règlement par virement</p>
+              )}
               {parsedAcompte.mode === 'cheque' && parsedAcompte.paid && (
                 <p className="text-sm text-dark">Règlement par chèque — reçu</p>
               )}
@@ -628,6 +635,14 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
                     className="w-full px-3 py-2 rounded-lg border border-green-200 bg-green-50 text-green-800 text-xs font-semibold hover:bg-green-100 transition-colors disabled:opacity-50"
                   >
                     Acompte payé — espèces
+                  </button>
+                  <button
+                    type="button"
+                    disabled={markingAcompte}
+                    onClick={() => void markAcomptePaye('virement')}
+                    className="w-full px-3 py-2 rounded-lg border border-green-200 bg-green-50 text-green-800 text-xs font-semibold hover:bg-green-100 transition-colors disabled:opacity-50"
+                  >
+                    Acompte payé — virement
                   </button>
                   <button
                     type="button"

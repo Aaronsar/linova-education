@@ -1,5 +1,5 @@
 /**
- * Marque manuellement l’acompte comme payé (espèces ou chèque reçu).
+ * Marque manuellement l’acompte comme payé (espèces, virement ou chèque reçu).
  * Auth : token Supabase utilisateur (cookie/Bearer).
  * Écriture DB : service role (bypass RLS).
  */
@@ -12,7 +12,7 @@ import {
   type ManualAcompteMode,
 } from '@/lib/parse-acompte';
 
-const VALID_MODES: ManualAcompteMode[] = ['especes', 'cheque'];
+const VALID_MODES: ManualAcompteMode[] = ['especes', 'virement', 'cheque'];
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
