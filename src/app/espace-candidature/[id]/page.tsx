@@ -8,6 +8,7 @@ import {
   acompteDisplayKind,
   parseAcompteFromRemarques,
   stripeDashboardUrl,
+  type ManualAcompteMode,
   type StripeAcompteLive,
 } from '@/lib/parse-acompte';
 import {
@@ -112,6 +113,7 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
   const [saveIsError, setSaveIsError] = useState(false);
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const [generatingContrat, setGeneratingContrat] = useState(false);
+  const [markingAcompte, setMarkingAcompte] = useState(false);
   const [stripeLive, setStripeLive] = useState<StripeAcompteLive | null>(null);
   const [stripeLoading, setStripeLoading] = useState(false);
 
@@ -219,6 +221,44 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
       showSaveMessage(data.alreadyHad ? 'Contrat PDF régénéré' : 'Contrat PDF généré');
     } finally {
       setGeneratingContrat(false);
+    }
+  };
+
+  const markAcomptePaye = async (mode: ManualAcompteMode) => {
+    if (!inscription) return;
+    const ok = window.confirm(
+      mode === 'especes'
+        ? 'Marquer l’acompte comme payé en espèces ?'
+        : 'Marquer le chèque d’acompte comme reçu ?'
+    );
+    if (!ok) return;
+    setMarkingAcompte(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) {
+        showSaveMessage('Session expirée, veuillez vous reconnecter', true);
+        return;
+      }
+      const res = await fetch('/api/candidatures/mark-acompte', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ candidatureId: inscription.id, mode }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showSaveMessage(`Erreur : ${data.error || 'mise à jour échouée'}`, true);
+        return;
+      }
+      setInscription((prev) => prev ? { ...prev, remarques: data.remarques } : prev);
+      showSaveMessage(
+        mode === 'especes' ? 'Acompte marqué payé en espèces' : 'Chèque d’acompte marqué reçu'
+      );
+    } finally {
+      setMarkingAcompte(false);
     }
   };
 
@@ -539,6 +579,12 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
               {parsedAcompte.mode === 'carte' && (
                 <p className="text-sm text-dark">Règlement par carte</p>
               )}
+              {parsedAcompte.mode === 'especes' && parsedAcompte.paid && (
+                <p className="text-sm text-dark">Règlement en espèces</p>
+              )}
+              {parsedAcompte.mode === 'cheque' && parsedAcompte.paid && (
+                <p className="text-sm text-dark">Règlement par chèque — reçu</p>
+              )}
               {parsedAcompte.pendingCheque && (
                 <p className="text-sm text-dark">Règlement par chèque — en attente de réception</p>
               )}
@@ -572,6 +618,26 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
               )}
               {!parsedAcompte.hasAcompteLine && !stripeLive && (
                 <p className="text-sm text-gray-500">Pas d&apos;acompte enregistré sur ce dossier (souvent alternance).</p>
+              )}
+              {acompteKind !== 'paye_stripe' && (
+                <div className="flex flex-col gap-2 pt-1">
+                  <button
+                    type="button"
+                    disabled={markingAcompte}
+                    onClick={() => void markAcomptePaye('especes')}
+                    className="w-full px-3 py-2 rounded-lg border border-green-200 bg-green-50 text-green-800 text-xs font-semibold hover:bg-green-100 transition-colors disabled:opacity-50"
+                  >
+                    Acompte payé — espèces
+                  </button>
+                  <button
+                    type="button"
+                    disabled={markingAcompte}
+                    onClick={() => void markAcomptePaye('cheque')}
+                    className="w-full px-3 py-2 rounded-lg border border-green-200 bg-green-50 text-green-800 text-xs font-semibold hover:bg-green-100 transition-colors disabled:opacity-50"
+                  >
+                    Acompte payé — chèque
+                  </button>
+                </div>
               )}
               {stripeLink && (
                 <a

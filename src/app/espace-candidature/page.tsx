@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import {
   ACOMPTE_BADGE,
   acompteDisplayKind,
+  isAcomptePayeKind,
   parseAcompteFromRemarques,
   type ParsedAcompte,
   type StripeAcompteLive,
@@ -115,7 +116,7 @@ export default function AdminDashboard() {
       c.nom?.toLowerCase().includes(q) ||
       c.email?.toLowerCase().includes(q);
     if (!textOk) return false;
-    if (filter === 'acompte_paye') return kindFor(c) === 'paye_stripe';
+    if (filter === 'acompte_paye') return isAcomptePayeKind(kindFor(c));
     if (filter === 'cheque') return kindFor(c) === 'cheque';
     if (filter === 'desinscrit') return isDesinscrit(c.statut, c.notes_admin);
     return true;
@@ -126,7 +127,7 @@ export default function AdminDashboard() {
     nouveau: inscriptions.filter((c) => !c.statut || c.statut === 'nouveau').length,
     en_cours: inscriptions.filter((c) => c.statut === 'en_cours' || c.statut === 'entretien').length,
     accepte: inscriptions.filter((c) => c.statut === 'accepte' || c.statut === 'accepte_alternance' || c.statut === 'accepte_initial').length,
-    acomptePaye: inscriptions.filter((c) => kindFor(c) === 'paye_stripe').length,
+    acomptePaye: inscriptions.filter((c) => isAcomptePayeKind(kindFor(c))).length,
   };
 
   const formatDate = (dateStr: string) => {
@@ -176,7 +177,7 @@ export default function AdminDashboard() {
           <p className="text-3xl font-bold text-green-600">{stats.accepte}</p>
         </div>
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 mb-1">Acomptes Stripe</p>
+          <p className="text-sm text-gray-500 mb-1">Acomptes payés</p>
           <p className="text-3xl font-bold text-green-700">{stats.acomptePaye}</p>
         </div>
       </div>
