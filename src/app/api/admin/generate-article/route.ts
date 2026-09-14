@@ -73,7 +73,7 @@ EXIGENCES CONTENU
 - 2 callouts (un "conseil", un "info")
 - 2 listes à puces minimum
 - 1 lien externe vers source officielle (ONISEP, sante.fr, legifrance.fr)
-- Données chiffrées : salaires €, durées semaines/mois, taux insertion %
+- Données chiffrées : salaires €, durées semaines/mois. Ne jamais inventer de taux de réussite ou d'insertion Linova (première session nationale en 2027).
 - Au moins 1 H2 formulé comme une question
 - Ton : expert accessible, pas corporate, jamais "il est important de noter"
 
@@ -208,7 +208,7 @@ RÈGLES STRICTES GEO
    - Durées (ex : 14 semaines de stage sur 2 ans, 6 à 7 semaines en 1re année + 7 à 8 semaines en 2e année)
    - Aides apprentissage 2026 BTS : 4 500 € (< 250 salariés), 1 500 € (≥ 250), 6 000 € si RQTH
    - SMIC brut mensuel depuis juin 2026 : 1 867,02 €
-   - Taux (ex : 87 % d'insertion professionnelle)
+   - Ne jamais inventer de taux de réussite ou d'insertion Linova (première session nationale 2027)
    - Dates (ex : dépôt de dossier avant le 15 mars)
 
 4. DÉFINITION DIRECTE : Le premier paragraphe doit définir le sujet en 1-2 phrases claires.

@@ -357,7 +357,7 @@ export default function Admission() {
               <h3 className="text-2xl font-bold mb-6">Pourquoi choisir Linova ?</h3>
               <div className="space-y-6">
                 {[
-                  { value: '80%', label: 'Taux d\'insertion professionnelle a 6 mois' },
+                  { value: '2027', label: 'Premiere session nationale du BTS' },
                   { value: '48h', label: 'Delai de reponse apres entretien' },
                   { value: '25', label: 'Etudiants maximum par promotion' },
                   { value: '10+', label: 'Annees d\'experience du groupe Diploma Education' },

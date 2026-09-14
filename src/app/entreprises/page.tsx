@@ -69,7 +69,7 @@ export default function Entreprises() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { value: '80%', label: 'Taux d\'insertion a 6 mois' },
+              { value: '50+', label: 'Laboratoires partenaires' },
               { value: '2/3', label: 'Rythme ecole/entreprise par semaine' },
               { value: 'Jusqu\'à 4 500 €', label: 'Aide employeur BTS (< 250 sal.)' },
               { value: '0 euro', label: 'Cout de formation pour l\'entreprise' },
@@ -126,7 +126,7 @@ export default function Entreprises() {
               },
               {
                 title: 'Investissement pour l\'avenir',
-                description: "80% de nos diplomes sont en emploi a 6 mois. A l'issue de son BTS, votre alternant peut devenir un collaborateur a part entiere, deja forme a vos methodes. Vous gagnez du temps et de l'argent sur le recrutement et la formation d'un nouveau salarie.",
+                description: "A l'issue de son BTS, votre alternant peut devenir un collaborateur a part entiere, deja forme a vos methodes. Vous gagnez du temps et de l'argent sur le recrutement et la formation d'un nouveau salarie. Le secteur de la biologie medicale recrute activement.",
                 icon: (
                   <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -415,8 +415,8 @@ export default function Entreprises() {
                 description: "Linova beneficie de l'expertise et du reseau du groupe Diploma Education, present dans la formation sante depuis plus de 10 ans. Cette appartenance garantit un savoir-faire eprouve et une solidite institutionnelle.",
               },
               {
-                title: '80% d\'insertion a 6 mois',
-                description: "Notre taux d'insertion professionnelle de 80% a 6 mois temoigne de la qualite de notre formation et de l'adequation de nos diplomes avec les besoins du marche de la biologie medicale.",
+                title: 'Premiere promotion, session 2027',
+                description: "La premiere promotion Linova prepare la session nationale 2027. Nous publierons chaque annee nos taux de reussite et d'insertion des qu'ils seront disponibles. Le secteur de la biologie medicale recrute activement.",
               },
             ].map((item, i) => (
               <div key={i} className="bg-light rounded-2xl p-8 text-center">

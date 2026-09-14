@@ -8,7 +8,7 @@ import CTASection from '@/components/CTASection';
 
 export const metadata: Metadata = {
   title: 'BTS Biologie Médicale - Formation en 2 ans à Paris',
-  description: "BTS Biologie Médicale en 2 ans à Paris, en initial ou alternance. RNCP 40027, 1350h de formation, 80% d'insertion à 6 mois. École certifiée Qualiopi. Candidatez dès maintenant.",
+  description: "BTS Biologie Médicale en 2 ans à Paris, en initial ou alternance. RNCP 40027, 1350h de formation. Première promotion, session nationale 2027. École certifiée Qualiopi. Candidatez dès maintenant.",
   keywords: ['BTS Biologie Médicale', 'formation laboratoire Paris', 'alternance biologie médicale', 'technicien laboratoire', 'RNCP 40027'],
   alternates: { canonical: '/formations/bts-biologie-medicale' },
 };
@@ -84,7 +84,7 @@ export default function BTSBiologieMedicale() {
                 {[
                   { value: '2 ans', label: 'Durée' },
                   { value: '1 350h', label: 'Formation' },
-                  { value: '80%', label: 'Insertion' },
+                  { value: '2027', label: '1re session' },
                 ].map((stat, i) => (
                   <div key={i}>
                     <div className="text-2xl font-bold text-yellow">{stat.value}</div>

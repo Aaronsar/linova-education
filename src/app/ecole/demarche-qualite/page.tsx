@@ -45,7 +45,7 @@ const faqItems = [
   {
     question: 'Quels indicateurs concrets utilisez-vous ?',
     answer:
-      "Nous suivons plusieurs indicateurs cles : le taux de reussite aux examens du BTS, le taux d'insertion professionnelle a 6 mois (actuellement superieur a 80 %), la satisfaction globale des etudiants, le taux de rupture en alternance, le taux d'assiduite et la progression des resultats au cours de la formation.",
+      "Nous suivons plusieurs indicateurs cles : le taux de reussite aux examens du BTS, le taux d'insertion professionnelle a 6 mois, la satisfaction globale des etudiants, le taux de rupture en alternance, le taux d'assiduite et la progression des resultats au cours de la formation. La premiere promotion Linova prepare la session nationale 2027 ; nous publierons ces taux chaque annee des qu'ils seront disponibles.",
   },
   {
     question: "Qu'entendez-vous par accessibilite dans la demarche qualite ?",
@@ -99,8 +99,8 @@ export default function DemarcheQualite() {
                 <h3 className="text-2xl font-bold mb-6">Nos indicateurs cles</h3>
                 <div className="space-y-6">
                   <div className="border-b border-white/20 pb-4">
-                    <div className="text-3xl font-bold text-yellow">80 %+</div>
-                    <p className="text-gray-300 text-sm mt-1">d&apos;insertion professionnelle a 6 mois</p>
+                    <div className="text-3xl font-bold text-yellow">2027</div>
+                    <p className="text-gray-300 text-sm mt-1">1re session nationale — taux publies ensuite</p>
                   </div>
                   <div className="border-b border-white/20 pb-4">
                     <div className="text-3xl font-bold text-yellow">Qualiopi</div>

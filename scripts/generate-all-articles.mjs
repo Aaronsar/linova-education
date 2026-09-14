@@ -128,7 +128,7 @@ ${INTERNAL_LINKS}
 EXIGENCES :
 - 7-8 H2, 2-3 H3, min 1000 mots
 - 1 FAQ (6 questions), 2 callouts, 2 listes, 1 lien externe
-- Données chiffrées (€, %, durées)
+- Données chiffrées (€, durées). Ne jamais inventer de taux de réussite ou d'insertion Linova (première session nationale en 2027).
 - Au moins 1 H2 sous forme de question
 - Ton : expert accessible, jamais "il est important de noter"
 
@@ -172,7 +172,7 @@ ${failedChecks || 'Optimiser pour les moteurs IA'}
 RÈGLES :
 1. FAQ : 6 questions min, réponses 200+ mots, liens internes dans 2 réponses
 2. H2 en questions : au moins 2 titres sous forme de question
-3. Données chiffrées dans chaque section (€, %, durées)
+3. Données chiffrées dans chaque section (€, durées). Ne jamais inventer de taux de réussite ou d'insertion Linova (première session nationale 2027).
 4. Premier paragraphe = définition directe "[Sujet] est/désigne..."
 5. Min 2 callouts (conseil + info), min 3 listes
 

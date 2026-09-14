@@ -65,7 +65,7 @@ const FORMATION_FAQ = [
   {
     question: "Comment se passe l'examen final du BTS ?",
     answer:
-      "L'examen national du BTS Biologie Médicale comprend des épreuves écrites (français, anglais, sciences appliquées, biochimie, microbiologie), des épreuves pratiques en laboratoire et la soutenance d'un rapport de stage. Le diplôme est de niveau 5 (Bac+2) reconnu par l'État (RNCP 40027). Notre taux de réussite à Linova est supérieur à la moyenne nationale.",
+      "L'examen national du BTS Biologie Médicale comprend des épreuves écrites (français, anglais, sciences appliquées, biochimie, microbiologie), des épreuves pratiques en laboratoire et la soutenance d'un rapport de stage. Le diplôme est de niveau 5 (Bac+2) reconnu par l'État (RNCP 40027). La première promotion Linova prépare la session nationale 2027 ; nous publierons chaque année nos taux de réussite dès qu'ils seront disponibles.",
   },
 ];
 
@@ -96,7 +96,7 @@ const DEBOUCHES_FAQ = [
   {
     question: "Quels sont les débouchés après un BTS Biologie Médicale ?",
     answer:
-      "Vous pouvez exercer comme technicien(ne) en laboratoire d'analyses médicales (ville ou hôpital), à l'EFS (don du sang), en industrie pharmaceutique, en recherche (INSERM, CNRS), en parasitologie, en anatomopathologie, en biologie de la reproduction (PMA), en toxicologie, en microbiologie, en hématologie. Le taux d'insertion à 6 mois est de 80 %.",
+      "Vous pouvez exercer comme technicien(ne) en laboratoire d'analyses médicales (ville ou hôpital), à l'EFS (don du sang), en industrie pharmaceutique, en recherche (INSERM, CNRS), en parasitologie, en anatomopathologie, en biologie de la reproduction (PMA), en toxicologie, en microbiologie, en hématologie. Le secteur recrute activement. La première promotion Linova prépare la session nationale 2027 ; nous publierons nos taux d'insertion dès qu'ils seront disponibles.",
   },
   {
     question: "Quel salaire après le BTS ?",

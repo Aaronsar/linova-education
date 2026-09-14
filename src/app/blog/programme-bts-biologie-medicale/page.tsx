@@ -132,7 +132,7 @@ export default function ProgrammeBTSBiologieMedicale() {
       </ul>
 
       <p>
-        Le taux de reussite au BTS Biologie Medicale avoisine les 80 % au niveau national. Autant dire que les etudiants qui travaillent regulierement et s&apos;investissent dans leurs stages ont toutes les raisons d&apos;etre confiants.
+        Le BTS Biologie Medicale est un diplome recent : sa premiere session nationale aura lieu en 2027. Les etudiants qui travaillent regulierement et s&apos;investissent dans leurs stages ont toutes les raisons d&apos;etre confiants : le referentiel valorise fortement la pratique en laboratoire.
       </p>
 
       <p>

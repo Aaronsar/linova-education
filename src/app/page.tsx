@@ -9,7 +9,7 @@ const stats = [
   { value: '60K', label: 'techniciens de laboratoire' },
   { value: '4K', label: 'laboratoires en France' },
   { value: '47K', label: "offres d'emploi par an" },
-  { value: '80%', label: "d'insertion à 6 mois" },
+  { value: '2027', label: '1re session nationale' },
 ];
 
 const blogPosts = [
@@ -232,8 +232,8 @@ export default function Home() {
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-teal text-white p-6 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold">80%</div>
-                <div className="text-sm">d&apos;insertion à 6 mois</div>
+                <div className="text-3xl font-bold">2027</div>
+                <div className="text-sm">1re session nationale</div>
               </div>
             </div>
           </div>

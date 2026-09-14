@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: "%s | Linova Éducation",
   },
   description:
-    "Linova Éducation, école spécialisée dans les métiers de la santé à Paris 12e. BTS Biologie Médicale en initial et alternance. Certification Qualiopi. 80% d'insertion à 6 mois.",
+    "Linova Éducation, école spécialisée dans les métiers de la santé à Paris 12e. BTS Biologie Médicale en initial et alternance. Certification Qualiopi. Première promotion, session nationale 2027.",
   keywords: [
     "BTS Biologie Médicale",
     "BTS Biologie Médicale Paris",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     siteName: "Linova Éducation",
     title: "Linova Éducation - L'école des métiers de la santé",
     description:
-      "BTS Biologie Médicale en initial et alternance à Paris. École certifiée Qualiopi. 80% d'insertion professionnelle à 6 mois.",
+      "BTS Biologie Médicale en initial et alternance à Paris. École certifiée Qualiopi. Première promotion, session nationale 2027.",
   },
   twitter: {
     card: "summary_large_image",

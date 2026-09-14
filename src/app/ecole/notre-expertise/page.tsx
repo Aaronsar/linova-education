@@ -55,7 +55,7 @@ const faqItems = [
   {
     question: 'Quel est le taux de reussite et d insertion de Linova ?',
     answer:
-      "Linova affiche un taux d'insertion professionnelle superieur a 80 % a six mois apres l'obtention du diplome. Ce resultat est le fruit de notre pedagogie de terrain, de notre reseau de partenaires et de l'accompagnement individualise que nous proposons a chaque etudiant.",
+      "La premiere promotion Linova prepare la session nationale 2027. Nous publierons chaque annee nos taux de reussite et d'insertion des qu'ils seront disponibles. En attendant, notre pedagogie de terrain, notre reseau de partenaires et l'accompagnement individualise visent a maximiser les chances de chaque etudiant.",
   },
   {
     question: 'Quels equipements sont disponibles pour les etudiants ?',
@@ -149,8 +149,8 @@ export default function NotreExpertise() {
                     <p className="text-gray-300 text-sm mt-1">entites complementaires</p>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-yellow">80 %</div>
-                    <p className="text-gray-300 text-sm mt-1">d&apos;insertion a 6 mois</p>
+                    <div className="text-3xl font-bold text-yellow">2027</div>
+                    <p className="text-gray-300 text-sm mt-1">1re session nationale</p>
                   </div>
                   <div>
                     <div className="text-3xl font-bold text-yellow">50+</div>

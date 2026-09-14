@@ -7,7 +7,7 @@ import { CandidaterButton } from '@/components/CandidaterModal';
 export const metadata: Metadata = {
   title: 'Pourquoi choisir Linova Education - Ecole BTS Biologie Medicale Paris 12',
   description:
-    "Decouvrez pourquoi Linova Education est l'ecole ideale pour votre BTS Biologie Medicale a Paris 12e. Plus de 10 ans d'experience, enseignants experts, certification Qualiopi, 80% d'insertion professionnelle a 6 mois. Formation initiale ou alternance.",
+    "Decouvrez pourquoi Linova Education est l'ecole ideale pour votre BTS Biologie Medicale a Paris 12e. Plus de 10 ans d'experience, enseignants experts, certification Qualiopi. Premiere promotion, session nationale 2027. Formation initiale ou alternance.",
   keywords: [
     'pourquoi choisir Linova',
     'ecole biologie medicale Paris',
@@ -40,7 +40,7 @@ const faqItems = [
   {
     question: 'Quels sont les principaux points forts de Linova ?',
     answer:
-      "Les points forts de Linova sont nombreux : specialisation 100 % sante, enseignants experts en activite, accompagnement individualise tout au long du parcours, reseau de plus de 50 laboratoires partenaires, certification Qualiopi, taux d'insertion professionnelle superieur a 80 % a 6 mois, et localisation au coeur de Paris dans le 12e arrondissement, facilement accessible en transports.",
+      "Les points forts de Linova sont nombreux : specialisation 100 % sante, enseignants experts en activite, accompagnement individualise tout au long du parcours, reseau de plus de 50 laboratoires partenaires, certification Qualiopi, premiere promotion preparant la session nationale 2027, et localisation au coeur de Paris dans le 12e arrondissement, facilement accessible en transports.",
   },
   {
     question: 'Quels sont les debouches apres un BTS Biologie Medicale ?',
@@ -70,7 +70,7 @@ export default function PourquoiLinova() {
       <PageHero
         title="Bien plus qu'un diplome :"
         highlight="un veritable tremplin professionnel"
-        description="Choisir une ecole, c'est engager un projet de vie. Linova propose une formation unique dans un cadre entierement consacre aux metiers de la sante, avec un taux d'insertion de 80 % a six mois."
+        description="Choisir une ecole, c'est engager un projet de vie. Linova propose une formation unique dans un cadre entierement consacre aux metiers de la sante. Premiere promotion Linova preparant la session nationale 2027."
       />
 
       {/* Introduction */}
@@ -99,8 +99,8 @@ export default function PourquoiLinova() {
                   <p className="text-gray-600 text-sm">annees d&apos;experience dans la formation sante</p>
                 </div>
                 <div className="bg-light rounded-2xl p-6">
-                  <div className="text-3xl font-bold text-teal mb-1">80 %</div>
-                  <p className="text-gray-600 text-sm">de taux d&apos;insertion professionnelle a 6 mois</p>
+                  <div className="text-3xl font-bold text-teal mb-1">2027</div>
+                  <p className="text-gray-600 text-sm">premiere session nationale du BTS</p>
                 </div>
                 <div className="bg-light rounded-2xl p-6">
                   <div className="text-3xl font-bold text-teal mb-1">Qualiopi</div>
@@ -142,7 +142,7 @@ export default function PourquoiLinova() {
               {
                 title: 'Diplome solide, secteur porteur',
                 description:
-                  "Un taux d'insertion professionnelle superieur a 80 % a 6 mois. Le secteur de la biologie medicale connait une penurie de techniciens qualifies, avec des milliers de postes a pourvoir d'ici 2030 selon les projections du ministere de la Sante.",
+                  "Le secteur de la biologie medicale connait une penurie de techniciens qualifies, avec des milliers de postes a pourvoir d'ici 2030 selon les projections du ministere de la Sante. Premiere promotion Linova preparant la session nationale 2027.",
               },
               {
                 title: 'Environnement 100 % sante',

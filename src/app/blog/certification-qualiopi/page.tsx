@@ -82,7 +82,7 @@ export default function CertificationQualiopi() {
         Deuxieme consequence : une garantie de qualite verifiable. Quand vous choisissez un organisme certifie Qualiopi, vous savez que ses processus ont ete audites, que ses formateurs sont qualifies, que les objectifs pedagogiques sont clairs et que l&apos;organisme s&apos;ameliore en continu. Ce n&apos;est pas de la communication, c&apos;est de la preuve.
       </p>
       <p>
-        Troisieme consequence : la transparence. Qualiopi nous oblige a communiquer clairement sur nos taux de reussite, nos taux d&apos;insertion professionnelle, nos delais d&apos;acces et nos modalites d&apos;evaluation. Bref, vous savez exactement dans quoi vous vous engagez avant de signer.
+        Troisieme consequence : la transparence. Qualiopi nous oblige a communiquer clairement sur nos indicateurs (taux de reussite, insertion professionnelle, delais d&apos;acces, modalites d&apos;evaluation) des qu&apos;ils sont disponibles. La premiere promotion Linova prepare la session nationale 2027 ; nous publierons ces taux chaque annee ensuite.
       </p>
 
       <h2>Pourquoi Linova va plus loin que Qualiopi</h2>
