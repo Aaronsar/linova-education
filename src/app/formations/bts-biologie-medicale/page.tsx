@@ -181,7 +181,7 @@ export default function BTSBiologieMedicale() {
               <ul className="space-y-3 mb-6">
                 {[
                   '25 semaines de cours réparties sur l\'année',
-                  '12 semaines de stage en milieu professionnel',
+                  '14 semaines de stage en milieu professionnel',
                   '3 à 4 semaines de vacances scolaires',
                   'Rythme : lundi-mardi-mercredi ou mercredi-jeudi-vendredi',
                 ].map((item, i) => (
@@ -352,7 +352,7 @@ export default function BTSBiologieMedicale() {
           <div className="mt-8 bg-white rounded-xl p-6 flex items-center justify-between">
             <div>
               <p className="font-bold text-dark">Stages en milieu professionnel (initial)</p>
-              <p className="text-sm text-gray-500">7 semaines en 1re année + 7 semaines en 2e année</p>
+              <p className="text-sm text-gray-500">6 à 7 semaines en 1re année + 7 à 8 semaines en 2e année</p>
             </div>
             <span className="text-xl font-bold text-teal">14 semaines</span>
           </div>

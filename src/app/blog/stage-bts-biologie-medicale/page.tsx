@@ -4,14 +4,14 @@ import BlogArticle from '@/components/BlogArticle';
 
 export const metadata: Metadata = {
   title: 'Stage en BTS Biologie Medicale : guide complet pour le reussir',
-  description: 'Tout savoir sur le stage en BTS Biologie Medicale : 12 semaines en laboratoire, comment trouver un stage, conseils pour reussir et rediger son rapport de stage.',
+  description: 'Tout savoir sur le stage en BTS Biologie Medicale : 14 semaines en laboratoire, comment trouver un stage, conseils pour reussir et rediger son rapport de stage.',
   keywords: 'stage BTS biologie medicale, stage laboratoire, rapport de stage BTS, trouver stage labo, stage analyses medicales',
   alternates: {
     canonical: '/blog/stage-bts-biologie-medicale',
   },
   openGraph: {
     title: 'Stage en BTS Biologie Medicale : guide complet pour le reussir',
-    description: 'Tout savoir sur le stage en BTS Biologie Medicale : 12 semaines en laboratoire, comment trouver un stage, conseils pour reussir et rediger son rapport de stage.',
+    description: 'Tout savoir sur le stage en BTS Biologie Medicale : 14 semaines en laboratoire, comment trouver un stage, conseils pour reussir et rediger son rapport de stage.',
     type: 'article',
     publishedTime: '2025-10-03',
   },
@@ -21,7 +21,7 @@ export default function StageBtsBiologieMedicale() {
   return (
     <BlogArticle
       title="Stage en BTS Biologie Medicale : guide complet pour le reussir"
-      subtitle="12 semaines en laboratoire, c'est le moment ou tout devient reel. Voici comment en tirer le maximum."
+      subtitle="14 semaines en laboratoire, c'est le moment ou tout devient reel. Voici comment en tirer le maximum."
       date="3 octobre 2025"
       readTime="8 min"
       category="BTS Biologie Medicale"
@@ -33,7 +33,7 @@ export default function StageBtsBiologieMedicale() {
         { title: 'Technicien de laboratoire medical : un metier au coeur du diagnostic', slug: 'technicien-laboratoire-medical' },
       ]}
       faqItems={[
-        { question: "Combien de semaines de stage en BTS Biologie Medicale ?", answer: "Le BTS Biologie Medicale prevoit 12 semaines de stage reparties sur les deux annees de formation. Ces stages se deroulent dans des laboratoires d'analyses de biologie medicale, des hopitaux ou des structures de recherche. Ils permettent de decouvrir toutes les disciplines de la biologie medicale en conditions reelles." },
+        { question: "Combien de semaines de stage en BTS Biologie Medicale ?", answer: "Le BTS Biologie Medicale prevoit 14 semaines de stage reparties sur les deux annees de formation : 6 a 7 semaines en 1re annee et 7 a 8 semaines en 2e annee. Ces stages se deroulent dans des laboratoires d'analyses de biologie medicale, des hopitaux ou des structures de recherche. Ils permettent de decouvrir toutes les disciplines de la biologie medicale en conditions reelles." },
         { question: "Comment trouver un stage en laboratoire d'analyses medicales ?", answer: "Commencez vos recherches 3 a 4 mois avant le debut du stage. Ciblez les laboratoires de biologie medicale prives, les hopitaux publics et les cliniques de votre region. Envoyez des candidatures spontanees avec CV et lettre de motivation adaptee. Votre ecole peut egalement vous mettre en contact avec son reseau de laboratoires partenaires." },
         { question: "Que fait-on pendant un stage en laboratoire ?", answer: "Pendant le stage, vous participez aux activites du laboratoire sous supervision : reception et tri des echantillons, realisation d'analyses sur automates, controles qualite, techniques manuelles (colorations, ensemencements). Vous decouvrez les differents postes (biochimie, hematologie, microbiologie, immunologie) et apprenez les procedures qualite du laboratoire." },
         { question: "Comment rediger un bon rapport de stage BTS Biologie Medicale ?", answer: "Un bon rapport de stage presente la structure d'accueil, decrit les activites realisees dans chaque discipline, analyse une problematique technique ou organisationnelle rencontree, et propose un regard critique sur l'experience. Illustrez avec des exemples concrets, des schemas et des photos (avec autorisation). La soutenance dure environ 30 minutes." },
@@ -41,13 +41,13 @@ export default function StageBtsBiologieMedicale() {
       ]}
     >
       <p>
-        On peut apprendre beaucoup de choses en salle de cours et en travaux pratiques. Mais il y a un moment ou il faut se confronter a la realite du terrain. C&apos;est exactement le role du stage en <Link href="/formations/bts-biologie-medicale">BTS Biologie Medicale</Link> : vous immerger dans un vrai laboratoire, avec de vrais echantillons, de vrais patients et de vrais professionnels. Douze semaines qui transforment un etudiant en futur professionnel. Voici comment les aborder au mieux.
+        On peut apprendre beaucoup de choses en salle de cours et en travaux pratiques. Mais il y a un moment ou il faut se confronter a la realite du terrain. C&apos;est exactement le role du stage en <Link href="/formations/bts-biologie-medicale">BTS Biologie Medicale</Link> : vous immerger dans un vrai laboratoire, avec de vrais echantillons, de vrais patients et de vrais professionnels. Quatorze semaines qui transforment un etudiant en futur professionnel. Voici comment les aborder au mieux.
       </p>
 
-      <h2>Le cadre du stage : 12 semaines qui comptent</h2>
+      <h2>Le cadre du stage : 14 semaines qui comptent</h2>
 
       <p>
-        Le referentiel du BTS Biologie Medicale prevoit 12 semaines de stage en milieu professionnel, reparties sur les deux annees de formation. Ces semaines ne sont pas la pour remplir le planning. Elles sont evaluees, notees, et font partie integrante de l&apos;examen final. En clair, ce n&apos;est pas un stage d&apos;observation ou l&apos;on regarde en retrait -- c&apos;est une immersion active.
+        Le referentiel du BTS Biologie Medicale prevoit 14 semaines de stage en milieu professionnel, reparties sur les deux annees de formation : 6 a 7 semaines en 1re annee et 7 a 8 semaines en 2e annee. Ces semaines ne sont pas la pour remplir le planning. Elles sont evaluees, notees, et font partie integrante de l&apos;examen final. En clair, ce n&apos;est pas un stage d&apos;observation ou l&apos;on regarde en retrait -- c&apos;est une immersion active.
       </p>
       <p>
         Les stages se deroulent principalement dans des laboratoires d&apos;analyses de biologie medicale, qu&apos;ils soient prives ou hospitaliers. L&apos;objectif est de couvrir un maximum de disciplines : biochimie, hematologie, microbiologie, immunologie, voire anatomopathologie. Certains etudiants ont la chance de decouvrir aussi des laboratoires de recherche ou des laboratoires de l&apos;Etablissement Francais du Sang.

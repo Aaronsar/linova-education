@@ -205,7 +205,9 @@ RÈGLES STRICTES GEO
 
 3. DONNÉES CHIFFRÉES : Chaque section doit contenir au moins 1 donnée chiffrée.
    - Salaires (ex : 2 100 € brut/mois en entrée de carrière)
-   - Durées (ex : 14 semaines de stage sur 2 ans)
+   - Durées (ex : 14 semaines de stage sur 2 ans, 6 à 7 semaines en 1re année + 7 à 8 semaines en 2e année)
+   - Aides apprentissage 2026 BTS : 4 500 € (< 250 salariés), 1 500 € (≥ 250), 6 000 € si RQTH
+   - SMIC brut mensuel depuis juin 2026 : 1 867,02 €
    - Taux (ex : 87 % d'insertion professionnelle)
    - Dates (ex : dépôt de dossier avant le 15 mars)
 

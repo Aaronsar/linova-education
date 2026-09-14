@@ -7,7 +7,7 @@ import { CandidaterButton } from '@/components/CandidaterModal';
 export const metadata: Metadata = {
   title: 'Entreprises - Recrutez un alternant BTS Biologie Medicale | Linova Paris',
   description:
-    "Recrutez un alternant en BTS Biologie Medicale avec Linova Education. Accompagnement complet : selection des profils, demarches OPCO, suivi pedagogique. Cout maitrise : 378 a 563 euros/mois apres aides. Aide de 6 000 euros pour les employeurs.",
+    "Recrutez un alternant en BTS Biologie Medicale avec Linova Education. Accompagnement complet : selection des profils, demarches OPCO, suivi pedagogique. Aide jusqu'a 4 500 euros pour les TPE/PME (BTS), 1 500 euros au-dela de 250 salaries.",
   keywords: [
     'recruter alternant biologie medicale',
     'apprentissage laboratoire Paris',
@@ -31,11 +31,11 @@ const faqItems = [
   },
   {
     question: "Combien coute un alternant pour l'entreprise ?",
-    answer: "Le cout reel d'un alternant est tres maitrise grace aux aides publiques. La remuneration brute varie de 795 a 1 766 euros/mois selon l'age. Apres deduction de l'aide exceptionnelle de 6 000 euros la premiere annee, le cout reel mensuel se situe entre 378 et 563 euros/mois pour un alternant de moins de 26 ans. Les frais de formation sont integralement pris en charge par votre OPCO.",
+    answer: "Le cout d'un alternant reste maitrise grace aux aides publiques. La remuneration brute varie de 803 a 1 867 euros/mois selon l'age (SMIC de juin 2026). Pour un BTS signe depuis le 8 mars 2026, l'aide a l'employeur est de 4 500 euros la 1re annee pour une entreprise de moins de 250 salaries, et de 1 500 euros pour une entreprise de 250 salaries et plus (6 000 euros si l'apprenti est reconnu travailleur handicape). Les frais de formation sont integralement pris en charge par votre OPCO.",
   },
   {
     question: "Quelles sont les aides financieres pour l'employeur ?",
-    answer: "Plusieurs aides sont cumulables : l'aide exceptionnelle a l'apprentissage (6 000 euros pour la premiere annee), l'exoneration de charges sociales (partielle ou totale selon la taille de l'entreprise), le financement de la formation par l'OPCO (aucun cout de scolarite pour l'employeur), et une aide supplementaire pouvant atteindre 6 000 euros pour l'embauche d'un apprenti en situation de handicap (via l'AGEFIPH).",
+    answer: "Plusieurs aides sont cumulables : l'aide exceptionnelle a l'apprentissage pour un BTS (4 500 euros la 1re annee pour une entreprise de moins de 250 salaries, 1 500 euros au-dela, 6 000 euros pour un apprenti reconnu travailleur handicape), l'exoneration de charges sociales (partielle ou totale selon la taille de l'entreprise), le financement de la formation par l'OPCO (aucun cout de scolarite pour l'employeur), et des aides AGEFIPH complementaires pour l'embauche d'un apprenti en situation de handicap.",
   },
   {
     question: "Comment se deroule le processus de recrutement ?",
@@ -71,7 +71,7 @@ export default function Entreprises() {
             {[
               { value: '80%', label: 'Taux d\'insertion a 6 mois' },
               { value: '2/3', label: 'Rythme ecole/entreprise par semaine' },
-              { value: '6 000 euros', label: 'Aide employeur 1re annee' },
+              { value: 'Jusqu\'à 4 500 €', label: 'Aide employeur BTS (< 250 sal.)' },
               { value: '0 euro', label: 'Cout de formation pour l\'entreprise' },
             ].map((stat, i) => (
               <div key={i} className="text-center">
@@ -117,7 +117,7 @@ export default function Entreprises() {
               },
               {
                 title: 'Cout maitrise et aides publiques',
-                description: "Avec l'aide exceptionnelle de 6 000 euros et le financement de la formation par l'OPCO, le cout reel d'un alternant de moins de 26 ans se situe entre 378 et 563 euros par mois seulement. Un investissement minime pour former un futur collaborateur operationnel.",
+                description: "Pour un BTS signe depuis le 8 mars 2026, l'Etat verse jusqu'a 4 500 euros la 1re annee a une entreprise de moins de 250 salaries (1 500 euros a partir de 250 salaries ; 6 000 euros si l'apprenti est reconnu travailleur handicape). La formation est financee par l'OPCO. Un investissement maitrise pour former un futur collaborateur operationnel.",
                 icon: (
                   <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -206,29 +206,29 @@ export default function Entreprises() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">18-20 ans</span>
-                      <span className="text-white font-semibold">795 - 939 euros brut / mois</span>
+                      <span className="text-white font-semibold">803 - 952 euros brut / mois</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">21-25 ans</span>
-                      <span className="text-white font-semibold">977 - 1 129 euros brut / mois</span>
+                      <span className="text-white font-semibold">990 - 1 139 euros brut / mois</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">26 ans et plus</span>
-                      <span className="text-white font-semibold">1 766 euros brut / mois</span>
+                      <span className="text-white font-semibold">1 867 euros brut / mois</span>
                     </div>
                   </div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-6">
                   <h3 className="font-semibold text-yellow mb-2">Cout reel apres aides</h3>
-                  <p className="text-gray-300 text-sm">Entre 378 et 563 euros / mois pour un alternant de moins de 26 ans, apres deduction de l&apos;aide exceptionnelle de 6 000 euros.</p>
+                  <p className="text-gray-300 text-sm">Pour une entreprise de moins de 250 salaries, l&apos;aide de 4 500 euros ramene le cout de la 1re annee. Le montant depend de l&apos;age de l&apos;alternant (a partir d&apos;environ 803 euros brut/mois avant aides). A partir de 250 salaries, l&apos;aide BTS est de 1 500 euros.</p>
                 </div>
                 <div className="bg-white/10 rounded-xl p-6">
                   <h3 className="font-semibold text-yellow mb-2">Aide exceptionnelle a l&apos;apprentissage</h3>
-                  <p className="text-gray-300 text-sm">6 000 euros verses par l&apos;Etat pour la 1re annee du contrat d&apos;apprentissage. Applicable a toutes les entreprises.</p>
+                  <p className="text-gray-300 text-sm">Pour un BTS (niveau 5) dont le contrat demarre depuis le 8 mars 2026 : jusqu&apos;a 4 500 euros la 1re annee pour une entreprise de moins de 250 salaries, 1 500 euros a partir de 250 salaries. 6 000 euros si l&apos;apprenti est reconnu travailleur handicape.</p>
                 </div>
                 <div className="bg-white/10 rounded-xl p-6">
                   <h3 className="font-semibold text-yellow mb-2">Aide handicap</h3>
-                  <p className="text-gray-300 text-sm">Jusqu&apos;a 6 000 euros supplementaires via l&apos;AGEFIPH pour l&apos;embauche d&apos;un apprenti en situation de handicap. Cumulable avec les autres aides.</p>
+                  <p className="text-gray-300 text-sm">L&apos;aide exceptionnelle de l&apos;Etat est portee a 6 000 euros pour un apprenti reconnu travailleur handicape, quelle que soit la taille de l&apos;entreprise. Des aides AGEFIPH complementaires peuvent s&apos;ajouter.</p>
                 </div>
                 <div className="bg-white/10 rounded-xl p-6">
                   <h3 className="font-semibold text-yellow mb-2">Formation 100% financee</h3>

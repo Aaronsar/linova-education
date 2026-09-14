@@ -45,7 +45,7 @@ const FORMATION_FAQ = [
   {
     question: "Quelle est la différence entre le format initial et l'alternance ?",
     answer:
-      "En formation initiale, vous êtes étudiant à plein temps avec 12 semaines de stage obligatoires sur les 2 ans. En alternance, vous alternez 2 jours/3 jours entre l'école et un laboratoire d'accueil. Vous êtes salarié, votre formation est gratuite (prise en charge par l'OPCO) et vous percevez une rémunération mensuelle (de 795 € à 1 766 € brut selon âge et année).",
+      "En formation initiale, vous êtes étudiant à plein temps avec 14 semaines de stage obligatoires sur les 2 ans (6 à 7 semaines en 1re année, 7 à 8 semaines en 2e année). En alternance, vous alternez 2 jours/3 jours entre l'école et un laboratoire d'accueil. Vous êtes salarié, votre formation est gratuite (prise en charge par l'OPCO) et vous percevez une rémunération mensuelle (de 803 € à 1 867 € brut selon âge et année).",
   },
   {
     question: "Combien d'heures de cours par semaine ?",
@@ -60,7 +60,7 @@ const FORMATION_FAQ = [
   {
     question: "Comment se déroulent les stages ?",
     answer:
-      "En formation initiale, 12 semaines de stage minimum sont obligatoires sur les 2 ans, généralement réparties en plusieurs périodes. Les stages se déroulent en laboratoire d'analyses médicales (LBM), à l'hôpital, à l'EFS, dans des centres de recherche ou en industrie pharmaceutique. Linova vous accompagne dans la recherche de votre stage via notre réseau d'entreprises partenaires.",
+      "En formation initiale, 14 semaines de stage minimum sont obligatoires sur les 2 ans (6 à 7 semaines en 1re année + 7 à 8 semaines en 2e année). Les stages se déroulent en laboratoire d'analyses médicales (LBM), à l'hôpital, à l'EFS, dans des centres de recherche ou en industrie pharmaceutique. Linova vous accompagne dans la recherche de votre stage via notre réseau d'entreprises partenaires.",
   },
   {
     question: "Comment se passe l'examen final du BTS ?",
@@ -88,7 +88,7 @@ const TARIFS_FAQ = [
   {
     question: "Combien gagne un alternant ?",
     answer:
-      "La rémunération dépend de votre âge et de votre année de formation. En 1re année : 795 € (18-20 ans), 977 € (21-25 ans), 1 766 € (26 ans et +). En 2e année : 939 €, 1 129 €, ou 1 766 €. Ces montants sont les minimums légaux ; la convention collective de l'entreprise peut prévoir mieux.",
+      "La rémunération dépend de votre âge et de votre année de formation. En 1re année : 802,82 € (18-20 ans), 989,52 € (21-25 ans), 1 867,02 € (26 ans et +). En 2e année : 952,18 €, 1 138,88 €, ou 1 867,02 €. Ces montants sont les minimums légaux calculés sur le SMIC de juin 2026 (1 867,02 € brut) ; la convention collective de l'entreprise peut prévoir mieux.",
   },
 ];
 

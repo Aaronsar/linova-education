@@ -35,7 +35,7 @@ export default function SalaireBTSBiologieMedicale() {
       faqItems={[
         { question: "Quel est le salaire de depart apres un BTS Biologie Medicale ?", answer: "Le salaire de depart apres un BTS Biologie Medicale se situe entre 1 800 et 2 200 euros brut par mois, selon le secteur (prive ou public) et la region. Dans le prive, les laboratoires de ville proposent generalement 1 800 a 2 000 euros brut. A l'hopital public, la grille de la fonction publique hospitaliere demarre autour de 1 900 euros brut en categorie B." },
         { question: "Un technicien de laboratoire gagne-t-il plus dans le public ou le prive ?", answer: "En debut de carriere, les salaires sont comparables. Mais sur le long terme, le secteur prive offre souvent des salaires plus eleves, surtout dans l'industrie pharmaceutique et les grands groupes de laboratoires. En revanche, le secteur public offre la securite de l'emploi, des primes specifiques (nuit, week-end, astreintes) et une meilleure couverture sociale." },
-        { question: "Combien gagne un alternant en BTS Biologie Medicale ?", answer: "En contrat d'apprentissage, la remuneration varie selon l'age : de 43 % du SMIC (environ 760 euros) pour les moins de 18 ans a 100 % du SMIC (environ 1 767 euros) pour les 26 ans et plus. En contrat de professionnalisation, la remuneration est generalement plus elevee. L'alternant beneficie en plus de la prise en charge de ses frais de scolarite." },
+        { question: "Combien gagne un alternant en BTS Biologie Medicale ?", answer: "En contrat d'apprentissage, la remuneration varie selon l'age : 43 % du SMIC en 1re annee pour les 18-20 ans (802,82 euros brut), 53 % pour les 21-25 ans (989,52 euros), et 100 % du SMIC pour les 26 ans et plus (1 867,02 euros depuis juin 2026). En deuxieme annee, les taux passent a 51 % et 61 % du SMIC. En contrat de professionnalisation, la remuneration est generalement plus elevee. L'alternant beneficie en plus de la prise en charge de ses frais de scolarite." },
         { question: "Comment faire evoluer son salaire apres un BTS Biologie Medicale ?", answer: "Plusieurs leviers existent : la specialisation (microbiologie, hematologie, biologie moleculaire), la prise de responsabilites (referent technique, responsable qualite), la poursuite d'etudes (licence professionnelle), le changement de secteur (industrie pharmaceutique, recherche) ou la mobilite geographique vers des zones en tension. Les techniciens qui se forment en continu aux nouvelles technologies sont les mieux remuneres." },
         { question: "Le BTS Biologie Medicale est-il rentable financierement ?", answer: "Oui. Avec un taux d'insertion professionnelle superieur a 90 % dans les six mois suivant le diplome et des salaires qui progressent regulierement avec l'experience, le BTS Biologie Medicale offre un excellent retour sur investissement. C'est d'autant plus vrai en alternance, ou la formation est financee par l'entreprise et l'etudiant touche un salaire des la premiere annee." },
       ]}
@@ -123,10 +123,10 @@ export default function SalaireBTSBiologieMedicale() {
       </p>
 
       <ul>
-        <li><strong>Moins de 18 ans</strong> : 43 % du SMIC en premiere annee, soit environ 760 euros brut</li>
-        <li><strong>18 a 20 ans</strong> : 51 a 67 % du SMIC, soit 900 a 1 180 euros brut selon l&apos;annee</li>
-        <li><strong>21 a 25 ans</strong> : 67 a 80 % du SMIC, soit 1 180 a 1 414 euros brut</li>
-        <li><strong>26 ans et plus</strong> : 100 % du SMIC, soit environ 1 767 euros brut</li>
+        <li><strong>Moins de 18 ans</strong> : 27 % du SMIC en premiere annee, soit environ 504 euros brut</li>
+        <li><strong>18 a 20 ans</strong> : 43 % puis 51 % du SMIC, soit 803 a 952 euros brut selon l&apos;annee</li>
+        <li><strong>21 a 25 ans</strong> : 53 % puis 61 % du SMIC, soit 990 a 1 139 euros brut</li>
+        <li><strong>26 ans et plus</strong> : 100 % du SMIC, soit 1 867,02 euros brut (depuis juin 2026)</li>
       </ul>
 
       <p>

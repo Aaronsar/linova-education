@@ -262,7 +262,7 @@ export default function Admission() {
               </p>
               <ul className="space-y-3 mb-8">
                 {[
-                  '12 semaines de stage obligatoire',
+                  '14 semaines de stage obligatoire',
                   'Echelonnement des paiements possible',
                   'Pret etudiant facilite via notre partenaire LCL',
                   'Cours en presentiel du lundi au vendredi',
@@ -294,7 +294,7 @@ export default function Admission() {
                 {[
                   '2 jours ecole / 3 jours entreprise',
                   'Formation gratuite (financee par l\'OPCO)',
-                  'Salaire : 795 a 1 766 euros brut / mois',
+                  'Salaire : 803 a 1 867 euros brut / mois',
                   'Statut salarie avec contrat d\'apprentissage',
                   'Accompagnement a la recherche d\'entreprise',
                 ].map((item, i) => (

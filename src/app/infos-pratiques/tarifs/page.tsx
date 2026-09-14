@@ -7,7 +7,7 @@ import { CandidaterButton } from '@/components/CandidaterModal';
 export const metadata: Metadata = {
   title: 'Tarifs BTS Biologie Medicale - Alternance gratuite, Initial sur devis | Linova Paris',
   description:
-    "Tarifs du BTS Biologie Medicale chez Linova Education Paris 12e : initial sur devis (echelonnement et pret etudiant LCL disponibles), 0 euro en alternance (finance par l'OPCO). Salaire alternant de 795 a 1 766 euros/mois.",
+    "Tarifs du BTS Biologie Medicale chez Linova Education Paris 12e : initial sur devis (echelonnement et pret etudiant LCL disponibles), 0 euro en alternance (finance par l'OPCO). Salaire alternant de 803 a 1 867 euros/mois.",
   keywords: [
     'tarif BTS Biologie Medicale',
     'cout formation laboratoire Paris',
@@ -27,7 +27,7 @@ const faqItems = [
   },
   {
     question: "Comment fonctionne le financement de l'alternance ?",
-    answer: "En alternance, les frais de formation sont integralement pris en charge par l'OPCO (Operateur de Competences) de l'entreprise d'accueil. Vous ne payez rien. De plus, en tant que salarie de l'entreprise, vous percevez une remuneration mensuelle allant de 795 a 1 766 euros brut selon votre age et votre annee de formation. C'est l'employeur qui effectue les demarches aupres de l'OPCO.",
+    answer: "En alternance, les frais de formation sont integralement pris en charge par l'OPCO (Operateur de Competences) de l'entreprise d'accueil. Vous ne payez rien. De plus, en tant que salarie de l'entreprise, vous percevez une remuneration mensuelle allant de 803 a 1 867 euros brut selon votre age et votre annee de formation. C'est l'employeur qui effectue les demarches aupres de l'OPCO.",
   },
   {
     question: "Est-il possible d'echelonner les paiements en initial ?",
@@ -39,7 +39,7 @@ const faqItems = [
   },
   {
     question: "Quel est le salaire d'un alternant en BTS Biologie Medicale ?",
-    answer: "La remuneration de l'alternant depend de son age et de son annee de formation. En premiere annee : 795 euros brut/mois pour les 18-20 ans, 977 euros pour les 21-25 ans, 1 766 euros pour les 26 ans et plus (100% du SMIC). En deuxieme annee : 939 euros brut/mois pour les 18-20 ans, 1 129 euros pour les 21-25 ans, 1 766 euros pour les 26 ans et plus. Ces montants sont des minimums legaux et peuvent etre superieurs selon la convention collective de l'entreprise.",
+    answer: "La remuneration de l'alternant depend de son age et de son annee de formation. En premiere annee : 802,82 euros brut/mois pour les 18-20 ans, 989,52 euros pour les 21-25 ans, 1 867,02 euros pour les 26 ans et plus (100% du SMIC). En deuxieme annee : 952,18 euros brut/mois pour les 18-20 ans, 1 138,88 euros pour les 21-25 ans, 1 867,02 euros pour les 26 ans et plus. Ces montants sont des minimums legaux bases sur le SMIC de juin 2026 ; la convention collective de l'entreprise peut prevoir mieux.",
   },
   {
     question: "Les frais de transport et de restauration sont-ils inclus ?",
@@ -79,7 +79,7 @@ export default function Tarifs() {
                   'Acces complet aux laboratoires et equipements',
                   'Supports de cours et plateforme numerique inclus',
                   'Accompagnement personnalise pour le financement',
-                  '12 semaines de stage en milieu professionnel',
+                  '14 semaines de stage en milieu professionnel',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <svg className="w-5 h-5 text-teal flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,7 +109,7 @@ export default function Tarifs() {
                 {[
                   '100% des frais pris en charge par l\'OPCO de l\'entreprise',
                   'Statut de salarie avec remuneration mensuelle',
-                  'Salaire : de 795 a 1 766 euros brut / mois',
+                  'Salaire : de 803 a 1 867 euros brut / mois',
                   'Experience professionnelle des la 1re annee',
                   'Rythme : 2 jours ecole / 3 jours entreprise',
                   'Financement integral + salaire + diplome',
@@ -151,9 +151,9 @@ export default function Tarifs() {
               </thead>
               <tbody>
                 {[
-                  { age: '18-20 ans', an1: '795 euros', an2: '939 euros', base: '43% puis 51% du SMIC' },
-                  { age: '21-25 ans', an1: '977 euros', an2: '1 129 euros', base: '53% puis 61% du SMIC' },
-                  { age: '26 ans et plus', an1: '1 766 euros', an2: '1 766 euros', base: '100% du SMIC' },
+                  { age: '18-20 ans', an1: '802,82 euros', an2: '952,18 euros', base: '43% puis 51% du SMIC' },
+                  { age: '21-25 ans', an1: '989,52 euros', an2: '1 138,88 euros', base: '53% puis 61% du SMIC' },
+                  { age: '26 ans et plus', an1: '1 867,02 euros', an2: '1 867,02 euros', base: '100% du SMIC' },
                 ].map((row, i) => (
                   <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-light'}>
                     <td className="py-4 px-6 font-semibold text-dark">{row.age}</td>
@@ -166,7 +166,7 @@ export default function Tarifs() {
             </table>
           </div>
           <p className="mt-6 text-sm text-gray-500 text-center">
-            Montants bruts mensuels indicatifs bases sur le SMIC en vigueur (1 766,92 euros brut en 2025). La convention collective de l&apos;entreprise peut prevoir des montants superieurs.
+            Montants bruts mensuels indicatifs bases sur le SMIC en vigueur (1 867,02 euros brut depuis juin 2026). La convention collective de l&apos;entreprise peut prevoir des montants superieurs.
           </p>
         </div>
       </section>
@@ -209,7 +209,7 @@ export default function Tarifs() {
               },
               {
                 title: 'Aide exceptionnelle a l\'apprentissage',
-                description: "L'Etat verse une aide de 6 000 euros a l'employeur pour la premiere annee de contrat d'apprentissage. Cette aide facilite le recrutement d'alternants et beneficie indirectement aux etudiants en facilitant l'acces a un contrat.",
+                description: "Pour un BTS (niveau 5) dont le contrat demarre depuis le 8 mars 2026, l'Etat verse a l'employeur jusqu'a 4 500 euros la 1re annee si l'entreprise a moins de 250 salaries, et 1 500 euros si elle en a 250 ou plus. Le montant est porte a 6 000 euros pour un apprenti reconnu travailleur handicape. Cette aide facilite le recrutement d'alternants.",
                 who: 'Alternance',
               },
             ].map((aide, i) => (
@@ -246,8 +246,8 @@ export default function Tarifs() {
               <tbody>
                 {[
                   { critere: 'Frais de scolarite (2 ans)', initial: '—', alternance: '0 euro' },
-                  { critere: 'Salaire mensuel', initial: 'Aucun', alternance: '795 a 1 766 euros brut' },
-                  { critere: 'Experience professionnelle', initial: '12 semaines de stage', alternance: '3 jours/semaine en entreprise' },
+                  { critere: 'Salaire mensuel', initial: 'Aucun', alternance: '803 a 1 867 euros brut' },
+                  { critere: 'Experience professionnelle', initial: '14 semaines de stage', alternance: '3 jours/semaine en entreprise' },
                   { critere: 'Financement', initial: 'A la charge de l\'etudiant', alternance: 'OPCO de l\'entreprise' },
                   { critere: 'Statut', initial: 'Etudiant', alternance: 'Salarie' },
                   { critere: 'Conges payes', initial: 'Vacances scolaires', alternance: '5 semaines de conges payes/an' },

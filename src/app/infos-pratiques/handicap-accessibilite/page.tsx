@@ -43,7 +43,7 @@ const faqItems = [
   },
   {
     question: "Existe-t-il des aides financieres specifiques pour les etudiants handicapes ?",
-    answer: "Oui, plusieurs dispositifs existent : l'AGEFIPH propose des aides pour les apprentis en situation de handicap, la MDPH peut attribuer des aides compensatoires, les OPCO peuvent mobiliser des financements supplementaires pour l'alternance, et l'employeur peut beneficier d'une aide pouvant atteindre 6 000 euros pour le recrutement d'un apprenti handicape. Notre referent handicap vous oriente vers les dispositifs adaptes.",
+    answer: "Oui, plusieurs dispositifs existent : l'AGEFIPH propose des aides pour les apprentis en situation de handicap, la MDPH peut attribuer des aides compensatoires, les OPCO peuvent mobiliser des financements supplementaires pour l'alternance, et l'employeur peut beneficier d'une aide exceptionnelle portee a 6 000 euros pour le recrutement d'un apprenti reconnu travailleur handicape. Notre referent handicap vous oriente vers les dispositifs adaptes.",
   },
   {
     question: "L'alternance est-elle possible pour les etudiants en situation de handicap ?",
@@ -283,7 +283,7 @@ export default function HandicapAccessibilite() {
               },
               {
                 title: 'Aide employeur (6 000 euros)',
-                description: "L'Etat verse une aide pouvant atteindre 6 000 euros a l'employeur qui recrute un apprenti en situation de handicap. Cela facilite votre acces a l'alternance et motive les entreprises a vous accueillir.",
+                description: "L'Etat verse une aide portee a 6 000 euros a l'employeur qui recrute un apprenti reconnu travailleur handicape, quelle que soit la taille de l'entreprise. Cela facilite votre acces a l'alternance et motive les entreprises a vous accueillir.",
               },
               {
                 title: 'Contrat d\'apprentissage amenage',

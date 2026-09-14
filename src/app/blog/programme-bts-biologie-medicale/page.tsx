@@ -36,7 +36,7 @@ export default function ProgrammeBTSBiologieMedicale() {
         { question: "Quelles sont les matieres principales du BTS Biologie Medicale ?", answer: "Le BTS Biologie Medicale comprend des matieres generales (francais, anglais, mathematiques, sciences physiques et chimiques -- environ 510h) et des matieres professionnelles (biochimie, microbiologie, hematologie, immunologie, anatomopathologie, biologie cellulaire -- environ 1335h). Les travaux pratiques en laboratoire representent une part majeure de la formation." },
         { question: "Combien d'heures de TP y a-t-il en BTS Biologie Medicale ?", answer: "Les travaux pratiques occupent environ 40 a 50 % du volume horaire professionnel, soit pres de 600 heures sur les deux annees. Les etudiants manipulent sur de vrais automates d'analyses, des microscopes, des milieux de culture et des echantillons biologiques dans des conditions proches du milieu professionnel." },
         { question: "Comment se deroulent les examens du BTS Biologie Medicale ?", answer: "Les examens finaux comprennent des epreuves ecrites (biochimie-biologie, sciences physiques et chimiques, expression francaise, anglais, mathematiques) et des epreuves pratiques en laboratoire. L'epreuve professionnelle de synthese inclut une soutenance orale basee sur les stages en milieu professionnel. Les coefficients les plus eleves sont attribues aux matieres professionnelles." },
-        { question: "Y a-t-il des stages obligatoires en BTS Biologie Medicale ?", answer: "Oui. Le BTS Biologie Medicale inclut 12 semaines de stage obligatoire reparties sur les deux annees, en laboratoire d'analyses medicales, en hopital ou en laboratoire de recherche. Ces stages sont essentiels car ils permettent de confronter les connaissances theoriques a la realite du terrain et constituent la base de l'epreuve professionnelle de synthese." },
+        { question: "Y a-t-il des stages obligatoires en BTS Biologie Medicale ?", answer: "Oui. Le BTS Biologie Medicale inclut 14 semaines de stage obligatoire reparties sur les deux annees (6 a 7 semaines en 1re annee, 7 a 8 semaines en 2e annee), en laboratoire d'analyses medicales, en hopital ou en laboratoire de recherche. Ces stages sont essentiels car ils permettent de confronter les connaissances theoriques a la realite du terrain et constituent la base de l'epreuve professionnelle de synthese." },
         { question: "Peut-on faire le BTS Biologie Medicale en alternance ?", answer: "Oui. Le BTS Biologie Medicale peut se preparer en alternance, avec un rythme partage entre l'ecole et l'entreprise (generalement un laboratoire d'analyses ou un hopital). L'alternance offre l'avantage de l'experience professionnelle, d'un salaire mensuel et d'une meilleure insertion a la sortie. Chez Linova, les deux modalites -- initial et alternance -- sont proposees." },
       ]}
     >
@@ -109,10 +109,10 @@ export default function ProgrammeBTSBiologieMedicale() {
         Chez Linova, nous avons fait le choix d&apos;investir dans des laboratoires equipes avec du materiel de derniere generation. Nos etudiants manipulent dans des conditions identiques a celles qu&apos;ils retrouveront en milieu professionnel. Ce n&apos;est pas un detail : quand vous arrivez en stage et que vous connaissez deja les gestes, vous prenez une longueur d&apos;avance.
       </p>
 
-      <h2>Les stages : 12 semaines d&apos;immersion professionnelle</h2>
+      <h2>Les stages : 14 semaines d&apos;immersion professionnelle</h2>
 
       <p>
-        Le programme prevoit 12 semaines de stage obligatoire reparties sur les deux annees. Ces stages se deroulent en laboratoire d&apos;analyses medicales (prive ou hospitalier), en EFS, en laboratoire de recherche ou en industrie pharmaceutique.
+        Le programme prevoit 14 semaines de stage obligatoire reparties sur les deux annees (6 a 7 semaines en 1re annee, 7 a 8 semaines en 2e annee). Ces stages se deroulent en laboratoire d&apos;analyses medicales (prive ou hospitalier), en EFS, en laboratoire de recherche ou en industrie pharmaceutique.
       </p>
 
       <p>

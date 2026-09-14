@@ -104,7 +104,7 @@ export default function QualitesTechnicienLaboratoire() {
         Si vous avez lu cette liste en vous reconnaissant dans certaines qualites mais pas dans toutes, pas de panique. Personne n&apos;arrive en formation avec un profil parfait. Le role d&apos;une bonne ecole, c&apos;est justement de vous aider a developper ces competences progressivement, par la pratique et l&apos;accompagnement.
       </p>
       <p>
-        Chez Linova, les travaux pratiques en conditions reelles, les stages de 12 semaines en laboratoire et le suivi individualise de chaque etudiant sont conçus pour ca. On ne vous demande pas d&apos;etre deja un professionnel le jour de la rentree. On vous demande d&apos;etre motive, curieux et pret a travailler. Le reste, on s&apos;en occupe. Pour commencer l&apos;aventure, consultez notre page <Link href="/infos-pratiques/admission">admission</Link> et lancez-vous.
+        Chez Linova, les travaux pratiques en conditions reelles, les stages de 14 semaines en laboratoire et le suivi individualise de chaque etudiant sont conçus pour ca. On ne vous demande pas d&apos;etre deja un professionnel le jour de la rentree. On vous demande d&apos;etre motive, curieux et pret a travailler. Le reste, on s&apos;en occupe. Pour commencer l&apos;aventure, consultez notre page <Link href="/infos-pratiques/admission">admission</Link> et lancez-vous.
       </p>
     </BlogArticle>
   );

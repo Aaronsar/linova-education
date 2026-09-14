@@ -201,7 +201,7 @@ export default function Home() {
                 {[
                   '1 350 heures de formation',
                   'Alternance : 2 jours école / 3 jours entreprise',
-                  'Stage : 12 semaines en formation initiale',
+                  'Stage : 14 semaines en formation initiale',
                   'Certification Qualiopi',
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
