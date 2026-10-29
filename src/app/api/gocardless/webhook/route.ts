@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 /**
  * Webhook GoCardless.
- * À enregistrer dans le dashboard : https://linova-education.fr/api/gocardless/webhook
- * Secret → env GOCARDLESS_WEBHOOK_SECRET
- *
- * Le dossier est surtout finalisé au retour navigateur ; ce webhook journalise
- * et confirme les événements mandat / paiement.
+ * Signature : HMAC-SHA256(secret, body) en hex = header Webhook-Signature.
+ * Persiste les changements d'état sur les mandats et paiements liés
+ * aux candidatures (table candidature_mandates).
  */
 export async function POST(request: Request) {
   const rawBody = await request.text();
@@ -20,7 +19,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 498 });
     }
   } else {
-    console.warn('[gocardless/webhook] GOCARDLESS_WEBHOOK_SECRET manquant — signature non vérifiée');
+    console.warn(
+      '[gocardless/webhook] GOCARDLESS_WEBHOOK_SECRET manquant — signature non vérifiée'
+    );
   }
 
   let payload: {
@@ -45,12 +46,88 @@ export async function POST(request: Request) {
       event.id,
       event.links || {}
     );
+    try {
+      await persistEvent(event);
+    } catch (err) {
+      console.error('[gocardless/webhook] persistEvent error', event.id, err);
+    }
   }
 
   return NextResponse.json({ received: true });
 }
 
-/** GoCardless : HMAC-SHA256(secret, body) en hex = header Webhook-Signature. */
+async function persistEvent(event: {
+  action?: string;
+  resource_type?: string;
+  links?: Record<string, string>;
+}) {
+  const admin = getSupabaseAdmin();
+
+  if (event.resource_type === 'mandates' && event.links?.mandate) {
+    const mandateId = event.links.mandate;
+    const action = event.action || '';
+    const nowIso = new Date().toISOString();
+
+    if (action === 'cancelled' || action === 'failed' || action === 'expired') {
+      await admin
+        .from('candidature_mandates')
+        .update({
+          status: action === 'failed' ? 'failed' : 'cancelled',
+          cancelled_at: nowIso,
+        })
+        .eq('gocardless_mandate_id', mandateId)
+        .in('status', ['pending', 'active']);
+    } else if (action === 'active' || action === 'submitted') {
+      await admin
+        .from('candidature_mandates')
+        .update({ status: 'active' })
+        .eq('gocardless_mandate_id', mandateId)
+        .eq('status', 'pending');
+    }
+  }
+
+  if (event.resource_type === 'payments' && event.links?.payment && event.links?.mandate) {
+    const paymentId = event.links.payment;
+    const mandateId = event.links.mandate;
+    const action = event.action || '';
+    const nextStatus = mapPaymentAction(action);
+    if (!nextStatus) return;
+
+    const { data: row } = await admin
+      .from('candidature_mandates')
+      .select('id, payments')
+      .eq('gocardless_mandate_id', mandateId)
+      .maybeSingle();
+    if (!row) return;
+    const payments = Array.isArray(row.payments) ? row.payments : [];
+    const next = payments.map((p: { id: string; status?: string }) =>
+      p.id === paymentId ? { ...p, status: nextStatus } : p
+    );
+    await admin.from('candidature_mandates').update({ payments: next }).eq('id', row.id);
+  }
+}
+
+function mapPaymentAction(action: string): string | null {
+  switch (action) {
+    case 'created':
+      return 'pending_submission';
+    case 'submitted':
+      return 'submitted';
+    case 'confirmed':
+      return 'confirmed';
+    case 'paid_out':
+      return 'paid_out';
+    case 'failed':
+      return 'failed';
+    case 'cancelled':
+      return 'cancelled';
+    case 'charged_back':
+      return 'charged_back';
+    default:
+      return null;
+  }
+}
+
 function verifyGoCardlessSignature(body: string, header: string, secret: string): boolean {
   if (!header) return false;
   const computed = createHmac('sha256', secret).update(body, 'utf8').digest('hex');

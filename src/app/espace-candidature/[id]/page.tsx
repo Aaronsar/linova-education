@@ -17,6 +17,8 @@ import {
   isDesinscrit,
   stripDesinscritTag,
 } from '@/lib/candidature-statut';
+import MandatesPanel from '@/components/espace-candidature/MandatesPanel';
+import { ACOMPTE_CENTS, FRAIS_ANNUELS_CENTS } from '@/lib/acompte';
 
 interface Inscription {
   id: string;
@@ -518,6 +520,11 @@ export default function InscriptionDetail({ params }: { params: Promise<{ id: st
           </div>
         </div>
       </div>
+
+      <MandatesPanel
+        candidatureId={inscription.id}
+        defaultSoldeCents={Math.max(0, FRAIS_ANNUELS_CENTS - ACOMPTE_CENTS)}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left column: main info */}
