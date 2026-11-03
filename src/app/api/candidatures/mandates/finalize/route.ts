@@ -84,7 +84,10 @@ export async function POST(req: NextRequest) {
       mandateId,
       plan,
       cand.email || '',
-      { label: previousMandateRowId ? 'solde scolarité (nouveau RIB)' : 'solde scolarité' }
+      {
+        label: previousMandateRowId ? 'solde scolarité (nouveau RIB)' : 'solde scolarité',
+        idempotencyPrefix: billingRequestId,
+      }
     );
 
     const rowPayload = {

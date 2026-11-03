@@ -240,7 +240,7 @@ export async function createScheduledPayments(
   mandateId: string,
   plan: MandatePlan,
   email: string,
-  opts: { startIndex?: number; totalCount?: number; label?: string } = {}
+  opts: { startIndex?: number; totalCount?: number; label?: string; idempotencyPrefix?: string } = {}
 ): Promise<ScheduledPayment[]> {
   const amounts = plan.amounts.length > 0 ? plan.amounts : splitSoldeCents(plan.soldeCents, plan.nb);
   const startIndex = opts.startIndex ?? 0;
@@ -255,6 +255,9 @@ export async function createScheduledPayments(
       payments: { id: string; charge_date: string; status: string };
     }>('/payments', {
       method: 'POST',
+      headers: opts.idempotencyPrefix
+        ? { 'Idempotency-Key': `${opts.idempotencyPrefix}-${i + 1}` }
+        : undefined,
       body: JSON.stringify({
         payments: {
           amount: String(amount),

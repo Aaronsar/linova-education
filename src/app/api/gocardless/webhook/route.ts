@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { finalizePendingMandate } from '@/lib/mandate-finalize';
 
 /**
  * Webhook GoCardless.
@@ -62,6 +63,15 @@ async function persistEvent(event: {
   links?: Record<string, string>;
 }) {
   const admin = getSupabaseAdmin();
+
+  if (
+    event.resource_type === 'billing_requests' &&
+    event.action === 'fulfilled' &&
+    event.links?.billing_request
+  ) {
+    await finalizePendingMandate(event.links.billing_request);
+    return;
+  }
 
   if (event.resource_type === 'mandates' && event.links?.mandate) {
     const mandateId = event.links.mandate;
