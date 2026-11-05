@@ -10,6 +10,7 @@ import {
   computeFirstPrelevementDate,
   gocardlessFetch,
   packBillingMetadata,
+  siteOrigin,
   splitSoldeCents,
   unpackBillingMetadata,
 } from './gocardless';
@@ -62,9 +63,7 @@ export async function createMandateFlow(
 ): Promise<CreateMandateFlowResult> {
   const plan = buildMandatePlan(opts.soldeCents, opts.nb, opts.startDate);
 
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://linova-education.fr');
+  const origin = siteOrigin();
 
   const basePath = opts.basePath.startsWith('/') ? opts.basePath : `/${opts.basePath}`;
   const returnQs = new URLSearchParams({ gocardless: 'ok' });

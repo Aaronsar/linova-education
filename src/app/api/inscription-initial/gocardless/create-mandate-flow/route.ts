@@ -5,6 +5,7 @@ import {
   gocardlessFetch,
   isGoCardlessConfigured,
   packBillingMetadata,
+  siteOrigin,
   splitSoldeCents,
 } from '@/lib/gocardless';
 import { ACOMPTE_CENTS } from '@/lib/acompte';
@@ -49,9 +50,7 @@ export async function POST(request: Request) {
     }
 
     const amounts = splitSoldeCents(soldeCents, nb);
-    const origin =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://linova-education.fr');
+    const origin = siteOrigin();
 
     const returnQs = new URLSearchParams({ gocardless: 'ok' });
     if (basePath.includes('reprendre') && paymentIntentId) {

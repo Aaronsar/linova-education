@@ -62,6 +62,25 @@ export async function gocardlessFetch<T = unknown>(
 }
 
 /**
+ * Origine publique du site pour les redirect_uri / exit_uri GoCardless.
+ * GoCardless refuse toute URL invalide (« must be a valid URL ») : une variable
+ * d'environnement saisie sans https://, avec un espace ou un retour à la ligne,
+ * ou pointant sur localhost, retombe sur le domaine de production.
+ */
+export function siteOrigin(): string {
+  const value = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (value) {
+    try {
+      const url = new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`);
+      if (url.protocol === 'https:' && url.hostname.includes('.')) return url.origin;
+    } catch {
+      // valeur inutilisable : domaine de production
+    }
+  }
+  return 'https://linova-education.fr';
+}
+
+/**
  * Règle métier GoCardless (délai SEPA) :
  * - inscription avant le 30 du mois M → 1er prélèvement = 5 du mois M+1
  * - inscription à partir du 30 du mois M → 1er prélèvement = 5 du mois M+2
