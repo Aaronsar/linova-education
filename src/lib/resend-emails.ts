@@ -526,6 +526,7 @@ export async function sendCandidatureCvAccuse(params: CandidatureCvParams) {
             <td style="font-size:15px;line-height:1.55;color:#202124;">
               <p style="margin:0 0 16px;">Bonjour ${escapeHtml(params.firstName)},</p>
               <p style="margin:0 0 16px;">Nous avons bien reçu votre candidature au <strong>${escapeHtml(params.formation)}</strong>, ainsi que votre CV. Merci de l'intérêt que vous portez à Linova Éducation.</p>
+              <p style="margin:0 0 16px;"><strong>À la clé : nous avons actuellement 19 places en alternance à pourvoir.</strong> Il s'agit de postes en bureau, dans les Hauts-de-Seine (92), avec un salaire fixe auquel s'ajoutent des commissions.</p>
               <p style="margin:0 0 16px;">Notre équipe étudie votre dossier et vous recontacte sous 5 jours ouvrés pour vous proposer un entretien.</p>
               <p style="margin:0 0 16px;">Une question d'ici là ? Répondez simplement à ce mail ou écrivez-nous à <a href="mailto:${RECRUTEMENT_EMAIL}" style="color:#6DA3A4;">${RECRUTEMENT_EMAIL}</a>.</p>
               <p style="margin:24px 0 0;">À très vite,<br />L'équipe Linova Éducation<br /><span style="color:#777;font-size:13px;">85 avenue Ledru-Rollin, 75012 Paris · 01 89 71 99 44</span></p>
