@@ -19,6 +19,7 @@ const navigation = [
     name: 'Formations',
     children: [
       { name: 'BTS Biologie Médicale', href: '/formations/bts-biologie-medicale' },
+      { name: 'BTS NDRC en alternance (à distance)', href: '/formations/bts-ndrc' },
     ],
   },
   {

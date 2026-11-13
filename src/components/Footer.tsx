@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { CookieSettingsButton } from '@/components/MetaPixel';
 
 export default function Footer() {
   return (
@@ -16,7 +17,7 @@ export default function Footer() {
             />
             <p className="mt-2 text-xs text-gray-400 italic">De la formation à la vocation</p>
             <p className="mt-4 text-sm text-gray-300 leading-relaxed">
-              L&apos;école dédiée aux métiers de la santé
+              La préparation d&apos;excellence au BTS, en initial et en alternance
             </p>
             <div className="mt-6 space-y-3">
               <div className="flex items-start gap-3">
@@ -60,6 +61,7 @@ export default function Footer() {
             <h3 className="font-[var(--font-outfit)] font-semibold text-lg mb-6">Formations</h3>
             <ul className="space-y-3">
               <li><Link href="/formations/bts-biologie-medicale" className="text-sm text-gray-300 hover:text-teal transition-colors">BTS Biologie Médicale</Link></li>
+              <li><Link href="/formations/bts-ndrc" className="text-sm text-gray-300 hover:text-teal transition-colors">BTS NDRC en alternance</Link></li>
               <li><Link href="/infos-pratiques/admission" className="text-sm text-gray-300 hover:text-teal transition-colors">Admission</Link></li>
               <li><Link href="/infos-pratiques/tarifs" className="text-sm text-gray-300 hover:text-teal transition-colors">Tarifs</Link></li>
               <li><Link href="/infos-pratiques/campus" className="text-sm text-gray-300 hover:text-teal transition-colors">Campus</Link></li>
@@ -83,9 +85,10 @@ export default function Footer() {
             </div>
 
             <div className="space-y-2">
-              <Link href="#" className="block text-xs text-gray-400 hover:text-teal transition-colors">Conditions générales de services</Link>
-              <Link href="#" className="block text-xs text-gray-400 hover:text-teal transition-colors">Politique de confidentialité</Link>
-              <Link href="#" className="block text-xs text-gray-400 hover:text-teal transition-colors">Mentions légales</Link>
+              <Link href="/conditions-generales-de-services" className="block text-xs text-gray-400 hover:text-teal transition-colors">Conditions générales de services</Link>
+              <Link href="/politique-de-confidentialite" className="block text-xs text-gray-400 hover:text-teal transition-colors">Politique de confidentialité</Link>
+              <Link href="/mentions-legales" className="block text-xs text-gray-400 hover:text-teal transition-colors">Mentions légales</Link>
+              <CookieSettingsButton className="block text-xs text-gray-400 hover:text-teal transition-colors cursor-pointer" />
             </div>
           </div>
         </div>

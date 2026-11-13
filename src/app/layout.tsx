@@ -9,11 +9,11 @@ import MetaPixel from "@/components/MetaPixel";
 export const metadata: Metadata = {
   metadataBase: new URL("https://linova-education.fr"),
   title: {
-    default: "Linova Éducation - L'école des métiers de la santé à Paris",
+    default: "Linova Éducation - La préparation d'excellence au BTS",
     template: "%s | Linova Éducation",
   },
   description:
-    "Linova Éducation, école spécialisée dans les métiers de la santé à Paris 12e. BTS Biologie Médicale en initial et alternance. Certification Qualiopi. Première promotion, session nationale 2027.",
+    "Linova Éducation prépare aux BTS en initial et en alternance : BTS Biologie Médicale à Paris 12e et BTS NDRC en alternance à distance. École certifiée Qualiopi.",
   keywords: [
     "BTS Biologie Médicale",
     "BTS Biologie Médicale Paris",
@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     "formation laboratoire",
     "alternance biologie médicale",
     "technicien laboratoire formation",
+    "BTS NDRC alternance",
+    "BTS NDRC à distance",
+    "BTS en alternance",
     "Linova Éducation",
     "Qualiopi",
     "formation santé alternance",
@@ -29,14 +32,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: "Linova Éducation",
-    title: "Linova Éducation - L'école des métiers de la santé",
+    title: "Linova Éducation - La préparation d'excellence au BTS",
     description:
-      "BTS Biologie Médicale en initial et alternance à Paris. École certifiée Qualiopi. Première promotion, session nationale 2027.",
+      "BTS Biologie Médicale en initial et alternance à Paris, BTS NDRC en alternance à distance. École certifiée Qualiopi.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Linova Éducation - L'école des métiers de la santé",
-    description: "BTS Biologie Médicale en initial et alternance à Paris. Certifié Qualiopi.",
+    title: "Linova Éducation - La préparation d'excellence au BTS",
+    description: "BTS Biologie Médicale à Paris et BTS NDRC en alternance à distance. Certifié Qualiopi.",
   },
   robots: {
     index: true,
@@ -53,7 +56,7 @@ const jsonLd = {
   url: "https://linova-education.fr",
   logo: "https://linova-education.fr/images/logo.png",
   description:
-    "École spécialisée dans les métiers de la santé à Paris. BTS Biologie Médicale en initial et alternance.",
+    "École de préparation aux BTS, en initial et en alternance : BTS Biologie Médicale à Paris et BTS NDRC en alternance à distance.",
   address: {
     "@type": "PostalAddress",
     streetAddress: "85 Avenue Ledru-Rollin",
@@ -75,6 +78,16 @@ const jsonLd = {
         provider: { "@type": "EducationalOrganization", name: "Linova Éducation" },
         timeRequired: "P2Y",
         educationalCredentialAwarded: "BTS Biologie Médicale (RNCP 40027)",
+      },
+      {
+        "@type": "Course",
+        name: "BTS Négociation et Digitalisation de la Relation Client (NDRC)",
+        description:
+          "Diplôme national en 2 ans, en alternance et à distance, pour devenir commercial. RNCP 38368.",
+        provider: { "@type": "EducationalOrganization", name: "Linova Éducation" },
+        timeRequired: "P2Y",
+        courseMode: "online",
+        educationalCredentialAwarded: "BTS NDRC (RNCP 38368)",
       },
     ],
   },

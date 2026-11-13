@@ -76,6 +76,12 @@ export default function CandidaterModal() {
 
         <div className="p-6 pt-8">
           <ContactForm embedded={false} form="contact" pixelEvent="InitiateCheckout" />
+          <p className="mt-4 text-center text-sm text-gray-500">
+            Vous candidatez au BTS NDRC en alternance ?{' '}
+            <a href="/formations/bts-ndrc#candidater" onClick={() => setOpen(false)} className="text-teal font-semibold hover:underline">
+              Déposez votre CV ici
+            </a>
+          </p>
         </div>
       </div>
     </div>

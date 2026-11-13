@@ -5,11 +5,46 @@ import CTASection from '@/components/CTASection';
 import { CandidaterButton } from '@/components/CandidaterModal';
 
 const stats = [
-  { value: '2M', label: 'professionnels de santé en France' },
-  { value: '60K', label: 'techniciens de laboratoire' },
-  { value: '4K', label: 'laboratoires en France' },
-  { value: '47K', label: "offres d'emploi par an" },
-  { value: '2027', label: '1re session nationale' },
+  { value: '2', label: "BTS, diplômes nationaux d'État" },
+  { value: '1 350 h', label: 'de formation par BTS' },
+  { value: '0 €', label: 'de frais de scolarité en alternance' },
+  { value: '2 ans', label: 'pour obtenir son diplôme' },
+  { value: 'Qualiopi', label: 'école certifiée' },
+];
+
+const formations = [
+  {
+    badge: 'Santé · Laboratoire',
+    title: 'BTS Biologie Médicale',
+    rncp: 'RNCP 40027',
+    description:
+      'Devenez technicien de laboratoire médical. Cours et travaux pratiques sur notre campus de Paris 12e.',
+    points: [
+      'En initial ou en alternance',
+      'En présentiel à Paris 12e',
+      '1 350 heures de formation sur 2 ans',
+      'Alternance : 2 jours école / 3 jours entreprise',
+    ],
+    href: '/formations/bts-biologie-medicale',
+    image: '/images/photos/etudiants-labo.png',
+    alt: 'Etudiants en travaux pratiques au laboratoire',
+  },
+  {
+    badge: 'Commerce · Relation client',
+    title: 'BTS NDRC',
+    rncp: 'RNCP 38368',
+    description:
+      'Négociation et Digitalisation de la Relation Client : devenez commercial. Formation à distance sur notre plateforme e-learning.',
+    points: [
+      'En alternance uniquement',
+      'À distance : e-learning et classes virtuelles',
+      '1 350 heures de formation sur 2 ans',
+      'Rentrée en janvier 2027',
+    ],
+    href: '/formations/bts-ndrc',
+    image: '/images/photos/etudiants-pause.png',
+    alt: 'Apprentis du BTS NDRC en alternance',
+  },
 ];
 
 const blogPosts = [
@@ -42,27 +77,27 @@ const blogPosts = [
 const faqItems = [
   {
     question: 'Quels types de formations proposez-vous ?',
-    answer: "Nous proposons le BTS Biologie Médicale, un diplôme d'État reconnu, disponible en formation initiale et en alternance. Notre spécialisation 100 % santé nous permet de vous offrir un enseignement de qualité, ancré dans la réalité du terrain.",
+    answer: "Nous préparons à deux BTS, diplômes nationaux d'État : le BTS Biologie Médicale, en formation initiale ou en alternance sur notre campus de Paris 12e, et le BTS NDRC (Négociation et Digitalisation de la Relation Client), en alternance et à distance.",
   },
   {
     question: "L'alternance est-elle possible ?",
-    answer: "Oui, nous proposons le BTS Biologie Médicale en alternance avec un rythme de 2 jours en formation et 3 jours en entreprise. Les frais de formation sont entièrement pris en charge par l'OPCO de l'entreprise d'accueil.",
+    answer: "Oui. Le BTS Biologie Médicale est proposé en alternance avec un rythme de 2 jours en formation et 3 jours en entreprise. Le BTS NDRC est proposé uniquement en alternance. Dans les deux cas, les frais de formation sont pris en charge par l'OPCO de l'entreprise d'accueil.",
+  },
+  {
+    question: 'Peut-on suivre un BTS à distance chez Linova ?',
+    answer: "Oui, le BTS NDRC se suit à distance : cours sur notre plateforme e-learning, classes virtuelles en direct avec les formateurs et suivi individuel. Le BTS Biologie Médicale, lui, se déroule en présentiel car il comporte de nombreux travaux pratiques en laboratoire.",
   },
   {
     question: 'Votre école est-elle accessible aux personnes en situation de handicap ?',
-    answer: "Absolument. Notre campus est accessible aux personnes à mobilité réduite et nous proposons des aménagements pédagogiques adaptés. Un référent handicap est disponible pour accompagner chaque étudiant dans son parcours.",
+    answer: "Absolument. Notre campus est accessible aux personnes à mobilité réduite et nous proposons des aménagements pédagogiques adaptés, en présentiel comme à distance. Un référent handicap est disponible pour accompagner chaque étudiant dans son parcours.",
   },
   {
     question: 'Comment se déroulent les évaluations ?',
-    answer: "Les évaluations combinent un contrôle continu et des examens finaux (écrits, oraux et pratiques). Le BTS comporte 9 unités d'évaluation avec des coefficients allant de 2 à 6.",
+    answer: "Chaque BTS combine des évaluations régulières pendant la formation (devoirs, quiz, BTS blancs) et les épreuves de l'examen national (écrites, orales et pratiques), définies par le référentiel du diplôme.",
   },
   {
     question: 'Quels sont les débouchés après le BTS ?',
-    answer: "Les débouchés sont nombreux : technicien de laboratoire médical, préleveur, technicien qualité, technicien en anatomopathologie... Vous pouvez exercer en hôpital, laboratoire privé, centre de recherche ou industrie pharmaceutique.",
-  },
-  {
-    question: 'Peut-on poursuivre ses études après le BTS ?',
-    answer: "Oui, vous pouvez poursuivre en licence professionnelle bio-analyses et biotechnologies, BUT, DETLM ou encore à l'international dans le domaine de la santé.",
+    answer: "Après le BTS Biologie Médicale : technicien de laboratoire médical, préleveur, technicien qualité... Après le BTS NDRC : commercial, conseiller clientèle, chargé d'affaires, animateur de réseau... Les deux diplômes permettent aussi de poursuivre en licence professionnelle ou en bachelor.",
   },
 ];
 
@@ -93,18 +128,18 @@ export default function Home() {
             {/* Right: Text */}
             <div className="order-1 lg:order-2">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-dark leading-tight">
-                UNE ÉCOLE DÉDIÉE
+                LA PRÉPARATION
                 <br />
-                <span className="text-teal">AUX MÉTIERS DE</span>
+                <span className="text-teal">D&apos;EXCELLENCE</span>
                 <br />
-                <span className="text-teal">LA SANTÉ</span>
+                <span className="text-teal">AU BTS</span>
               </h1>
               <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-xl">
-                Nous formons les professionnels de demain capables d&apos;évoluer dans des environnements exigeants : laboratoires, établissements de soins, structures médico-sociales... Notre objectif est clair : transmettre une expertise rigoureuse et aider chaque étudiant à construire un projet professionnel ancré dans le réel.
+                Linova prépare aux BTS, diplômes nationaux d&apos;État, en formation initiale et en alternance, sur notre campus parisien ou à distance. Notre objectif est clair : transmettre une expertise rigoureuse et aider chaque étudiant à décrocher son diplôme et à construire un projet professionnel ancré dans le réel.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
-                  href="/formations/bts-biologie-medicale"
+                  href="/#formations"
                   className="px-8 py-3.5 bg-yellow text-dark font-semibold rounded-full hover:brightness-95 transition-all text-lg"
                 >
                   Découvrir nos formations
@@ -130,7 +165,7 @@ export default function Home() {
                   </svg>
                 ),
                 title: 'PROFESSIONNALISER AVEC EXIGENCE',
-                description: "Notre pédagogie combine rigueur scientifique et pratique de terrain pour former des professionnels immédiatement opérationnels.",
+                description: "Notre pédagogie combine rigueur académique et pratique de terrain pour former des professionnels immédiatement opérationnels.",
               },
               {
                 icon: (
@@ -148,7 +183,7 @@ export default function Home() {
                   </svg>
                 ),
                 title: 'DES EXPERTS, CONNECTÉS AU TERRAIN',
-                description: "Nos enseignants sont des professionnels en activité : biologistes, techniciens, cadres de santé. Ils transmettent un savoir-faire concret.",
+                description: "Nos enseignants sont des professionnels en activité dans leur domaine, de la santé au commerce. Ils transmettent un savoir-faire concret.",
               },
             ].map((pillar, i) => (
               <div key={i} className="group bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl hover:border-teal/20 transition-all duration-300">
@@ -167,15 +202,15 @@ export default function Home() {
       <section className="py-20 bg-navy">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
-            Un secteur en pleine croissance
+            Linova en bref
           </h2>
           <p className="text-gray-300 text-center mb-16 max-w-2xl mx-auto">
-            La biologie médicale est un secteur porteur avec des besoins de recrutement croissants.
+            Une école certifiée Qualiopi, qui prépare aux BTS en initial et en alternance.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
             {stats.map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-yellow mb-2">{stat.value}</div>
+                <div className="text-3xl md:text-4xl font-bold text-yellow mb-2">{stat.value}</div>
                 <p className="text-sm text-gray-300">{stat.label}</p>
               </div>
             ))}
@@ -183,62 +218,63 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Formation highlight */}
-      <section className="py-20">
+      {/* Formations */}
+      <section id="formations" className="py-20 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <span className="inline-block px-4 py-1.5 bg-teal/10 text-teal text-sm font-semibold rounded-full mb-6">
-                Notre formation
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-dark mb-6">
-                BTS Biologie Médicale
-              </h2>
-              <p className="text-gray-600 leading-relaxed mb-6">
-                Un diplôme national en 2 ans pour devenir technicien de laboratoire médical. Formation disponible en initial et en alternance, certifiée RNCP 40027.
-              </p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  '1 350 heures de formation',
-                  'Alternance : 2 jours école / 3 jours entreprise',
-                  'Stage : 14 semaines en formation initiale',
-                  'Certification Qualiopi',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <svg className="w-5 h-5 text-teal flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/formations/bts-biologie-medicale"
-                className="inline-flex items-center gap-2 px-8 py-3.5 bg-yellow text-dark font-semibold rounded-full hover:brightness-95 transition-all"
-              >
-                En savoir plus
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-            <div className="relative">
-              <div className="relative rounded-3xl aspect-[4/3] overflow-hidden">
-                <Image
-                  src="/images/photos/etudiants-labo.png"
-                  alt="Etudiants en travaux pratiques au laboratoire"
-                  fill
-                  className="object-cover"
-                />
+          <div className="text-center mb-12">
+            <span className="inline-block px-4 py-1.5 bg-teal/10 text-teal text-sm font-semibold rounded-full mb-6">
+              Nos formations
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">
+              Deux BTS, deux façons d&apos;apprendre
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Des diplômes nationaux de niveau bac+2, reconnus par l&apos;État et enregistrés au RNCP.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {formations.map((f) => (
+              <div key={f.href} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-shadow flex flex-col">
+                <div className="relative aspect-[16/9]">
+                  <Image src={f.image} alt={f.alt} fill className="object-cover" />
+                  <span className="absolute top-4 left-4 px-3 py-1 bg-white text-dark text-xs font-semibold rounded-full shadow">
+                    {f.badge}
+                  </span>
+                </div>
+                <div className="p-8 flex flex-col flex-1">
+                  <div className="flex items-baseline justify-between gap-4 mb-3">
+                    <h3 className="text-2xl font-bold text-dark">{f.title}</h3>
+                    <span className="text-xs font-semibold text-teal whitespace-nowrap">{f.rncp}</span>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed mb-6">{f.description}</p>
+                  <ul className="space-y-3 mb-8">
+                    {f.points.map((item, i) => (
+                      <li key={i} className="flex items-center gap-3">
+                        <svg className="w-5 h-5 text-teal flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-gray-700">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-auto">
+                    <Link
+                      href={f.href}
+                      className="inline-flex items-center gap-2 px-8 py-3.5 bg-yellow text-dark font-semibold rounded-full hover:brightness-95 transition-all"
+                    >
+                      Découvrir la formation
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <div className="absolute -bottom-6 -left-6 bg-teal text-white p-6 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold">2027</div>
-                <div className="text-sm">1re session nationale</div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
+
 
       {/* Blog */}
       <section className="py-20 bg-gray">

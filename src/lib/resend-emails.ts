@@ -39,6 +39,8 @@ async function sendBrevoEmail(payload: {
   subject: string;
   htmlContent: string;
   replyTo?: { email: string; name?: string };
+  /** Pièces jointes : contenu encodé en base64 (format attendu par Brevo). */
+  attachment?: { name: string; content: string }[];
 }) {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) throw new Error('Missing BREVO_API_KEY');
@@ -58,6 +60,7 @@ async function sendBrevoEmail(payload: {
       subject,
       htmlContent: payload.htmlContent,
       replyTo: payload.replyTo,
+      ...(payload.attachment?.length ? { attachment: payload.attachment } : {}),
     }),
   });
 
@@ -412,5 +415,127 @@ export async function sendCandidatureRejected(params: BookingEmailParams) {
       body,
       footerNote: `Pour échanger : <a href="mailto:admissions@linova-education.fr" style="color:#182D3C;">admissions@linova-education.fr</a> · 01 89 71 99 44`,
     }),
+  });
+}
+
+// ─── Candidature avec CV (BTS NDRC en alternance) ───────────────────────────
+
+const RECRUTEMENT_EMAIL = 'recrutement@linova-education.fr';
+
+export interface CandidatureCvParams {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  formation: string;
+  birthDate?: string;
+  city?: string;
+  diploma?: string;
+  availability?: string;
+  message?: string;
+  sourceUrl?: string;
+  cv: { name: string; contentBase64: string };
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** Mail interne : la candidature et le CV en pièce jointe, sur la boîte recrutement. */
+export async function sendCandidatureCvToRecrutement(params: CandidatureCvParams) {
+  const fullName = `${params.firstName} ${params.lastName}`;
+  const rows: [string, string | undefined][] = [
+    ['Formation', params.formation],
+    ['Nom', fullName],
+    ['Email', params.email],
+    ['Téléphone', params.phone],
+    ['Date de naissance', params.birthDate],
+    ['Ville / code postal', params.city],
+    ['Dernier diplôme', params.diploma],
+    ['Disponibilité', params.availability],
+    ['Page', params.sourceUrl],
+  ];
+  const rowsHtml = rows
+    .filter(([, v]) => v)
+    .map(
+      ([label, v]) =>
+        `<tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong style="color:#182D3C;">${label} :</strong> ${escapeHtml(v as string)}</td></tr>`
+    )
+    .join('');
+
+  await sendBrevoEmail({
+    to: { email: RECRUTEMENT_EMAIL, name: 'Linova Recrutement' },
+    replyTo: { email: params.email, name: fullName },
+    subject: `Nouvelle candidature ${params.formation} — ${fullName}`,
+    attachment: [{ name: params.cv.name, content: params.cv.contentBase64 }],
+    htmlContent: `
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background-color:#F9F9F9;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F9F9F9;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;">
+          <tr>
+            <td style="background-color:#182D3C;padding:20px 40px;">
+              <h1 style="margin:0;color:#E6DC40;font-size:18px;font-weight:700;">Nouvelle candidature — ${escapeHtml(params.formation)}</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0">${rowsHtml}</table>
+              ${
+                params.message
+                  ? `<h3 style="margin:24px 0 8px;color:#182D3C;font-size:15px;">Message du candidat</h3>
+              <p style="margin:0;color:#555;font-size:14px;line-height:1.6;white-space:pre-wrap;">${escapeHtml(params.message)}</p>`
+                  : ''
+              }
+              <p style="margin:24px 0 0;color:#555;font-size:14px;">Le CV est en pièce jointe. Répondre à ce mail écrit directement au candidat.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`,
+  });
+}
+
+/** Accusé de réception envoyé au candidat. */
+export async function sendCandidatureCvAccuse(params: CandidatureCvParams) {
+  await sendBrevoEmail({
+    to: { email: params.email, name: `${params.firstName} ${params.lastName}` },
+    replyTo: { email: RECRUTEMENT_EMAIL, name: 'Linova Recrutement' },
+    subject: `Nous avons bien reçu votre candidature — Linova Éducation`,
+    htmlContent: `
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#202124;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
+    <tr>
+      <td style="padding:32px 28px 48px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:720px;margin:0;">
+          <tr>
+            <td style="font-size:15px;line-height:1.55;color:#202124;">
+              <p style="margin:0 0 16px;">Bonjour ${escapeHtml(params.firstName)},</p>
+              <p style="margin:0 0 16px;">Nous avons bien reçu votre candidature au <strong>${escapeHtml(params.formation)}</strong>, ainsi que votre CV. Merci de l'intérêt que vous portez à Linova Éducation.</p>
+              <p style="margin:0 0 16px;">Notre équipe étudie votre dossier et vous recontacte sous 5 jours ouvrés pour vous proposer un entretien.</p>
+              <p style="margin:0 0 16px;">Une question d'ici là ? Répondez simplement à ce mail ou écrivez-nous à <a href="mailto:${RECRUTEMENT_EMAIL}" style="color:#6DA3A4;">${RECRUTEMENT_EMAIL}</a>.</p>
+              <p style="margin:24px 0 0;">À très vite,<br />L'équipe Linova Éducation<br /><span style="color:#777;font-size:13px;">85 avenue Ledru-Rollin, 75012 Paris · 01 89 71 99 44</span></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`,
   });
 }

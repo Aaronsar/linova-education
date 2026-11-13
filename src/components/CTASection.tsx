@@ -4,7 +4,7 @@ import { CandidaterButton } from './CandidaterModal';
 
 export default function CTASection({
   title = "Prêt à rejoindre Linova ?",
-  description = "Faites le premier pas vers votre carrière dans les métiers de la santé.",
+  description = "Faites le premier pas vers votre BTS et votre futur métier.",
   primaryText = "Candidater",
   secondaryText = "Demander des informations",
 }: {
