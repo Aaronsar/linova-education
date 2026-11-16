@@ -160,7 +160,7 @@ export async function POST(request: Request) {
         city: params.city,
         last_diploma: params.diploma,
         formation,
-        motivation: params.message,
+        motivation_candidature: params.message,
         cv_url: cvUrl,
         cv_filename: params.cv.name,
       },
