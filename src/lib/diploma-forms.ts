@@ -18,6 +18,13 @@ export const DIPLOMA_FORMS = {
   etudiant: 'linova-formulaire-etudiant-hs21cc52',
   handicap: 'linova-formulaire-handicap-hsfc90df',
   dernieresPlaces: 'dernieres-places-linova-hsd04d92',
+  /**
+   * Candidature CV BTS NDRC. Le slug exact est fourni par le CRM Diploma ;
+   * en attendant on reprend le form "alternant" qui accepte les mêmes
+   * champs, surchargeable via DIPLOMA_CANDIDATURE_NDRC_SLUG.
+   */
+  candidatureNdrc:
+    process.env.DIPLOMA_CANDIDATURE_NDRC_SLUG || 'linova-formulaire-alternant-hs353368',
 } as const;
 
 export type DiplomaFormKey = keyof typeof DIPLOMA_FORMS;

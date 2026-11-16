@@ -11,6 +11,11 @@
 
 import { NextResponse } from 'next/server';
 import { sendCandidatureCvAccuse, sendCandidatureCvToRecrutement } from '@/lib/resend-emails';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { submitToDiplomaCrm } from '@/lib/diploma-crm';
+
+const CV_BUCKET = 'candidatures';
+const CV_SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365; // 1 an
 
 // Limite du corps de requête sur Vercel : 4,5 Mo. On garde une marge.
 const MAX_CV_BYTES = 4 * 1024 * 1024;
@@ -119,6 +124,49 @@ export async function POST(request: Request) {
     await sendCandidatureCvAccuse(params);
   } catch (err) {
     console.error('[candidature-cv] Accusé de réception non envoyé :', err);
+  }
+
+  // Dépôt du CV dans Supabase Storage + envoi au CRM Diploma. Ces étapes ne
+  // doivent pas faire échouer la candidature : si quelque chose casse, le
+  // recrutement a déjà reçu l'email, on log et on continue.
+  let cvUrl = '';
+  try {
+    const supabase = getSupabaseAdmin();
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const storagePath = `cv-ndrc/${stamp}-${params.cv.name}`;
+    const { error: upErr } = await supabase.storage.from(CV_BUCKET).upload(storagePath, bytes, {
+      contentType: cv.type || 'application/octet-stream',
+      upsert: false,
+    });
+    if (upErr) throw upErr;
+    const { data: signed, error: signErr } = await supabase.storage
+      .from(CV_BUCKET)
+      .createSignedUrl(storagePath, CV_SIGNED_URL_TTL_SECONDS);
+    if (signErr || !signed?.signedUrl) throw signErr || new Error('URL signée manquante');
+    cvUrl = signed.signedUrl;
+  } catch (err) {
+    console.error('[candidature-cv] Upload CV Supabase impossible :', err);
+  }
+
+  try {
+    await submitToDiplomaCrm({
+      form: 'candidatureNdrc',
+      sourceUrl: params.sourceUrl,
+      data: {
+        firstname: firstName,
+        lastname: lastName,
+        email,
+        phone,
+        city: params.city,
+        last_diploma: params.diploma,
+        formation,
+        motivation: params.message,
+        cv_url: cvUrl,
+        cv_filename: params.cv.name,
+      },
+    });
+  } catch (err) {
+    console.error('[candidature-cv] Envoi CRM Diploma impossible :', err);
   }
 
   return NextResponse.json({ success: true });
