@@ -40,3 +40,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# local-only helper scripts (one-shot/rattrapages)
+scripts/_*
+scripts/rattrape_*.mjs
+scripts/retry-failed-articles.mjs
+
+# docs internes à ne pas publier
+recap-paiements-*.pdf
