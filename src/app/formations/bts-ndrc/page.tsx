@@ -75,7 +75,7 @@ export default function BTSNDRCPage() {
               <p className="mt-6 text-gray-300 text-lg leading-relaxed max-w-lg">
                 Un diplôme national bac+2 pour devenir commercial, préparé en deux ans en contrat d&apos;apprentissage. Vous apprenez le métier en entreprise et suivez vos cours à distance, en direct avec vos formateurs, sur notre plateforme e-learning.
               </p>
-              <div className="mt-8 space-y-3">
+              <div className="mt-8 space-y-3 hidden md:block">
                 {[
                   { label: 'RNCP 38368', sublabel: 'Diplôme d\'État de niveau 5 (bac+2)' },
                   { label: 'Prérequis', sublabel: 'Baccalauréat ou titre de niveau 4' },
@@ -92,7 +92,20 @@ export default function BTSNDRCPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-8 flex flex-wrap gap-8">
+              <div className="mt-8 md:hidden rounded-2xl bg-yellow/10 border border-yellow/30 p-5">
+                <div className="flex items-start gap-3">
+                  <Check className="text-yellow" />
+                  <div>
+                    <p className="text-white font-semibold text-lg leading-snug">
+                      Admis au BTS, votre alternance est assurée.
+                    </p>
+                    <p className="text-gray-200 text-sm mt-2 leading-relaxed">
+                      Dès que votre candidature est validée, notre équipe vous présente directement des entreprises partenaires et vous accompagne jusqu&apos;à la signature de votre contrat d&apos;apprentissage.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-8 hidden md:flex flex-wrap gap-8">
                 {[
                   { value: '2 ans', label: 'Durée' },
                   { value: '1 350 h', label: 'Formation' },
