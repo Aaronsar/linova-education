@@ -45,6 +45,7 @@ export default function CandidatureCvForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
 
   const canSubmit =
     firstname.trim() && lastname.trim() && isValidEmail(email) && phone.trim() && cv && consent && !submitting;
@@ -186,12 +187,38 @@ export default function CandidatureCvForm({
           <label htmlFor="cv-file" className={labelClass}>Votre CV * (PDF, DOC ou DOCX — 4 Mo maximum)</label>
           <label
             htmlFor="cv-file"
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 hover:border-teal cursor-pointer transition-colors"
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!dragOver) setDragOver(true);
+            }}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragOver(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragOver(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragOver(false);
+              const file = e.dataTransfer.files?.[0];
+              if (file) handleFile(file);
+            }}
+            className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
+              dragOver ? 'border-teal bg-teal/5' : 'border-gray-300 hover:border-teal'
+            }`}
           >
             <svg className="w-5 h-5 text-teal flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0-12l-4 4m4-4l4 4" />
             </svg>
-            <span className="text-sm text-gray-600 truncate">{cv ? cv.name : 'Cliquez pour déposer votre CV'}</span>
+            <span className="text-sm text-gray-600 truncate">
+              {cv ? cv.name : dragOver ? 'Déposez votre CV ici' : 'Glissez votre CV ici ou cliquez pour le déposer'}
+            </span>
           </label>
           <input
             id="cv-file"
