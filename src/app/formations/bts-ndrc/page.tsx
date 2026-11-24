@@ -62,7 +62,7 @@ export default function BTSNDRCPage() {
       <section className="pt-32 pb-20 bg-navy">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            <div>
+            <div className="order-1 lg:order-none lg:col-start-1 lg:row-start-1">
               <div className="flex flex-wrap gap-2 mb-6">
                 <span className="inline-block px-4 py-1.5 bg-yellow text-dark text-sm font-semibold rounded-full">Alternance uniquement</span>
                 <span className="inline-block px-4 py-1.5 bg-white/10 text-white text-sm font-semibold rounded-full">100 % à distance</span>
@@ -72,7 +72,7 @@ export default function BTSNDRCPage() {
                 BTS <span className="text-teal italic">NDRC</span> en alternance
               </h1>
               <p className="mt-3 text-xl text-gray-200 font-medium">Négociation et Digitalisation de la Relation Client</p>
-              <p className="mt-6 text-gray-300 text-lg leading-relaxed max-w-lg">
+              <p className="hidden md:block mt-6 text-gray-300 text-lg leading-relaxed max-w-lg">
                 Un diplôme national bac+2 pour devenir commercial, préparé en deux ans en contrat d&apos;apprentissage. Vous apprenez le métier en entreprise et suivez vos cours à distance, en direct avec vos formateurs, sur notre plateforme e-learning.
               </p>
               <div className="mt-8 space-y-3 hidden md:block">
@@ -92,19 +92,6 @@ export default function BTSNDRCPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-8 md:hidden rounded-2xl bg-yellow/10 border border-yellow/30 p-5">
-                <div className="flex items-start gap-3">
-                  <Check className="text-yellow" />
-                  <div>
-                    <p className="text-white font-semibold text-lg leading-snug">
-                      Admis au BTS, votre alternance est assurée.
-                    </p>
-                    <p className="text-gray-200 text-sm mt-2 leading-relaxed">
-                      Dès que votre candidature est validée, notre équipe vous présente directement des entreprises partenaires et vous accompagne jusqu&apos;à la signature de votre contrat d&apos;apprentissage.
-                    </p>
-                  </div>
-                </div>
-              </div>
               <div className="mt-8 hidden md:flex flex-wrap gap-8">
                 {[
                   { value: '2 ans', label: 'Durée' },
@@ -119,8 +106,21 @@ export default function BTSNDRCPage() {
                 ))}
               </div>
             </div>
-            <div id="candidater" className="scroll-mt-28">
+            <div id="candidater" className="scroll-mt-28 order-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-2">
               <CandidatureCvForm />
+            </div>
+            <div className="order-3 lg:order-none lg:col-start-1 lg:row-start-2 md:hidden rounded-2xl bg-yellow/10 border border-yellow/30 p-5">
+              <div className="flex items-start gap-3">
+                <Check className="text-yellow" />
+                <div>
+                  <p className="text-white font-semibold text-lg leading-snug">
+                    Admis au BTS, votre alternance est assurée.
+                  </p>
+                  <p className="text-gray-200 text-sm mt-2 leading-relaxed">
+                    Dès que votre candidature est validée, notre équipe vous présente directement des entreprises partenaires et vous accompagne jusqu&apos;à la signature de votre contrat d&apos;apprentissage.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
