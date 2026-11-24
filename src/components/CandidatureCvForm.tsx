@@ -1,16 +1,13 @@
 'use client';
 
 /**
- * Formulaire de candidature avec dépôt de CV (BTS NDRC en alternance).
- * Envoie tout à /api/candidature-cv, qui transmet la candidature et le CV
+ * Formulaire de candidature (BTS NDRC en alternance).
+ * Envoie tout à /api/candidature-cv, qui transmet la candidature
  * à recrutement@linova-education.fr.
  */
 
 import { useState } from 'react';
 import { trackPixelEvent } from './MetaPixel';
-
-const MAX_CV_BYTES = 4 * 1024 * 1024;
-const ACCEPT = '.pdf,.doc,.docx';
 
 const DIPLOMES = [
   'Terminale en cours',
@@ -26,7 +23,7 @@ const isValidEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 export default function CandidatureCvForm({
   formation = 'bts-ndrc',
   title = 'Candidater au BTS NDRC en alternance',
-  subtitle = 'Déposez votre CV : nous vous recontactons sous 5 jours ouvrés.',
+  subtitle = 'Nous vous recontactons sous 5 jours ouvrés.',
 }: {
   formation?: string;
   title?: string;
@@ -39,40 +36,18 @@ export default function CandidatureCvForm({
   const [city, setCity] = useState('');
   const [diploma, setDiploma] = useState('');
   const [message, setMessage] = useState('');
-  const [cv, setCv] = useState<File | null>(null);
   const [consent, setConsent] = useState(false);
   const [hp, setHp] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
 
   const canSubmit =
-    firstname.trim() && lastname.trim() && isValidEmail(email) && phone.trim() && cv && consent && !submitting;
-
-  function handleFile(file: File | null) {
-    setError(null);
-    if (!file) {
-      setCv(null);
-      return;
-    }
-    const ext = (file.name.split('.').pop() || '').toLowerCase();
-    if (!['pdf', 'doc', 'docx'].includes(ext)) {
-      setCv(null);
-      setError('Format non accepté. Formats acceptés : PDF, DOC, DOCX.');
-      return;
-    }
-    if (file.size > MAX_CV_BYTES) {
-      setCv(null);
-      setError('Votre CV dépasse 4 Mo. Merci de joindre un fichier plus léger.');
-      return;
-    }
-    setCv(file);
-  }
+    firstname.trim() && lastname.trim() && isValidEmail(email) && phone.trim() && consent && !submitting;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canSubmit || !cv) return;
+    if (!canSubmit) return;
     setSubmitting(true);
     setError(null);
 
@@ -88,7 +63,6 @@ export default function CandidatureCvForm({
     body.set('consent', 'oui');
     body.set('hp', hp);
     body.set('source_url', window.location.href);
-    body.set('cv', cv);
 
     try {
       const res = await fetch('/api/candidature-cv', { method: 'POST', body });
@@ -132,7 +106,7 @@ export default function CandidatureCvForm({
         </div>
         <h3 className="font-bold text-dark text-lg mb-2">Candidature envoyée !</h3>
         <p className="text-sm text-gray-500">
-          Merci {firstname}, nous avons bien reçu votre CV. Un e-mail de confirmation vient de vous être envoyé et notre
+          Merci {firstname}, nous avons bien reçu votre candidature. Un e-mail de confirmation vient de vous être envoyé et notre
           équipe vous recontacte sous 5 jours ouvrés.
         </p>
       </div>
@@ -184,52 +158,6 @@ export default function CandidatureCvForm({
         </div>
 
         <div>
-          <label htmlFor="cv-file" className={labelClass}>Votre CV * (PDF, DOC ou DOCX — 4 Mo maximum)</label>
-          <label
-            htmlFor="cv-file"
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!dragOver) setDragOver(true);
-            }}
-            onDragEnter={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setDragOver(true);
-            }}
-            onDragLeave={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setDragOver(false);
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setDragOver(false);
-              const file = e.dataTransfer.files?.[0];
-              if (file) handleFile(file);
-            }}
-            className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
-              dragOver ? 'border-teal bg-teal/5' : 'border-gray-300 hover:border-teal'
-            }`}
-          >
-            <svg className="w-5 h-5 text-teal flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0-12l-4 4m4-4l4 4" />
-            </svg>
-            <span className="text-sm text-gray-600 truncate">
-              {cv ? cv.name : dragOver ? 'Déposez votre CV ici' : 'Glissez votre CV ici ou cliquez pour le déposer'}
-            </span>
-          </label>
-          <input
-            id="cv-file"
-            type="file"
-            accept={ACCEPT}
-            onChange={(e) => handleFile(e.target.files?.[0] || null)}
-            className="sr-only"
-          />
-        </div>
-
-        <div>
           <label htmlFor="cv-message" className={labelClass}>Votre motivation en quelques mots</label>
           <textarea id="cv-message" value={message} onChange={(e) => setMessage(e.target.value)} rows={3} maxLength={2000} className={inputClass} />
         </div>
@@ -237,7 +165,7 @@ export default function CandidatureCvForm({
         <label className="flex items-start gap-2 text-xs text-gray-500 leading-relaxed cursor-pointer">
           <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 accent-[#6DA3A4]" required />
           <span>
-            J&apos;accepte que Linova Éducation utilise ces informations et mon CV pour étudier ma candidature, me
+            J&apos;accepte que Linova Éducation utilise ces informations pour étudier ma candidature, me
             recontacter et me présenter aux entreprises qui recrutent en alternance. *
           </span>
         </label>

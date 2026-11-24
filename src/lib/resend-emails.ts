@@ -434,7 +434,7 @@ export interface CandidatureCvParams {
   availability?: string;
   message?: string;
   sourceUrl?: string;
-  cv: { name: string; contentBase64: string };
+  cv?: { name: string; contentBase64: string };
 }
 
 function escapeHtml(value: string): string {
@@ -471,7 +471,7 @@ export async function sendCandidatureCvToRecrutement(params: CandidatureCvParams
     to: { email: RECRUTEMENT_EMAIL, name: 'Linova Recrutement' },
     replyTo: { email: params.email, name: fullName },
     subject: `Nouvelle candidature ${params.formation} — ${fullName}`,
-    attachment: [{ name: params.cv.name, content: params.cv.contentBase64 }],
+    ...(params.cv ? { attachment: [{ name: params.cv.name, content: params.cv.contentBase64 }] } : {}),
     htmlContent: `
 <!DOCTYPE html>
 <html lang="fr">
@@ -495,7 +495,7 @@ export async function sendCandidatureCvToRecrutement(params: CandidatureCvParams
               <p style="margin:0;color:#555;font-size:14px;line-height:1.6;white-space:pre-wrap;">${escapeHtml(params.message)}</p>`
                   : ''
               }
-              <p style="margin:24px 0 0;color:#555;font-size:14px;">Le CV est en pièce jointe. Répondre à ce mail écrit directement au candidat.</p>
+              <p style="margin:24px 0 0;color:#555;font-size:14px;">Répondre à ce mail écrit directement au candidat.</p>
             </td>
           </tr>
         </table>
@@ -525,7 +525,7 @@ export async function sendCandidatureCvAccuse(params: CandidatureCvParams) {
           <tr>
             <td style="font-size:15px;line-height:1.55;color:#202124;">
               <p style="margin:0 0 16px;">Bonjour ${escapeHtml(params.firstName)},</p>
-              <p style="margin:0 0 16px;">Nous avons bien reçu votre candidature au <strong>${escapeHtml(params.formation)}</strong>, ainsi que votre CV. Merci de l'intérêt que vous portez à Linova Éducation.</p>
+              <p style="margin:0 0 16px;">Nous avons bien reçu votre candidature au <strong>${escapeHtml(params.formation)}</strong>. Merci de l'intérêt que vous portez à Linova Éducation.</p>
               <p style="margin:0 0 16px;"><strong>À la clé : nous avons actuellement 19 places en alternance à pourvoir.</strong> Il s'agit de postes en bureau, dans les Hauts-de-Seine (92), avec un salaire fixe auquel s'ajoutent des commissions.</p>
               <p style="margin:0 0 16px;">Notre équipe étudie votre dossier et vous recontacte sous 5 jours ouvrés pour vous proposer un entretien.</p>
               <p style="margin:0 0 16px;">Une question d'ici là ? Répondez simplement à ce mail ou écrivez-nous à <a href="mailto:${RECRUTEMENT_EMAIL}" style="color:#6DA3A4;">${RECRUTEMENT_EMAIL}</a>.</p>
